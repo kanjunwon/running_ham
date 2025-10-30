@@ -1,3 +1,5 @@
+// 메인페이지 로직 코드
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';
@@ -56,10 +58,9 @@ class _MainScreenState extends State<MainScreen> {
     super.dispose();
   }
 
-  // build 함수가 1줄로 줄어듦!
   @override
   Widget build(BuildContext context) {
-    // 로직은 UI를 호출하고, 걸음 수(_steps) 데이터만 전달!
+    // 로직은 UI를 호출, 걸음 수(_steps) 데이터만 전달
     return MainScreenUI(steps: _steps);
   }
 }

@@ -1,9 +1,9 @@
 // 메인페이지 UI 코드 (피그마로 그대로 옮겨서 줄여야함)
 
 import 'package:flutter/material.dart';
-import 'package:running_ham/screens/record_screen.dart';
-import 'package:running_ham/screens/store_screen.dart';
-import 'package:running_ham/screens/inventory_screen.dart';
+import 'package:running_ham/screens/record_screen/record_screen.dart';
+import 'package:running_ham/screens/store_screen/store_screen.dart';
+import 'package:running_ham/screens/inventory_screen/inventory_screen.dart';
 
 // UI만 담당 StatelessWidget
 class MainScreenUI extends StatelessWidget {
@@ -100,7 +100,7 @@ class MainScreenUI extends StatelessWidget {
                           ),
                           Row(
                             children: [
-                              IconButton(
+                              IconButton( // 알람이 아닌, 도토리가 들어가야함
                                 icon: Icon(Icons.notifications_outlined, color: Colors.grey.shade700),
                                 onPressed: () { print("Notifications tapped"); },
                               ),
@@ -284,9 +284,7 @@ class MainScreenUI extends StatelessWidget {
     );
   }
 
-  //
   // --- (여기부터는 '헬퍼 함수'들) ---
-  //
   Widget _buildProgressBar(int currentSteps) {
     const goalSteps = 10000;
     const reward1Steps = 5000;
