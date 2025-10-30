@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:running_ham/screens/main_screen.dart'; // [중요!] 우리 메인 화면 불러오기
+import 'package:running_ham/screens/main_screen/main_screen.dart'; // 메인화면 import
 
 void main() {
   runApp(const RunningHamApp());
@@ -13,11 +13,10 @@ class RunningHamApp extends StatelessWidget {
     return MaterialApp(
       title: '러닝햄',
       theme: ThemeData(
-         // 나중에 피그마 디자인에 맞춰서 흰색 배경(라이트 모드)으로 고정하자
+         // 나중에 피그마 디자인에 맞춰서 수정해야함 (다크 or 라이트)
          // brightness: Brightness.light, 
       ),
       
-      // [핵심!] 뼈대 다 없애고, 'MainScreen'을 유일한 홈으로 지정!
       home: MainScreen(), 
     );
   }
