@@ -25,3 +25,24 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # 이미지 UI 경로
+  assets:
+    - assets/images/main_images/
+    - assets/images/record_images/
+    - assets/images/store_images/
+    - assets/images/inventory_images/
+
+  # 폰트 경로
+  fonts:
+    - family: Recipekorea
+      fonts:
+        - asset: assets/fonts/Recipekorea.ttf
+
+    - family: AppleSDGothicNeoB00
+      fonts:
+        - asset: assets/fonts/AppleSDGothicNeoB.ttf
+
+    - family: AppleSDGothicNeoM00
+      fonts:
+        - asset: assets/fonts/AppleSDGothicNeoM.ttf

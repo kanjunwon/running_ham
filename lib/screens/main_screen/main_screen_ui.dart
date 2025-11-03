@@ -1,5 +1,3 @@
-// 메인페이지 UI 코드 (피그마로 그대로 옮겨서 줄여야함)
-
 import 'package:flutter/material.dart';
 import 'package:running_ham/screens/record_screen/record_screen.dart';
 import 'package:running_ham/screens/store_screen/store_screen.dart';
@@ -14,7 +12,6 @@ class MainScreenUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 피그마 코드 덩어리 << 줄여야 함.
     final screenWidth = MediaQuery.of(context).size.width;
     const designWidth = 390.0;
 
@@ -28,6 +25,29 @@ class MainScreenUI extends StatelessWidget {
             child: Stack(
               clipBehavior: Clip.none,
               children: [
+                // 톳밥 (바닥 배경)
+                Positioned(
+                  top: 400, // 햄스터 발밑 좌표
+                  left: 0,
+                  right: 0,
+                  height: 300, // 톳밥 높이
+                  child: Image.asset(
+                    'assets/images/main_images/ground.png',
+                    fit: BoxFit.fill, // 화면에 꽉 차게
+                  ),
+                ),
+
+                Positioned(
+                  // 챗바퀴
+                  top: 195,  // 햄스터랑 비슷한 위치 (값 조절하기)
+                  left: -60,  // 왼쪽으로 치우치게 (값 조절하기)
+                  child: Image.asset(
+                    'assets/images/main_images/chat_normal_back.png',
+                    width: 259, // 햄스터보다 조금 작게 (값 조절하기)
+                    height: 261,
+                  ),
+                ),
+
                 Positioned(
                   left: 0,
                   top: 582,
@@ -43,20 +63,31 @@ class MainScreenUI extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                // 밥그릇
                 Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 150,
+                  top: 410,   // 햄스터: 180
+                  right: 10,   // 햄스터 중앙보다 오른쪽
+                  child: Image.asset(
+                    'assets/images/main_images/food_normal_back.png',
+                    width: 133,
+                    height: 72,
+                  ),
+                ),
+
+                Positioned(
+                  // 김햄찌
+                  left: 30,
+                  right: 30,
+                  top: 250,
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Container(
-                      width: 250,
-                      height: 250,
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage("https://placehold.co/250x250/EFEFEF/AAAAAA&text=Hamster"),
-                          fit: BoxFit.contain,
-                        ),
+                      width: 231,
+                      height: 262,
+                      child: Image.asset(
+                        'assets/images/main_images/ham_1.png',
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
@@ -96,17 +127,21 @@ class MainScreenUI extends StatelessWidget {
                         children: [
                           IconButton(
                             icon: Icon(Icons.settings_outlined, color: Colors.grey.shade700),
-                            onPressed: () { print("Settings tapped"); },
+                            onPressed: () {
+                              print("Settings tapped");
+                            },
                           ),
+
                           Row(
                             children: [
-                              IconButton( // 알람이 아닌, 도토리가 들어가야함
-                                icon: Icon(Icons.notifications_outlined, color: Colors.grey.shade700),
-                                onPressed: () { print("Notifications tapped"); },
+                              // 도토리 아이콘
+                              Image.asset(
+                                'assets/images/main_images/money_main_back.png',
+                                width: 20,
+                                height: 20,
                               ),
-                              const SizedBox(width: 0),
-                              Icon(Icons.grain_rounded, color: Colors.brown.shade400, size: 20),
                               const SizedBox(width: 4),
+                              // 2. 재화 (150)
                               Text(
                                 '150',
                                 style: TextStyle(
@@ -115,7 +150,14 @@ class MainScreenUI extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(width: 5),
+                              const SizedBox(width: 8), // 재화와 알람 사이 간격
+                              // 알람 아이콘 (종 모양)
+                              IconButton(
+                                icon: Icon(Icons.notifications_outlined, color: Colors.grey.shade700),
+                                onPressed: () {
+                                  print("Notifications tapped");
+                                },
+                              ),
                             ],
                           ),
                         ],
@@ -123,6 +165,7 @@ class MainScreenUI extends StatelessWidget {
                     ),
                   ),
                 ),
+
                 Positioned(
                   left: 20,
                   top: 111 + 30,
@@ -131,9 +174,12 @@ class MainScreenUI extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.grey.shade800,
                       fontSize: 15,
+                      fontFamily: 'Recipekrea',
+                      fontWeight: FontWeight.bold
                     ),
                   ),
                 ),
+
                 Positioned(
                   left: 20,
                   top: 140 + 30,
@@ -141,7 +187,7 @@ class MainScreenUI extends StatelessWidget {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: steps < 0 ? (steps == -1 ? '!' : '?') : '$steps', // [수정!] _steps -> steps
+                          text: steps < 0 ? (steps == -1 ? '!' : '?') : '$steps',
                           style: const TextStyle(
                             color: Color(0xFFE45151),
                             fontSize: 32,
@@ -152,21 +198,21 @@ class MainScreenUI extends StatelessWidget {
                         const TextSpan(
                           text: ' 걸음',
                           style: TextStyle(
-                            color: Color(0xFF1A1A1A),
-                            fontSize: 16,
-                            fontFamily: 'AppleSDGothicNeoB00',
-                            fontWeight: FontWeight.w400,
-                            height: 2.2
-                          ),
+                              color: Color(0xFF1A1A1A),
+                              fontSize: 16,
+                              fontFamily: 'AppleSDGothicNeoB',
+                              fontWeight: FontWeight.w400,
+                              height: 2.2),
                         ),
                       ],
                     ),
                   ),
                 ),
+
                 Positioned(
                   left: 0,
                   right: 0,
-                  top: 410,
+                  top: 500,
                   child: Text(
                     '김햄찌',
                     textAlign: TextAlign.center,
@@ -178,6 +224,18 @@ class MainScreenUI extends StatelessWidget {
                     ),
                   ),
                 ),
+
+                // 물그릇
+                Positioned(
+                  top: 150,    // 햄스터: 180
+                  right: -50,   // 햄스터 중앙보다 오른쪽
+                  child: Image.asset(
+                    'assets/images/main_images/water_normal_back.png',
+                    width: 119,
+                    height: 231, // (물통은 길쭉하니까)
+                  ),
+                ),
+
                 Positioned(
                   left: 20,
                   right: 20,
@@ -218,7 +276,7 @@ class MainScreenUI extends StatelessWidget {
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 16,
-                                  fontFamily: 'AppleSDGothicNeoB00',
+                                  fontFamily: 'AppleSDGothicNeoB',
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
@@ -226,18 +284,15 @@ class MainScreenUI extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        
-                        // [수정!] _steps -> steps
-                        _buildProgressBar(steps), 
-
+                        _buildProgressBar(steps),
                         const SizedBox(height: 30),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
+                            // 운동 기록
                             _buildMenuButton(
                               context: context,
-                              icon: Icons.directions_run,
-                              iconColor: Colors.orange.shade600,
+                              imagePath: 'assets/images/main_images/record_icon.png',
                               label: '운동 기록',
                               onTap: () {
                                 Navigator.push(
@@ -246,10 +301,11 @@ class MainScreenUI extends StatelessWidget {
                                 );
                               },
                             ),
+
+                            // 상점
                             _buildMenuButton(
                               context: context,
-                              icon: Icons.store_outlined,
-                              iconColor: Colors.blue.shade600,
+                              imagePath: 'assets/images/main_images/store_icon.png',
                               label: '상점',
                               onTap: () {
                                 Navigator.push(
@@ -258,10 +314,11 @@ class MainScreenUI extends StatelessWidget {
                                 );
                               },
                             ),
+
+                            // 보관함
                             _buildMenuButton(
                               context: context,
-                              icon: Icons.inventory_2_outlined,
-                              iconColor: Colors.purple.shade600,
+                              imagePath: 'assets/images/main_images/inventory_icon.png',
                               label: '보관함',
                               onTap: () {
                                 Navigator.push(
@@ -285,6 +342,7 @@ class MainScreenUI extends StatelessWidget {
   }
 
   // --- (여기부터는 '헬퍼 함수'들) ---
+
   Widget _buildProgressBar(int currentSteps) {
     const goalSteps = 10000;
     const reward1Steps = 5000;
@@ -297,34 +355,38 @@ class MainScreenUI extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-          height: 15,
+          height: 15, // 라벨 텍스트가 표시될 여유 공간
           child: LayoutBuilder(
             builder: (context, constraints) {
               final barWidth = constraints.maxWidth;
               return Stack(
-                clipBehavior: Clip.none,
+                clipBehavior: Clip.none, // 밖으로 튀어나가도 보이게
                 children: [
+                  // '걸음 수' 텍스트만 남김 (도토리 아이콘 삭제)
                   Positioned(
                     left: 0,
-                    bottom: -15,
-                    child: Text('${steps < 0 ? 0 : steps}보', style: const TextStyle(fontSize: 12)), // [수정!] _steps -> steps
+                    bottom: -15, // 게이지 바 아래에 텍스트 배치
+                    child: Text('${steps < 0 ? 0 : steps}보', style: const TextStyle(fontSize: 15)),
                   ),
-                  Positioned(
+
+                  Positioned( 
                     left: barWidth * reward1Progress - 15,
                     bottom: -15,
-                    child: const Text('50개', style: TextStyle(fontSize: 12)),
+                    child: const Text('50개 ', style: TextStyle(fontSize: 15)),
                   ),
+
                   Positioned(
                     right: 0,
                     bottom: -15,
-                    child: const Text('100개', style: TextStyle(fontSize: 12)),
+                    child: const Text('100개', style: TextStyle(fontSize: 15)),
                   ),
                 ],
               );
             },
           ),
         ),
-        const SizedBox(height: 10 + 15),
+
+        const SizedBox(height: 10 + 15), // 라벨 높이만큼 간격 추가
         SizedBox(
           width: double.infinity,
           child: LayoutBuilder(
@@ -332,7 +394,9 @@ class MainScreenUI extends StatelessWidget {
               final barWidth = constraints.maxWidth;
               return Stack(
                 alignment: Alignment.centerLeft,
+                clipBehavior: Clip.none, // 밖으로 튀어나가는 도토리 보이게
                 children: [
+                  // 뒷 배경 바
                   Container(
                     width: barWidth,
                     height: 16,
@@ -343,6 +407,8 @@ class MainScreenUI extends StatelessWidget {
                       ),
                     ),
                   ),
+
+                  // 채워진 바
                   Container(
                     width: barWidth * progress,
                     height: 16,
@@ -353,14 +419,20 @@ class MainScreenUI extends StatelessWidget {
                       ),
                     ),
                   ),
+
+                  // 5000보 구분선
                   Positioned(
                     left: barWidth * reward1Progress - 1,
                     child: Container(width: 2, height: 16, color: Colors.white),
                   ),
+
+                  // 10000보 구분선
                   Positioned(
                     left: barWidth * reward2Progress - 1,
                     child: Container(width: 2, height: 16, color: Colors.white),
                   ),
+
+                  // 게이지 위 동그라미
                   Positioned(
                     left: (barWidth * progress - 10).clamp(0.0, barWidth - 20),
                     child: Container(
@@ -372,7 +444,25 @@ class MainScreenUI extends StatelessWidget {
                         border: Border.all(color: Colors.white, width: 2),
                       ),
                     ),
-                  )
+                  ),
+                  // '...보' 텍스트와 분리해서 게이지 바 Stack으로 옮김
+                  Positioned( 
+                    // 게이지 바 위에 딱 맞게 좌표 수정
+                    left: 0,
+                    top: -5, // 게이지 바(height: 16)의 중앙(-10) + 아이콘 높이(-10) = -5 (대충)
+                    child: Container(
+                      width: 26, // 아이콘 크기 (동그라미 보다 크게)
+                      height: 26,
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white, // 흰색 배경
+                          border: Border.all(color: const Color(0xFFE76F6F), width: 2)),
+                      child: Image.asset(
+                        'assets/images/main_images/money_main_back.png',
+                      ),
+                    ),
+                  ),
                 ],
               );
             },
@@ -384,9 +474,8 @@ class MainScreenUI extends StatelessWidget {
 
   Widget _buildMenuButton({
     required BuildContext context,
-    required IconData icon,
+    required String imagePath,
     required String label,
-    required Color iconColor,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
@@ -414,7 +503,11 @@ class MainScreenUI extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 35, color: iconColor),
+            Image.asset(
+              imagePath,
+              width: 35, // 가로 크기
+              height: 35, // 세로 크기
+            ),
             const SizedBox(height: 5),
             Text(
               label,
