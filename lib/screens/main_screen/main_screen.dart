@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:pedometer/pedometer.dart';  // 만보기 플러그인
 import 'package:permission_handler/permission_handler.dart';  // 권한 핸들러
 import 'package:running_ham/screens/main_screen/main_screen_ui.dart';   // UI 파일
+import 'package:running_ham/screens/main_screen/main_screen_widgets.dart'; // 헬퍼 함수
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase 로그인
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firebase DB
 
 // 햄스터 상태를 종류별로 정의
 enum HamsterState {
@@ -32,16 +35,41 @@ class _MainScreenState extends State<MainScreen> {
 HamsterState _hamsterState = HamsterState.normal; // 기본 상태로 시작
 final int _targetSteps = 5000;  // 목표 설음 수 (나중에 10000보 추가)
 
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState(); // 앱 시작 시, 로직 실행
-  }
+String? _userId; // 발급받은 유저 ID 저장할 변수
 
-  @override
-  void dispose() {
-    _stepCountStreamSubscription.cancel(); // 앱 종료 시 스트림 구독 취소
-    super.dispose();
+@override
+void initState() {
+  super.initState();
+    _initializeFirebaseAndLogin(); // 앱 시작 시, 로직 실행
+}
+
+@override
+void dispose() {
+  _stepCountStreamSubscription.cancel(); // 앱 종료 시 스트림 구독 취소
+  super.dispose();
+}
+
+// 초기화 및 익명 로그인 함수
+  Future<void> _initializeFirebaseAndLogin() async {
+    try {
+      //  익명으로 로그인 시도
+      final userCredential = await FirebaseAuth.instance.signInAnonymously();
+
+      // 로그인 성공 시 고유 ID (uid)를 변수에 저장
+      _userId = userCredential.user?.uid;
+      print("익명 로그인 성공! 유저 ID: $_userId"); // 터미널에 로그 찍기
+
+      if (_userId != null) {
+        // 만보기 센서 켜기
+        initPlatformState();
+      } else {
+        // ID 발급 실패 시
+        if (mounted) setState(() => _steps = -3); // 로그인 실패 에러
+      }
+    } catch (e) {
+      print("파이어베이스 익명 로그인 에러: $e");
+      if (mounted) setState(() => _steps = -3); // 로그인 실패 에러
+    }
   }
 
 // 만보기 센서 연결 함수 (권한 확인 포함)
