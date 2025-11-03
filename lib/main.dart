@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:running_ham/screens/main_screen/main_screen.dart'; // 메인화면 import
+import 'package:firebase_core/firebase_core.dart'; // Firebase
+import 'firebase_options.dart'; // Firebase 설정 파일
 
-void main() {
+void main() async {
+  // Flutter가 Firebase를 기다리도록 설정
+  WidgetsFlutterBinding.ensureInitialized(); 
+  
+  // Firebase 프로젝트 초기화
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const RunningHamApp());
 }
 

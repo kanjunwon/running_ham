@@ -59,6 +59,13 @@ class ProgressBar extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               final barWidth = constraints.maxWidth;
+              if (barWidth == 0) {
+                return const SizedBox(height: 20); // 0이면 빈 공간                
+              }
+              
+              final double maxHandleLeft = (barWidth - 20).clamp(0.0, double.infinity); // (barWidth - 20)이 음수가 되지 않도록, 0.0으로 최소값 고정
+              final double calculatedHandleLeft = barWidth * progress - 10; // 게이지 핸들의 계산된 위치
+
               return Stack(
                 alignment: Alignment.centerLeft,
                 clipBehavior: Clip.none, // 밖으로 튀어나가는 도토리 보이게
@@ -101,7 +108,39 @@ class ProgressBar extends StatelessWidget {
 
                   // 게이지 위 동그라미
                   Positioned(
-                    left: (barWidth * progress - 10).clamp(0.0, barWidth - 20),
+                    left: -3, // 게이지 바 시작점에 딱 맞추기
+                    top: -5, // 게이지 바 위로 살짝 올리기
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+
+                        // 빨간 테두리 동그라미 (배경)
+                        Container(
+                          width: 26,
+                          height: 26,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white, // 흰색 배경
+                              border: Border.all(
+                                  color: const Color(0xFFE76F6F), width: 2)),
+                        ),
+                        // 2. 도토리 아이콘 동그라미 위에 겹치기
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Image.asset(
+                            'assets/images/main_images/money_main_back.png',
+                            width: 14,
+                            height: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // 게이지 위 동그라미 (움직이는 핸들)
+                  Positioned(
+                    // clamp 로직 수정
+                    left: calculatedHandleLeft.clamp(0.0, maxHandleLeft), 
                     child: Container(
                       width: 20,
                       height: 20,
@@ -109,24 +148,6 @@ class ProgressBar extends StatelessWidget {
                         color: const Color(0xFFE76F6F),
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 2),
-                      ),
-                    ),
-                  ),
-                  // ...보 텍스트와 분리해서 게이지 바 Stack으로 옮김
-                  Positioned(
-                    // 게이지 바 위에 딱 맞게 좌표 수정
-                    left: 0,
-                    top: -5, // 게이지 바(height: 16)의 중앙(-10) + 아이콘 높이(-10) = -5 (대충)
-                    child: Container(
-                      width: 26, // 아이콘 크기 (동그라미 보다 크게)
-                      height: 26,
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white, // 흰색 배경
-                          border: Border.all(color: const Color(0xFFE76F6F), width: 2)),
-                      child: Image.asset(
-                        'assets/images/main_images/money_main_back.png',
                       ),
                     ),
                   ),
