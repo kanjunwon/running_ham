@@ -5,7 +5,7 @@ import 'package:running_ham/screens/main_screen/main_screen.dart'; // HamsterSta
 import 'package:running_ham/screens/record_screen/record_screen.dart';
 import 'package:running_ham/screens/store_screen/store_screen.dart';
 import 'package:running_ham/screens/inventory_screen/inventory_screen.dart';
-import 'package:running_ham/screens/main_screen/main_screen_widget.dart'; // 헬퍼 함수 코드 import
+import 'main_screen_widget.dart'; // 헬퍼 함수 코드 import
 
 // UI만 담당 StatelessWidget
 class MainScreenUI extends StatelessWidget {

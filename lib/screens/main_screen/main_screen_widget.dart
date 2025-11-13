@@ -32,20 +32,62 @@ class ProgressBar extends StatelessWidget {
               return Stack(
                 clipBehavior: Clip.none, // 밖으로 튀어나가도 보이게
                 children: [
+                  
                   Positioned(
                     left: 0,
                     bottom: -15, // 게이지 바 아래에 텍스트 배치
-                    child: Text('$displaySteps보', style: const TextStyle(fontSize: 15, fontFamily: 'AppleSDGothicNeoM00')),
+                    child: Row(
+                      children: [
+                        
+                        Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: 26,
+                              height: 26,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white, // 흰색 배경
+                                  border: Border.all(
+                                      color: const Color(0xFFE76F6F), width: 2)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Image.asset(
+                                'assets/images/main_images/money_main_back.png',
+                                width: 14,
+                                height: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        const SizedBox(width: 4), // 도토리와 텍스트 사이 간격
+
+                        Text('$displaySteps보',
+                            style: const TextStyle(
+                                fontSize: 15,
+                                fontFamily: 'AppleSDGothicNeoM00')),
+                      ],
+                    ),
                   ),
+
                   Positioned(
                     left: barWidth * reward1Progress - 15,
                     bottom: -15,
-                    child: const Text('50개 ', style: TextStyle(fontSize: 15, fontFamily: 'AppleSDGothicNeoM00')),
+                    child: const Text('50개 ',
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'AppleSDGothicNeoM00')),
                   ),
+
                   Positioned(
                     right: 0,
                     bottom: -15,
-                    child: const Text('100개', style: TextStyle(fontSize: 15, fontFamily: 'AppleSDGothicNeoM00')),
+                    child: const Text('100개',
+                        style: TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'AppleSDGothicNeoM00')),
                   ),
                 ],
               );
@@ -60,7 +102,7 @@ class ProgressBar extends StatelessWidget {
             builder: (context, constraints) {
               final barWidth = constraints.maxWidth;
               if (barWidth == 0) {
-                return const SizedBox(height: 20); // 0이면 빈 공간                
+                return const SizedBox(height: 20); // 0이면 빈 공간
               }
               
               final double maxHandleLeft = (barWidth - 20).clamp(0.0, double.infinity); // (barWidth - 20)이 음수가 되지 않도록, 0.0으로 최소값 고정
@@ -106,41 +148,9 @@ class ProgressBar extends StatelessWidget {
                     child: Container(width: 2, height: 16, color: Colors.white),
                   ),
 
-                  // 게이지 위 동그라미
-                  Positioned(
-                    left: -3, // 게이지 바 시작점에 딱 맞추기
-                    top: -5, // 게이지 바 위로 살짝 올리기
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-
-                        // 빨간 테두리 동그라미 (배경)
-                        Container(
-                          width: 26,
-                          height: 26,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white, // 흰색 배경
-                              border: Border.all(
-                                  color: const Color(0xFFE76F6F), width: 2)),
-                        ),
-                        // 2. 도토리 아이콘 동그라미 위에 겹치기
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Image.asset(
-                            'assets/images/main_images/money_main_back.png',
-                            width: 14,
-                            height: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // 게이지 위 동그라미 (움직이는 핸들)
                   Positioned(
                     // clamp 로직 수정
-                    left: calculatedHandleLeft.clamp(0.0, maxHandleLeft), 
+                    left: calculatedHandleLeft.clamp(0.0, maxHandleLeft),
                     child: Container(
                       width: 20,
                       height: 20,
@@ -214,7 +224,7 @@ class MenuButton extends StatelessWidget {
                 color: Colors.grey.shade800,
                 fontSize: 13,
                 fontFamily: 'AppleSDGothicNeoM00', // 폰트 적용
-                fontWeight: FontWeight.bold,    // 볼드체
+                fontWeight: FontWeight.bold, // 볼드체
               ),
             ),
           ],
