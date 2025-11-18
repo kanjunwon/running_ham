@@ -37,6 +37,9 @@ class _MainScreenState extends State<MainScreen> {
 
   String? _userId; // 발급받은 유저 ID 저장할 변수
 
+  // Firestore 인스턴스
+  final db = FirebaseFirestore.instance;
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +49,8 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void dispose() {
     _stepCountStreamSubscription?.cancel(); // 앱 종료 시 스트림 구독 취소
+    _saveUserData(); // 유저 데이터 저장
+
     super.dispose();
   }
 
@@ -55,13 +60,13 @@ class _MainScreenState extends State<MainScreen> {
       //  익명으로 로그인 시도
       final userCredential = await FirebaseAuth.instance.signInAnonymously();
 
-      // 로그인 성공 시 고유 ID (uid)를 변수에 저장
+      // 로그인 성공 시 고유 ID)를 변수에 저장
       _userId = userCredential.user?.uid;
       print("익명 로그인 성공! 유저 ID: $_userId"); // 터미널에 로그 찍기
 
       if (_userId != null && mounted) {
-        // 만보기 센서 켜기
-        initPlatformState();
+        await _loadUserData(); // 유저 데이터 불러오기
+        initPlatformState(); // 만보기 센서 연결 함수 호출
       } else {
         // ID 발급 실패 시
         if (mounted) setState(() => _steps = -3); // 로그인 실패 에러
@@ -72,7 +77,7 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-  // 만보기 센서 연결 함수 (권한 확인 포함)
+  // 만보기 센서 연결 함수
   Future<void> initPlatformState() async {
     // 신체 활동 권한부터 확인
     var status = await Permission.activityRecognition.status;
@@ -85,7 +90,7 @@ class _MainScreenState extends State<MainScreen> {
     if (status.isGranted) {
       startListening(); // 만보기 스트림 시작
     } else {
-      // 권한이 거부되면 걸음 수를 -1 (에러)로 표시
+      // 권한이 거부되면 걸음 수를 -1 에러로 표시
       if (mounted) {
         setState(() {
           _steps = -1; // 권한 없음 에러
@@ -114,7 +119,7 @@ class _MainScreenState extends State<MainScreen> {
         // 연속 미달 시 fat2 로직은 나중에 추가
       });
     }, onError: (error) {
-      // 에러 처리 (센서 없음 등)
+      // 에러 처리
       print("만보기 에러: $error");
       if (mounted) {
         setState(() {
@@ -124,10 +129,59 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  // 데이터 저장 함수
+  Future<void> _saveUserData() async {
+    if (_userId == null) return; // 비 로그인 시 저장 안 함
+
+    try {
+      // users 컬렉션에 _userId 문서로 데이터 저장
+      await db.collection('users').doc(_userId).set({
+        'steps': _steps, // 현재 걸음 수
+        'hamsterState': _hamsterState.toString(), // 현재 햄스터 상태
+        'lastSaved': FieldValue.serverTimestamp(), // 마지막 저장 시간 (서버 시간 기준)
+      }, SetOptions(merge: true)); // 덮어쓰되, 기존 필드 유지
+      print("[$_userId] 데이터 저장 성공: $_steps 보");
+    } catch (e) {
+      print("Firestore DB 저장 에러: $e");
+    }
+  }
+
+  // 데이터 불러오기 함수
+  Future<void> _loadUserData() async {
+    if (_userId == null) return; // 비 로그인 시 불러오기 안 함
+
+    try {
+      // users 컬렉션에서 _userId 문서를 가져옴
+      final docSnap = await db.collection('users').doc(_userId).get();
+
+      if (docSnap.exists && mounted) {
+        Map<String, dynamic> data = docSnap.data()!;
+        
+        setState(() { // setState로 UI 갱신
+          // DB 데이터로 로컬 변수 복원
+          _steps = data['steps'] ?? 0; // null일 경우 0으로
+          
+          String savedState = data['hamsterState'] ?? 'HamsterState.normal';
+          // 문자열을 다시 enum으로 변환
+          _hamsterState = HamsterState.values.firstWhere(
+              (e) => e.toString() == savedState,
+              orElse: () => HamsterState.normal); // 못찾으면 기본값
+        });
+        print("🔄 [$_userId] 데이터 불러오기/복원 성공: $_steps 보");
+        
+      } else { // 데이터가 없다면 → 신규 유저
+        print("[$_userId] 신규 유저. DB에 데이터 없음.");
+        // 기본값으로 _saveUserData 한번 호출해서 초기 문서 생성 가능
+      }
+    } catch (e) {
+      print("Firestore DB 불러오기 에러: $e");
+    }
+  }
+
   // build 함수 (UI 그리는 부분)
   @override
   Widget build(BuildContext context) {
-    // '로직' 파일은 UI 파일을 조립만 함
+    // 로직 파일은 UI 파일 조립
     return MainScreenUI(
       steps: _steps, // 현재 걸음 수 전달
       hamsterState: _hamsterState, // 현재 햄스터 상태 전달
