@@ -1,1097 +1,285 @@
-// 기록 화면
+import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart'; // <--- 1. 이거 추가!
+class RecordScreen extends StatefulWidget {
+  const RecordScreen({super.key});
 
-class RecordScreen extends StatelessWidget { // <--- 2. 이름 추가!
-  const RecordScreen({super.key}); // (이것도 추가해주면 더 좋아)
+  @override
+  State<RecordScreen> createState() => _RecordScreenState();
+}
+
+class _RecordScreenState extends State<RecordScreen> {
+  // [테스트용 데이터] (일, 월, 화, 수, 목, 금, 토)
+  final List<int> weeklySteps = [10500, 2000, 6000, 0, 0, 0, 0]; 
+  final List<String> weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          '기록',
+          style: TextStyle(
+            color: Color(0xFF4D3817),
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF4D3817)),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 1. 상단 통계
+            _buildTopStats(),
+
+            const SizedBox(height: 30),
+
+            // 2. 주간 기록 (그래프 수정됨!)
+            _buildSectionTitle("주간 기록"),
+            const SizedBox(height: 15),
+            _buildWeeklyChart(), // <--- 여기가 핵심!
+
+            const SizedBox(height: 30),
+
+            // 3. 월간 기록
+            _buildSectionTitle("월간 기록"),
+            const SizedBox(height: 15),
+            _buildMonthlyCalendar(),
+            
+            const SizedBox(height: 40),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // --- [위젯 조립 공장] ---
+
+  Widget _buildTopStats() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildStatItem("오늘 걸음 수", "5,102"),
+        _buildStatItem("이번 주 걸음 수", "18,030"),
+        _buildStatItem("이번 달 걸음 수", "18,030"),
+      ],
+    );
+  }
+
+  Widget _buildStatItem(String label, String count) {
     return Column(
       children: [
-        Container(
-          width: 390,
-          height: 844,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(color: Colors.white),
-          child: Stack(
-            children: [
-              Positioned(
-                left: 0,
-                top: 0,
-                child: Container(
-                  width: 390,
-                  height: 47,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 27,
-                        top: 14,
-                        child: Container(
-                          width: 54,
-                          height: 21,
-                          decoration: ShapeDecoration(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                left: 0,
-                                top: 1,
-                                child: SizedBox(
-                                  width: 54,
-                                  height: 20,
-                                  child: Text(
-                                    '9:41',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontFamily: 'SF Pro Text',
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.31,
-                                      letterSpacing: -0.32,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 336,
-                        top: 19,
-                        child: Container(
-                          width: 27.40,
-                          height: 13,
-                          child: Stack(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                top: 810,
-                child: Container(
-                  width: 390,
-                  height: 34,
-                  decoration: BoxDecoration(color: Colors.white),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 128,
-                        top: 21,
-                        child: Container(
-                          width: 134,
-                          height: 5,
-                          decoration: ShapeDecoration(
-                            color: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 18,
-                top: 59,
-                child: Container(
-                  width: 18,
-                  height: 18,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(),
-                  child: Stack(),
-                ),
-              ),
-              Positioned(
-                left: 181,
-                top: 59,
-                child: Text(
-                  '기록',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 16,
-                    fontFamily: 'AppleSDGothicNeoB00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 38,
-                top: 113,
-                child: Text(
-                  '오늘 걸음 수',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 12,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 43,
-                top: 138,
-                child: Text(
-                  '5,102',
-                  style: TextStyle(
-                    color: const Color(0xFFE45151),
-                    fontSize: 16,
-                    fontFamily: 'Recipekorea',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 157,
-                top: 113,
-                child: Text(
-                  '이번 주 걸음 수',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 12,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 161,
-                top: 138,
-                child: Text(
-                  '18,030',
-                  style: TextStyle(
-                    color: const Color(0xFFE45151),
-                    fontSize: 16,
-                    fontFamily: 'Recipekorea',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 278,
-                top: 113,
-                child: Text(
-                  '이번 달 걸음 수',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 12,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 283,
-                top: 138,
-                child: Text(
-                  '18,030',
-                  style: TextStyle(
-                    color: const Color(0xFFE45151),
-                    fontSize: 16,
-                    fontFamily: 'Recipekorea',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 20,
-                top: 223,
-                child: Container(
-                  width: 350,
-                  height: 260,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 93,
-                top: 253,
-                child: Container(
-                  width: 20,
-                  height: 192,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFE45151),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 129,
-                top: 416,
-                child: Container(
-                  width: 20,
-                  height: 29,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFFFC0C0),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 165,
-                top: 337,
-                child: Container(
-                  width: 20,
-                  height: 108,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFFC8F8F),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 204,
-                top: 445,
-                child: Container(
-                  width: 19,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFD9D9D9),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(8),
-                        bottomRight: Radius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 241,
-                top: 444.14,
-                child: Container(
-                  width: 19,
-                  height: 0.86,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFD9D9D9),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(8),
-                        bottomRight: Radius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 278,
-                top: 444.14,
-                child: Container(
-                  width: 19,
-                  height: 0.86,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFD9D9D9),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(8),
-                        bottomRight: Radius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 315,
-                top: 445,
-                child: Container(
-                  width: 19,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFD9D9D9),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(8),
-                        bottomRight: Radius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 133,
-                top: 449,
-                child: Text(
-                  'M',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 173,
-                top: 449,
-                child: Text(
-                  'T',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 209,
-                top: 449,
-                child: Text(
-                  'W',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 250,
-                top: 449,
-                child: Text(
-                  'T',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 286,
-                top: 449,
-                child: Text(
-                  'F',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 97,
-                top: 449,
-                child: Text(
-                  'S',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 322,
-                top: 449,
-                child: Text(
-                  'S',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 64,
-                top: 436,
-                child: SizedBox(
-                  width: 18,
-                  height: 9,
-                  child: Text(
-                    '0',
-                    style: TextStyle(
-                      color: const Color(0xFF6A6A6A),
-                      fontSize: 12,
-                      fontFamily: 'AppleSDGothicNeoM00',
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 45,
-                top: 342,
-                child: SizedBox(
-                  width: 40,
-                  height: 13,
-                  child: Text(
-                    '5.000',
-                    style: TextStyle(
-                      color: const Color(0xFF6A6A6A),
-                      fontSize: 12,
-                      fontFamily: 'AppleSDGothicNeoM00',
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 41,
-                top: 253,
-                child: SizedBox(
-                  width: 48,
-                  height: 11,
-                  child: Text(
-                    '10.000',
-                    style: TextStyle(
-                      color: const Color(0xFF6A6A6A),
-                      fontSize: 12,
-                      fontFamily: 'AppleSDGothicNeoM00',
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 21,
-                top: 195,
-                child: Container(
-                  width: 78,
-                  height: 28,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFFFDDDD),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 37,
-                top: 200,
-                child: Text(
-                  '주간 기록',
-                  style: TextStyle(
-                    color: const Color(0xFFE45151),
-                    fontSize: 12,
-                    fontFamily: 'AppleSDGothicNeoB00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 39,
-                top: 620,
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFE45151),
-                    shape: OvalBorder(),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 87,
-                top: 620,
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFFFC0C0),
-                    shape: OvalBorder(),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 134,
-                top: 620,
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFFC8F8F),
-                    shape: OvalBorder(),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 40,
-                top: 644,
-                child: Text(
-                  '11,289',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 8,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 89,
-                top: 644,
-                child: Text(
-                  '1,639',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 8,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 136,
-                top: 644,
-                child: Text(
-                  '5,102',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 8,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 93,
-                top: 577,
-                child: Text(
-                  'M',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoEB00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 142,
-                top: 577,
-                child: Text(
-                  'T',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoEB00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 188,
-                top: 577,
-                child: Text(
-                  'W',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoEB00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 238,
-                top: 577,
-                child: Text(
-                  'T',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoEB00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 286,
-                top: 577,
-                child: Text(
-                  'F',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoEB00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 48,
-                top: 577,
-                child: Text(
-                  'S',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoEB00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 331,
-                top: 577,
-                child: Text(
-                  'S',
-                  style: TextStyle(
-                    color: const Color(0xFF6A6A6A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoEB00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 331,
-                top: 623,
-                child: Text(
-                  '7',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 328,
-                top: 658,
-                child: Text(
-                  '14',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 327,
-                top: 734,
-                child: Text(
-                  '28',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 329,
-                top: 697,
-                child: Text(
-                  '21',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 158,
-                top: 540,
-                child: Opacity(
-                  opacity: 0.90,
-                  child: Text(
-                    '2025.10',
-                    style: TextStyle(
-                      color: const Color(0xFFE45151),
-                      fontSize: 16,
-                      fontFamily: 'Pretendard',
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 48,
-                top: 658,
-                child: Text(
-                  '8',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 46,
-                top: 697,
-                child: Text(
-                  '15',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 45,
-                top: 734,
-                child: Text(
-                  '22',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 44,
-                top: 771,
-                child: Text(
-                  '29',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 49,
-                top: 623,
-                child: Text(
-                  '1',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 95,
-                top: 658,
-                child: Text(
-                  '9',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 92,
-                top: 734,
-                child: Text(
-                  '23',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 91,
-                top: 771,
-                child: Text(
-                  '30',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 93,
-                top: 697,
-                child: Text(
-                  '16',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 96,
-                top: 623,
-                child: Text(
-                  '2',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 140,
-                top: 658,
-                child: Text(
-                  '10',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 139,
-                top: 734,
-                child: Text(
-                  '24',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 140,
-                top: 697,
-                child: Text(
-                  '17',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 143,
-                top: 623,
-                child: Text(
-                  '3',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 281,
-                top: 658,
-                child: Text(
-                  '13',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 280,
-                top: 734,
-                child: Text(
-                  '27',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 279,
-                top: 697,
-                child: Text(
-                  '20',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 283,
-                top: 623,
-                child: Text(
-                  '6',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 188,
-                top: 658,
-                child: Text(
-                  '11',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 186,
-                top: 734,
-                child: Text(
-                  '25',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 187,
-                top: 697,
-                child: Text(
-                  '18',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 189,
-                top: 623,
-                child: Text(
-                  '4',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 233,
-                top: 658,
-                child: Text(
-                  '12',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 232,
-                top: 734,
-                child: Text(
-                  '26',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 233,
-                top: 697,
-                child: Text(
-                  '19',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 236,
-                top: 623,
-                child: Text(
-                  '5',
-                  style: TextStyle(
-                    color: const Color(0xFF1A1A1A),
-                    fontSize: 13,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 21,
-                top: 496,
-                child: Container(
-                  width: 78,
-                  height: 28,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFFFDDDD),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 37,
-                top: 501,
-                child: Text(
-                  '월간 기록',
-                  style: TextStyle(
-                    color: const Color(0xFFE45151),
-                    fontSize: 12,
-                    fontFamily: 'AppleSDGothicNeoB00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ],
+        Text(
+          label,
+          style: TextStyle(color: Colors.grey.shade800, fontSize: 12),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          count,
+          style: const TextStyle(
+            color: Color(0xFFE45151),
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Recipekorea',
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFDDDD),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: Color(0xFFE45151),
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
+  // [핵심 수정] 막대 색상 결정 함수
+  Color _getBarColor(int steps) {
+    if (steps >= 10000) {
+      return const Color(0xFFE45151); // 10,000보 달성 (진한 빨강)
+    } else if (steps >= 5000) {
+      return const Color(0xFFFD8F8F); // 5,000보 달성 (중간 분홍)
+    } else {
+      return const Color(0xFFFFC0C0); // 실패/조금 걸음 (연한 분홍 - 0 포함)
+    }
+  }
+
+  // [핵심 수정] 주간 차트 위젯 (Y축 라벨 추가)
+  Widget _buildWeeklyChart() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      height: 250,
+      child: Row(
+        children: [
+          // 1. 왼쪽 Y축 (수치 라벨)
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // 위-중간-아래 정렬
+            crossAxisAlignment: CrossAxisAlignment.end, // 오른쪽 정렬
+            children: const [
+              Text('10,000', style: TextStyle(fontSize: 10, color: Colors.grey)),
+              Text('5,000', style: TextStyle(fontSize: 10, color: Colors.grey)),
+              Text('0', style: TextStyle(fontSize: 10, color: Colors.grey)),
+            ],
+          ),
+          
+          const SizedBox(width: 15), // 라벨과 그래프 사이 간격
+
+          // 2. 오른쪽 그래프 (막대기들)
+          Expanded(
+            child: LayoutBuilder( // 부모 크기에 맞춰서 높이 계산
+              builder: (context, constraints) {
+                // 차트 영역의 실제 높이 (요일 글자 높이 제외)
+                final chartHeight = constraints.maxHeight - 20; 
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: List.generate(7, (index) {
+                    // 막대 높이 계산 (10000보가 100% 기준)
+                    double heightFactor = weeklySteps[index] / 10000;
+                    if (heightFactor > 1.0) heightFactor = 1.0; // 그래프 뚫고 나가지 않게
+
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        // 막대기
+                        Container(
+                          width: 18, // 막대 두께
+                          height: chartHeight * heightFactor, // 비율에 따른 높이
+                          decoration: BoxDecoration(
+                            color: _getBarColor(weeklySteps[index]), // 색상 함수 적용!
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        const SizedBox(height: 1), // 막대와 요일 사이 간격
+                        // 요일
+                        Text(
+                          weekDays[index],
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 3. 월간 달력 위젯
+  Widget _buildMonthlyCalendar() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          // 달력 헤더
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.chevron_left, color: Colors.grey),
+              const SizedBox(width: 10),
+              const Text(
+                "2025.10",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFE45151),
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Icon(Icons.chevron_right, color: Colors.grey),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // 요일 헤더
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: weekDays
+                .map((day) => Text(
+                      day,
+                      style: const TextStyle(
+                          color: Colors.grey, fontWeight: FontWeight.bold),
+                    ))
+                .toList(),
+          ),
+          const SizedBox(height: 10),
+          const Divider(), 
+
+          // 날짜 그리드
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 31 + 3, // 빈칸 + 31일
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 7,
+              childAspectRatio: 0.8,
+            ),
+            itemBuilder: (context, index) {
+              if (index < 3) return const SizedBox();
+              
+              int day = index - 2;
+              // [테스트용] 1, 2, 3일에만 기록
+              bool hasRecord = (day >= 1 && day <= 3);
+              int steps = hasRecord ? (day == 1 ? 11289 : (day == 2 ? 1639 : 5102)) : 0;
+
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: hasRecord ? const Color(0xFFE45151).withOpacity(day == 1 ? 1.0 : 0.4) : Colors.transparent,
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "$day",
+                      style: TextStyle(
+                        color: hasRecord ? Colors.white : Colors.black,
+                        fontWeight: hasRecord ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  if (hasRecord)
+                    Text(
+                      "$steps",
+                      style: const TextStyle(fontSize: 8, color: Colors.grey),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }
