@@ -8,6 +8,7 @@ import 'package:running_ham/screens/main_screen/main_screen_ui.dart'; // UI 파�
 import 'main_screen_widget.dart'; // 헬퍼 함수
 import 'package:firebase_auth/firebase_auth.dart'; // Firebase 로그인
 import 'package:cloud_firestore/cloud_firestore.dart'; // Firebase DB
+import 'package:intl/intl.dart'; // 날짜 비교용
 
 // 햄스터 상태를 종류별로 정의
 enum HamsterState {
@@ -40,6 +41,11 @@ class _MainScreenState extends State<MainScreen> {
   // Firestore 인스턴스
   final db = FirebaseFirestore.instance;
 
+  // 연속 및 재화 로직을 위한 변수
+  int _continuousFailureDays = 0; // 연속 실패일
+  int _seedCount = 0; // 재화 (도토리)
+  String _lastRewardDateKey = ''; // 마지막으로 보상받은 날짜 (yyyyMMdd)
+
   @override
   void initState() {
     super.initState();
@@ -65,7 +71,7 @@ class _MainScreenState extends State<MainScreen> {
       print("익명 로그인 성공! 유저 ID: $_userId"); // 터미널에 로그 찍기
 
       if (_userId != null && mounted) {
-        await _loadUserData(); // 유저 데이터 불러오기
+        await _loadAndProcessUserData(); // 유저 데이터 불러오기 + 날짜 처리
         initPlatformState(); // 만보기 센서 연결 함수 호출
       } else {
         // ID 발급 실패 시
@@ -101,23 +107,43 @@ class _MainScreenState extends State<MainScreen> {
 
   // 만보기 스트림 시작 함수
   void startListening() {
+    // 오늘 날짜 키
+    final String todayKey = DateFormat('yyyyMMdd').format(DateTime.now());
     _stepCountStreamSubscription =
         Pedometer.stepCountStream.listen((StepCount event) {
       if (!mounted) return; // 위젯이 화면에 없으면 중단
 
-      setState(() {
-        _steps = event.steps; // 상태 변수에 최신 걸음 수를 업데이트
+      // 걸음 수 업데이트
+final newSteps = event.steps;
 
-        // 살찌는 로직 - 걸음 수에 따라 햄스터 상태 판단
+      setState(() {
+        _steps = newSteps; // 상태 변수에 최신 걸음 수를 업데이트
+
+        // 살찌는 로직 + 연속 로직과 연동
         if (_steps < _targetSteps) {
           // 목표(5000보) 미달 시
-          _hamsterState = HamsterState.fat1;
+          if (_continuousFailureDays >= 2) {
+            _hamsterState = HamsterState.fat2; // 연속 2일 이상 실패 시 fat2
+          } else {
+            _hamsterState = HamsterState.fat1; // 그 외에는 fat1
+          }
         } else {
           // 목표 달성 시
           _hamsterState = HamsterState.normal;
         }
-        // 연속 미달 시 fat2 로직은 나중에 추가
+
+        // 재화 로직
+        // 5000보 달성 오늘 보상을 아직 안 받았다면
+        if (_steps >= _targetSteps && _lastRewardDateKey != todayKey) {
+          _seedCount += 50; // 재화 (도토리) 50개 획득
+          _lastRewardDateKey = todayKey; // 오늘 보상 받음으로 처리
+          print("5000보 달성! 도토리 50개 획득! (총: $_seedCount 개)");
+        }
       });
+
+      // 걸음 수, 상태가 변경될 때마다 DB에 저장
+      _saveUserData();
+
     }, onError: (error) {
       // 에러 처리
       print("만보기 에러: $error");
@@ -130,54 +156,109 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   // 데이터 저장 함수
-  Future<void> _saveUserData() async {
-    if (_userId == null) return; // 비 로그인 시 저장 안 함
+
+  // 햄스터 상태 문자열을 enum으로 변환
+  HamsterState _parseHamsterState(String? stateStr) {
+    return HamsterState.values.firstWhere(
+        (e) => e.toString() == stateStr,
+        orElse: () => HamsterState.normal); // 못찾으면 기본값
+  }
+
+  // [4단계] 데이터 '불러오기' 및 '날짜 처리' (핵심 로직)
+  Future<void> _loadAndProcessUserData() async {
+    if (_userId == null) return;
 
     try {
-      // users 컬렉션에 _userId 문서로 데이터 저장
+      final docSnap = await db.collection('users').doc(_userId).get();
+      final now = DateTime.now();
+      final todayKey = DateFormat('yyyyMMdd').format(now);
+
+      if (docSnap.exists && mounted) { // 저장된 데이터가 있다면
+        Map<String, dynamic> data = docSnap.data()!;
+        
+        // DB 데이터 로컬 변수로 복원
+        int yesterdaysSteps = data['steps'] ?? 0;
+        _hamsterState = _parseHamsterState(data['hamsterState']);
+        _continuousFailureDays = data['continuousFailureDays'] ?? 0;
+        _seedCount = data['seedCount'] ?? 0;
+        _lastRewardDateKey = data['lastRewardDateKey'] ?? '';
+        
+        final Timestamp? lastSavedTimestamp = data['lastSaved'];
+        
+        // (2) 날짜 비교 로직
+        if (lastSavedTimestamp != null) {
+          final lastSavedDate = lastSavedTimestamp.toDate();
+          final lastSavedKey = DateFormat('yyyyMMdd').format(lastSavedDate);
+
+          if (lastSavedKey != todayKey) { // 새로운 날이 되었다면
+            print("새로운 날입니다! 어제 걸음 수를 정산합니다.");
+            // 어제 날짜로 정산 시작
+            _steps = 0; // '오늘' 걸음 수는 0으로 초기화
+
+            final daysDifference = now.difference(lastSavedDate).inDays;
+
+            if (daysDifference == 1) { // (정상) 하루 지남
+              if (yesterdaysSteps < _targetSteps) {
+                _continuousFailureDays++; // 어제 실패
+              } else {
+                _continuousFailureDays = 0; // 어제 성공 (연속 실패 리셋)
+              }
+            } else if (daysDifference > 1) { // (비정상) 2일 이상 미접속
+              print("$daysDifference 일 이상 미접속!");
+              _continuousFailureDays = 2; // 2일 이상 실패로 간주 (fat2)
+            }
+
+            // 연속 실패에 따른 오늘 햄스터 상태 결정
+            if (_continuousFailureDays >= 2) {
+              _hamsterState = HamsterState.fat2;
+            } else if (_continuousFailureDays == 1) {
+              _hamsterState = HamsterState.fat1;
+            } else {
+              _hamsterState = HamsterState.normal;
+            }
+
+          } else { // (같은 날)
+            print("같은 날 재접속. 어제 걸음 수: $yesterdaysSteps");
+            _steps = yesterdaysSteps; // 같은 날이면 DB 걸음 수 그대로 복원
+          }
+        } else {
+           print("[$_userId] lastSaved 타임스탬프 없음. (신규 유저 혹은 구버전 데이터)");
+           _steps = yesterdaysSteps;
+        }
+
+      } else { // 저장된 데이터가 없다면 (신규 유저)
+        print("[$_userId] 신규 유저. DB에 데이터 없음.");
+        // 모든 변수가 0, normal, '' (기본값)
+      }
+
+      // 최종적으로 로드, 처리된 데이터로 UI 갱신
+      setState(() {});
+      print("[$_userId] 데이터 불러오기/처리 성공: $_steps 보, $_continuousFailureDays 일 연속 실패, $_seedCount 도토리");
+
+    } catch (e) {
+      print("Firestore DB 불러오기 및 처리 에러: $e");
+    }
+  }
+
+  // 데이터 저장 함수
+  Future<void> _saveUserData() async {
+    if (_userId == null) return; // 로그인 안됐으면 저장 안 함
+
+    try {
+      // users 컬렉션 안에, _userId 이름으로 데이터 저장
       await db.collection('users').doc(_userId).set({
         'steps': _steps, // 현재 걸음 수
         'hamsterState': _hamsterState.toString(), // 현재 햄스터 상태
         'lastSaved': FieldValue.serverTimestamp(), // 마지막 저장 시간 (서버 시간 기준)
+        'continuousFailureDays': _continuousFailureDays, // 연속 실패일
+        'seedCount': _seedCount, // 재화(도토리)
+        'lastRewardDateKey': _lastRewardDateKey, // 마지막 보상 날짜
       }, SetOptions(merge: true)); // 덮어쓰되, 기존 필드 유지
-      print("[$_userId] 데이터 저장 성공: $_steps 보");
+
     } catch (e) {
       print("Firestore DB 저장 에러: $e");
     }
   }
-
-  // 데이터 불러오기 함수
-  Future<void> _loadUserData() async {
-    if (_userId == null) return; // 비 로그인 시 불러오기 안 함
-
-    try {
-      // users 컬렉션에서 _userId 문서를 가져옴
-      final docSnap = await db.collection('users').doc(_userId).get();
-
-      if (docSnap.exists && mounted) {
-        Map<String, dynamic> data = docSnap.data()!;
-        
-        setState(() { // setState로 UI 갱신
-          // DB 데이터로 로컬 변수 복원
-          _steps = data['steps'] ?? 0; // null일 경우 0으로
-          
-          String savedState = data['hamsterState'] ?? 'HamsterState.normal';
-          // 문자열을 다시 enum으로 변환
-          _hamsterState = HamsterState.values.firstWhere(
-              (e) => e.toString() == savedState,
-              orElse: () => HamsterState.normal); // 못찾으면 기본값
-        });
-        print("🔄 [$_userId] 데이터 불러오기/복원 성공: $_steps 보");
-        
-      } else { // 데이터가 없다면 → 신규 유저
-        print("[$_userId] 신규 유저. DB에 데이터 없음.");
-        // 기본값으로 _saveUserData 한번 호출해서 초기 문서 생성 가능
-      }
-    } catch (e) {
-      print("Firestore DB 불러오기 에러: $e");
-    }
-  }
-
   // build 함수 (UI 그리는 부분)
   @override
   Widget build(BuildContext context) {
@@ -185,6 +266,7 @@ class _MainScreenState extends State<MainScreen> {
     return MainScreenUI(
       steps: _steps, // 현재 걸음 수 전달
       hamsterState: _hamsterState, // 현재 햄스터 상태 전달
+      seedCount: _seedCount, // 재화 (도토리) 전달
     );
   }
 }

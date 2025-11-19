@@ -1,709 +1,302 @@
-// 보관함 화면
+import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart'; // <--- 1. 이거 추가!
+class InventoryScreen extends StatefulWidget {
+  const InventoryScreen({super.key});
 
-class InventoryScreen extends StatelessWidget { // <--- 2. 이름 추가!
-  const InventoryScreen({super.key}); // (이것도 추가해주면 더 좋아)
+  @override
+  State<InventoryScreen> createState() => _InventoryScreenState();
+}
+
+class _InventoryScreenState extends State<InventoryScreen> {
+  // [1] 현재 장착된 이미지들 (상태 변수)
+  String currentBowl = 'assets/images/main_images/food_normal_back.png';
+  String currentWater = 'assets/images/main_images/water_normal_back.png';
+  String currentWheel = 'assets/images/main_images/chat_normal_back.png';
+  String? currentAcc;
+
+  // [2] 내 아이템 목록 (테스트용 데이터)
+  final List<Map<String, dynamic>> myItems = [
+    // --- 밥그릇 ---
+    {
+      'name': '기본 밥그릇',
+      'image': 'assets/images/main_images/item_bowl_basic.png',
+      'preview': 'assets/images/main_images/food_normal_back.png',
+      'category': 'bowl',
+    },
+    {
+      'name': '고급 밥그릇',
+      'image': 'assets/images/main_images/item_bowl_adv.png',
+      'preview': 'assets/images/main_images/food_gold_back.png',
+      'category': 'bowl',
+    },
+    // --- 물통 ---
+    {
+      'name': '기본 물통',
+      'image': 'assets/images/main_images/item_water_basic.png',
+      'preview': 'assets/images/main_images/water_normal_back.png',
+      'category': 'water',
+    },
+    {
+      'name': '고급 물통',
+      'image': 'assets/images/main_images/item_water_adv.png',
+      'preview': 'assets/images/main_images/water_pink_back.png',
+      'category': 'water',
+    },
+    // --- 챗바퀴 ---
+    {
+      'name': '기본 챗바퀴',
+      'image': 'assets/images/main_images/item_wheel_basic.png',
+      'preview': 'assets/images/main_images/chat_normal_back.png',
+      'category': 'wheel',
+    },
+    {
+      'name': '고급 챗바퀴',
+      'image': 'assets/images/main_images/item_wheel_adv.png',
+      'preview': 'assets/images/main_images/chat_blue_back.png',
+      'category': 'wheel',
+    },
+    // --- 액세서리 ---
+    {
+      'name': '썬글라스',
+      'image': 'assets/images/main_images/item_sunglasses.png',
+      'preview': 'assets/images/main_images/acc_sunglasses.png',
+      'category': 'acc',
+    },
+    {
+      'name': '머리핀',
+      'image': 'assets/images/main_images/item_hairpin.png',
+      'preview': 'assets/images/main_images/acc_hairpin.png',
+      'category': 'acc',
+    },
+    // --- 소모 아이템 (카테고리: consumable) ---
+    {
+      'name': '챗바퀴 타기(1일)',
+      'image': 'assets/images/main_images/item_ticket.png',
+      'preview': '', // 소모품은 미리보기 없음
+      'category': 'consumable',
+    },
+    {
+      'name': '햄스터 염색권',
+      'image': 'assets/images/main_images/item_dye.png',
+      'preview': '',
+      'category': 'consumable',
+    },
+    {
+      'name': '이름 변경권',
+      'image': 'assets/images/main_images/item_rename.png',
+      'preview': '',
+      'category': 'consumable',
+    },
+  ];
+
+  // [3] 아이템 장착 함수
+  void _equipItem(Map<String, dynamic> item) {
+    // 소모품이면 장착 X
+    if (item['category'] == 'consumable') return;
+
+    setState(() {
+      switch (item['category']) {
+        case 'bowl':
+          currentBowl = item['preview'];
+          break;
+        case 'water':
+          currentWater = item['preview'];
+          break;
+        case 'wheel':
+          currentWheel = item['preview'];
+          break;
+        case 'acc':
+          if (currentAcc == item['preview']) {
+            currentAcc = null;
+          } else {
+            currentAcc = item['preview'];
+          }
+          break;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 390,
-          height: 844,
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(color: Colors.white),
-          child: Stack(
+    // 리스트를 두 개로 쪼개기! (치장용 vs 소모품용)
+    final equipItems = myItems.where((i) => i['category'] != 'consumable').toList();
+    final consumableItems = myItems.where((i) => i['category'] == 'consumable').toList();
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFFAF3E6),
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          '보관함',
+          style: TextStyle(color: Color(0xFF4D3817), fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF4D3817)),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Column(
+        children: [
+          // [1] 상단: 햄스터 방 미리보기
+          Expanded(
+            flex: 4,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  bottom: 0, left: 0, right: 0, height: 150,
+                  child: Image.asset('assets/images/main_images/ground.png', fit: BoxFit.fill),
+                ),
+                Positioned(
+                  top: 20, left: -40,
+                  child: Image.asset(currentWheel, width: 220, height: 220),
+                ),
+                Positioned(
+                  bottom: 30, right: 10,
+                  child: Image.asset(currentBowl, width: 110, height: 60),
+                ),
+                Positioned(
+                  top: 20, right: -30,
+                  child: Image.asset(currentWater, width: 100, height: 200),
+                ),
+                Positioned(
+                  bottom: 50, left: 0, right: 0,
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Image.asset('assets/images/main_images/ham_1.png', width: 180),
+                  ),
+                ),
+                if (currentAcc != null)
+                  Positioned(
+                    bottom: 150, left: 0, right: 0,
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Image.asset(currentAcc!, width: 80),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
+          // [2] 하단: 아이템 목록 (흰색 카드)
+          Expanded(
+            flex: 5,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 10,
+                    offset: Offset(0, -5),
+                  ),
+                ],
+              ),
+              
+              // [수정됨] GridView 하나가 아니라, ListView 안에 섹션을 나눔
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 1. 치장 아이템 섹션
+                    const Text("치장 아이템", 
+                        style: TextStyle(color: Color(0xFF4D3817), fontWeight: FontWeight.bold, fontSize: 14)),
+                    const SizedBox(height: 10),
+                    
+                    _buildGrid(equipItems), // 치장 아이템 그리드
+
+                    const SizedBox(height: 25), // 섹션 사이 간격
+
+                    // 2. 소모 아이템 섹션 (여기가 호미가 원하던 위치!)
+                    const Text("소모 아이템", 
+                        style: TextStyle(color: Color(0xFF4D3817), fontWeight: FontWeight.bold, fontSize: 14)),
+                    const SizedBox(height: 10),
+
+                    _buildGrid(consumableItems), // 소모 아이템 그리드
+                    
+                    const SizedBox(height: 30), // 맨 밑 여백
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 그리드 만드는 함수 (중복 제거용)
+  Widget _buildGrid(List<Map<String, dynamic>> items) {
+    return GridView.builder(
+      shrinkWrap: true, // [중요] Column 안에서 크기만큼만 차지하게 함
+      physics: const NeverScrollableScrollPhysics(), // 스크롤은 부모(SingleChildScrollView)한테 맡김
+      itemCount: items.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemBuilder: (context, index) {
+        final item = items[index];
+        
+        // 장착 여부 확인 (테두리용) - 소모품은 제외
+        bool isEquipped = false;
+        if (item['category'] != 'consumable') {
+           isEquipped = 
+             currentBowl == item['preview'] || 
+             currentWater == item['preview'] || 
+             currentWheel == item['preview'] || 
+             currentAcc == item['preview'];
+        }
+
+        return GestureDetector(
+          onTap: () => _equipItem(item),
+          child: Column(
             children: [
-              Positioned(
-                left: 18,
-                top: 59,
-                child: Container(
-                  width: 18,
-                  height: 18,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(),
-                  child: Stack(),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(
+                    color: isEquipped ? const Color(0xFFE76F6F) : Colors.grey.shade200,
+                    width: isEquipped ? 2 : 1,
+                  ),
+                  boxShadow: [
+                    if (isEquipped)
+                      BoxShadow(color: const Color(0xFFE76F6F).withOpacity(0.2), blurRadius: 4)
+                  ],
                 ),
-              ),
-              Positioned(
-                left: 174,
-                top: 59,
-                child: Text(
-                  '보관함',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 16,
-                    fontFamily: 'AppleSDGothicNeoB00',
-                    fontWeight: FontWeight.w400,
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Image.asset(
+                    item['image'],
+                    fit: BoxFit.contain,
+                    errorBuilder: (c, e, s) => const Icon(Icons.help_outline, color: Colors.grey),
                   ),
                 ),
               ),
-              Positioned(
-                left: -11,
-                top: 101,
-                child: Container(
-                  width: 414,
-                  height: 414,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/414x414"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 318,
-                top: 93,
-                child: Container(
-                  width: 119,
-                  height: 231,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/119x231"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 262,
-                top: 342,
-                child: Container(
-                  width: 133,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/133x72"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: -85,
-                top: 130,
-                child: Container(
-                  width: 259,
-                  height: 261,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/259x261"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 79,
-                top: 183,
-                child: Container(
-                  width: 231,
-                  height: 262,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/231x262"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                top: 0,
-                child: Container(
-                  width: 390,
-                  height: 47,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 27,
-                        top: 14,
-                        child: Container(
-                          width: 54,
-                          height: 21,
-                          decoration: ShapeDecoration(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                left: 0,
-                                top: 1,
-                                child: SizedBox(
-                                  width: 54,
-                                  height: 20,
-                                  child: Text(
-                                    '9:41',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontFamily: 'SF Pro Text',
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.31,
-                                      letterSpacing: -0.32,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 336,
-                        top: 19,
-                        child: Container(
-                          width: 27.40,
-                          height: 13,
-                          child: Stack(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                top: 451,
-                child: Container(
-                  width: 390,
-                  height: 376,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFFF7F5F0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30),
-                      ),
-                    ),
-                    shadows: [
-                      BoxShadow(
-                        color: Color(0x3F000000),
-                        blurRadius: 4,
-                        offset: Offset(0, -4),
-                        spreadRadius: 0,
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                top: 810,
-                child: Container(
-                  width: 390,
-                  height: 34,
-                  decoration: BoxDecoration(color: const Color(0xFFF8F5F0)),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 128,
-                        top: 21,
-                        child: Container(
-                          width: 134,
-                          height: 5,
-                          decoration: ShapeDecoration(
-                            color: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 297,
-                top: 495,
-                child: Container(
-                  width: 70,
-                  height: 82,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 297,
-                top: 589,
-                child: Container(
-                  width: 70,
-                  height: 82,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 24,
-                top: 495,
-                child: Container(
-                  width: 70,
-                  height: 82,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 24,
-                top: 589,
-                child: Container(
-                  width: 70,
-                  height: 82,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 24,
-                top: 713,
-                child: Container(
-                  width: 70,
-                  height: 82,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 115,
-                top: 495,
-                child: Container(
-                  width: 70,
-                  height: 82,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 115,
-                top: 589,
-                child: Container(
-                  width: 70,
-                  height: 82,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 115,
-                top: 713,
-                child: Container(
-                  width: 70,
-                  height: 82,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 206,
-                top: 713,
-                child: Container(
-                  width: 70,
-                  height: 82,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 206,
-                top: 495,
-                child: Container(
-                  width: 70,
-                  height: 82,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 206,
-                top: 589,
-                child: Container(
-                  width: 70,
-                  height: 82,
-                  decoration: ShapeDecoration(
-                    color: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 34,
-                top: 514,
-                child: Container(
-                  width: 50,
-                  height: 27,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/50x27"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 36,
-                top: 553,
-                child: Text(
-                  '기본 밥그릇',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 10,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 309,
-                top: 553,
-                child: Text(
-                  '고급 밥그릇',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 10,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 24,
-                top: 471,
-                child: Text(
-                  '치장 아이템',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 12,
-                    fontFamily: 'AppleSDGothicNeoB00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 24,
-                top: 692,
-                child: Text(
-                  '소모 아이템',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 12,
-                    fontFamily: 'AppleSDGothicNeoB00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 131,
-                top: 553,
-                child: Text(
-                  '기본 물통',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 10,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 40,
-                top: 647,
-                child: Text(
-                  '고급 물통',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 10,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 27,
-                top: 771,
-                child: Text(
-                  '챗바퀴 타기(1일)',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 10,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 122,
-                top: 771,
-                child: Text(
-                  '햄스터 염색권',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 10,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 218,
-                top: 764,
-                child: Text(
-                  '햄스터\n이름 변경권',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 10,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 218,
-                top: 553,
-                child: Text(
-                  '기본 챗바퀴',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 10,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 127,
-                top: 647,
-                child: Text(
-                  '고급 챗바퀴',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 10,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 223,
-                top: 647,
-                child: Text(
-                  '썬글라스',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 10,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 319,
-                top: 647,
-                child: Text(
-                  '머리핀',
-                  style: TextStyle(
-                    color: const Color(0xFF4D3817),
-                    fontSize: 10,
-                    fontFamily: 'AppleSDGothicNeoM00',
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 139,
-                top: 505,
-                child: Container(
-                  width: 21,
-                  height: 41,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/21x41"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 220,
-                top: 504,
-                child: Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/42x42"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 307,
-                top: 511,
-                child: Container(
-                  width: 50,
-                  height: 33,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/50x33"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 48,
-                top: 595,
-                child: Container(
-                  width: 21,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/21x48"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 309,
-                top: 604,
-                child: Container(
-                  width: 48,
-                  height: 35,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/48x35"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 123,
-                top: 598,
-                child: Container(
-                  width: 54,
-                  height: 54,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/54x54"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 269,
-                top: 631,
-                child: Container(
-                  transform: Matrix4.identity()..translate(0.0, 0.0)..rotateZ(3.14),
-                  width: 56,
-                  height: 21,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/56x21"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 130,
-                top: 727,
-                child: Container(
-                  width: 39,
-                  height: 39,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/39x39"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 35,
-                top: 721,
-                child: Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/48x48"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 220,
-                top: 723,
-                child: Container(
-                  width: 43,
-                  height: 43,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage("https://placehold.co/43x43"),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
+              const SizedBox(height: 5),
+              Text(
+                item['name'],
+                style: const TextStyle(fontSize: 11, color: Color(0xFF4D3817)),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 }

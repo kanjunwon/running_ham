@@ -12,11 +12,13 @@ class MainScreenUI extends StatelessWidget {
 
   final int steps;  // 로직 파일로부터 걸음 수 데이터를 전달받음
   final HamsterState hamsterState; // 햄스터 상태 데이터를 전달받음
+  final int seedCount; // 재화 (도토리) 데이터
 
   const MainScreenUI({
       super.key,
       required this.steps,
       required this.hamsterState, // 햄스터 상태도 필수로 받기
+      required this.seedCount, // 재화 (도토리) 데이터
     });
 
   @override
@@ -142,7 +144,7 @@ class MainScreenUI extends StatelessWidget {
                               const SizedBox(width: 4),
                               // 재화 (150)
                               Text(
-                                '150',  // 나중에 변수로 받아야 함
+                                '$seedCount',  // 나중에 변수로 받아야 함
                                 style: TextStyle(
                                   color: Colors.brown.shade700,
                                   fontSize: 15,
