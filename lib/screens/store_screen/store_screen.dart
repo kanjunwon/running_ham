@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
-// [1] 상품 목록 데이터 (카테고리별로 나중에 필터링함)
+// [1] 상품 목록 데이터 (호미가 보내준 경로 완벽 반영)
 final List<Map<String, dynamic>> storeItems = [
   // --- 밥그릇 ---
   {
     'id': 'bowl_basic',
     'name': '기본 밥그릇',
     'price': 1000,
-    'image': 'assets/images/main_images/item_bowl_basic.png',
+    'image': 'assets/images/store_images/food_normal_store.png',
     'category': 'bowl',
   },
   {
     'id': 'bowl_adv',
     'name': '고급 밥그릇',
     'price': 1500,
-    'image': 'assets/images/main_images/item_bowl_adv.png',
+    'image': 'assets/images/store_images/food_rare_store.png',
     'category': 'bowl',
   },
   // --- 챗바퀴 ---
@@ -22,14 +22,14 @@ final List<Map<String, dynamic>> storeItems = [
     'id': 'wheel_basic',
     'name': '기본 챗바퀴',
     'price': 1000,
-    'image': 'assets/images/main_images/item_wheel_basic.png',
+    'image': 'assets/images/store_images/chat_normal_store.png',
     'category': 'wheel',
   },
   {
     'id': 'wheel_adv',
     'name': '고급 챗바퀴',
     'price': 1500,
-    'image': 'assets/images/main_images/item_wheel_adv.png',
+    'image': 'assets/images/store_images/chat_rare_store.png',
     'category': 'wheel',
   },
   // --- 액세서리 ---
@@ -37,28 +37,28 @@ final List<Map<String, dynamic>> storeItems = [
     'id': 'water_basic',
     'name': '기본 물통',
     'price': 1000,
-    'image': 'assets/images/main_images/item_water_basic.png',
-    'category': 'accessory',
+    'image': 'assets/images/store_images/water_normal_store.png',
+    'category': 'accessory', // 주의: 물통이 액세서리로 분류되어 있음 (데이터 유지)
   },
   {
     'id': 'water_adv',
     'name': '고급 물통',
     'price': 1500,
-    'image': 'assets/images/main_images/item_water_adv.png',
+    'image': 'assets/images/store_images/water_rare_store.png',
     'category': 'accessory',
   },
   {
     'id': 'sunglasses',
     'name': '썬글라스',
     'price': 1000,
-    'image': 'assets/images/main_images/item_sunglasses.png',
+    'image': 'assets/images/store_images/sunglass_store.png',
     'category': 'accessory',
   },
   {
     'id': 'hairpin',
     'name': '머리핀',
     'price': 1000,
-    'image': 'assets/images/main_images/item_hairpin.png',
+    'image': 'assets/images/store_images/hairpin_store.png',
     'category': 'accessory',
   },
   // --- 소모 아이템 ---
@@ -66,21 +66,21 @@ final List<Map<String, dynamic>> storeItems = [
     'id': 'ticket_wheel',
     'name': '챗바퀴 타기(1일)',
     'price': 1500,
-    'image': 'assets/images/main_images/item_ticket.png',
+    'image': 'assets/images/store_images/1day_store.png',
     'category': 'consumable',
   },
   {
     'id': 'item_dye',
     'name': '햄스터 염색권',
     'price': 1000,
-    'image': 'assets/images/main_images/item_dye.png',
+    'image': 'assets/images/store_images/color_change_store.png',
     'category': 'consumable',
   },
   {
     'id': 'ticket_name',
     'name': '이름변경권',
     'price': 1000,
-    'image': 'assets/images/main_images/item_rename.png',
+    'image': 'assets/images/store_images/nickname_change_store.png',
     'category': 'consumable',
   },
 ];
@@ -93,13 +93,13 @@ class StoreScreen extends StatefulWidget {
 }
 
 class _StoreScreenState extends State<StoreScreen> {
-  // [테스트용 가짜 데이터]
-  int mySeeds = 3000;
+  // [테스트용 가짜 데이터] - 부자 모드
+  int mySeeds = 999999;
   List<String> myInventory = [];
 
   // 구매 로직 (UI 테스트용)
   void _buyItem(String itemId, String itemName, int price) {
-    if (myInventory.contains(itemId)) return; // 이미 있으면 반응 X (또는 메시지)
+    if (myInventory.contains(itemId)) return; 
     
     if (mySeeds < price) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -113,16 +113,20 @@ class _StoreScreenState extends State<StoreScreen> {
       myInventory.add(itemId);
     });
 
-    // 심플한 토스트 메시지 느낌으로 성공 알림
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$itemName 구매 완료!'), duration: const Duration(milliseconds: 1000)),
+      SnackBar(
+        content: Text('$itemName 구매 완료!'), 
+        duration: const Duration(milliseconds: 800),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F5F0), // 배경색 (베이지)
+      backgroundColor: const Color(0xFFF7F5F0), // 배경색
       
       appBar: AppBar(
         centerTitle: true,
@@ -148,10 +152,11 @@ class _StoreScreenState extends State<StoreScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 상단 도토리 (우측 정렬)
+              // 상단 도토리
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  // 도토리 아이콘은 공통 폴더(main_images)에 있다고 가정
                   Image.asset('assets/images/main_images/money_main_back.png', width: 22),
                   const SizedBox(width: 6),
                   Text(
@@ -170,7 +175,8 @@ class _StoreScreenState extends State<StoreScreen> {
               // --- 카테고리별 섹션 ---
               _buildCategorySection("밥그릇", "bowl"),
               _buildCategorySection("챗바퀴", "wheel"),
-              _buildCategorySection("액세서리", "accessory"),
+              // [수정] 호미 데이터에 맞춰 'accessory'로 변경
+              _buildCategorySection("액세서리", "accessory"), 
               _buildCategorySection("소모 아이템", "consumable"),
               
               const SizedBox(height: 40), // 하단 여백
@@ -183,7 +189,6 @@ class _StoreScreenState extends State<StoreScreen> {
 
   // [카테고리 섹션 빌더]
   Widget _buildCategorySection(String title, String categoryCode) {
-    // 해당 카테고리 아이템만 골라내기
     final items = storeItems.where((item) => item['category'] == categoryCode).toList();
 
     if (items.isEmpty) return const SizedBox.shrink();
@@ -192,7 +197,6 @@ class _StoreScreenState extends State<StoreScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 20),
-        // 섹션 제목
         Text(
           title,
           style: const TextStyle(
@@ -203,7 +207,6 @@ class _StoreScreenState extends State<StoreScreen> {
         ),
         const SizedBox(height: 10),
         
-        // 아이템 나열 (Wrap 사용 - 줄바꿈 자동)
         Wrap(
           spacing: 12, // 가로 간격
           runSpacing: 12, // 세로 간격
@@ -218,9 +221,6 @@ class _StoreScreenState extends State<StoreScreen> {
 
   // [아이템 카드 위젯]
   Widget _buildItemCard(Map<String, dynamic> item, bool isOwned) {
-    // 화면 너비에 따라 카드 크기 계산 (대략 3등분 느낌)
-    // final cardWidth = (MediaQuery.of(context).size.width - 64) / 3; 
-    // Figma랑 비슷하게 고정 크기로 가는 게 나을 수도 있음
     const double cardWidth = 100; 
     const double cardHeight = 135;
 
@@ -231,9 +231,15 @@ class _StoreScreenState extends State<StoreScreen> {
         height: cardHeight,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16), // 둥근 모서리
-          // 그림자 살짝 (원하면 추가, 피그마는 거의 없어보임)
-          // boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, offset: Offset(0, 2))],
+          borderRadius: BorderRadius.circular(16),
+          // 그림자 추가 (피그마 느낌)
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05), 
+              blurRadius: 5, 
+              offset: const Offset(0, 2)
+            )
+          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -247,6 +253,7 @@ class _StoreScreenState extends State<StoreScreen> {
                   child: Image.asset(
                     item['image'],
                     fit: BoxFit.contain,
+                    // 에러나면 회색 아이콘
                     errorBuilder: (c, e, s) => const Icon(Icons.image_not_supported, color: Colors.grey, size: 30),
                   ),
                 ),

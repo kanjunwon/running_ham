@@ -9,107 +9,108 @@ class InventoryScreen extends StatefulWidget {
 
 class _InventoryScreenState extends State<InventoryScreen> {
   // [1] 현재 장착된 이미지들 (상태 변수)
+  // 초기값은 메인 화면과 동일하게 유지
   String currentBowl = 'assets/images/main_images/food_normal_back.png';
   String currentWater = 'assets/images/main_images/water_normal_back.png';
   String currentWheel = 'assets/images/main_images/chat_normal_back.png';
-  String? currentAcc;
+  String? currentAccsory;
 
-  // [2] 내 아이템 목록 (테스트용 데이터)
+  // [2] 내 아이템 목록 (경로 그대로 유지)
   final List<Map<String, dynamic>> myItems = [
     // --- 밥그릇 ---
     {
       'name': '기본 밥그릇',
-      'image': 'assets/images/main_images/item_bowl_basic.png',
-      'preview': 'assets/images/main_images/food_normal_back.png',
+      'image': 'assets/images/inventory_images/food_normal_inventory_image.png', // [장착용]
+      'preview': 'assets/images/inventory_images/food_normal_inventory_preview.png', // [목록용]
       'category': 'bowl',
     },
     {
       'name': '고급 밥그릇',
-      'image': 'assets/images/main_images/item_bowl_adv.png',
-      'preview': 'assets/images/main_images/food_gold_back.png',
+      'image': 'assets/images/inventory_images/food_rare_inventory_image.png',
+      'preview': 'assets/images/inventory_images/food_rare_inventory_preview.png',
       'category': 'bowl',
     },
     // --- 물통 ---
     {
       'name': '기본 물통',
-      'image': 'assets/images/main_images/item_water_basic.png',
-      'preview': 'assets/images/main_images/water_normal_back.png',
+      'image': 'assets/images/inventory_images/water_normal_inventory_image.png',
+      'preview': 'assets/images/inventory_images/water_normal_inventory_preview.png',
       'category': 'water',
     },
     {
       'name': '고급 물통',
-      'image': 'assets/images/main_images/item_water_adv.png',
-      'preview': 'assets/images/main_images/water_pink_back.png',
+      'image': 'assets/images/inventory_images/water_rare_inventory_image.png',
+      'preview': 'assets/images/inventory_images/water_rare_inventory_preview.png',
       'category': 'water',
     },
     // --- 챗바퀴 ---
     {
       'name': '기본 챗바퀴',
-      'image': 'assets/images/main_images/item_wheel_basic.png',
-      'preview': 'assets/images/main_images/chat_normal_back.png',
+      'image': 'assets/images/inventory_images/chat_normal_inventory_image.png',
+      'preview': 'assets/images/inventory_images/chat_normal_inventory_preview.png',
       'category': 'wheel',
     },
     {
       'name': '고급 챗바퀴',
-      'image': 'assets/images/main_images/item_wheel_adv.png',
-      'preview': 'assets/images/main_images/chat_blue_back.png',
+      'image': 'assets/images/inventory_images/chat_rare_inventory_image.png',
+      'preview': 'assets/images/inventory_images/chat_rare_inventory_preview.png',
       'category': 'wheel',
     },
     // --- 액세서리 ---
     {
       'name': '썬글라스',
-      'image': 'assets/images/main_images/item_sunglasses.png',
-      'preview': 'assets/images/main_images/acc_sunglasses.png',
-      'category': 'acc',
+      'image': '', // 디자이너한테 주라고 하기
+      'preview': 'assets/images/inventory_images/sunglass_inventory_preview.png',
+      'category': 'accsory',
     },
     {
       'name': '머리핀',
-      'image': 'assets/images/main_images/item_hairpin.png',
-      'preview': 'assets/images/main_images/acc_hairpin.png',
-      'category': 'acc',
+      'image': 'assets/images/inventory_images/hairpin_inventory_image.png',
+      'preview': 'assets/images/inventory_images/hairpin_inventory_preview.png',
+      'category': 'accsory',
     },
-    // --- 소모 아이템 (카테고리: consumable) ---
+    // --- 소모 아이템 ---
     {
       'name': '챗바퀴 타기(1일)',
-      'image': 'assets/images/main_images/item_ticket.png',
-      'preview': '', // 소모품은 미리보기 없음
+      'image': '', 
+      'preview': 'assets/images/inventory_images/1day_inventory_preview.png',
       'category': 'consumable',
     },
     {
       'name': '햄스터 염색권',
-      'image': 'assets/images/main_images/item_dye.png',
-      'preview': '',
+      'image': '', 
+      'preview': 'assets/images/inventory_images/color_change_inventory_preview.png',
       'category': 'consumable',
     },
     {
       'name': '이름 변경권',
-      'image': 'assets/images/main_images/item_rename.png',
-      'preview': '',
+      'image': '', 
+      'preview': 'assets/images/inventory_images/nickname_change_inventory_preview.png',
       'category': 'consumable',
     },
   ];
 
   // [3] 아이템 장착 함수
   void _equipItem(Map<String, dynamic> item) {
-    // 소모품이면 장착 X
     if (item['category'] == 'consumable') return;
 
     setState(() {
+      // [수정됨] item['preview'] 대신 item['image']를 현재 장착 이미지로 설정!
       switch (item['category']) {
         case 'bowl':
-          currentBowl = item['preview'];
+          currentBowl = item['image'];
           break;
         case 'water':
-          currentWater = item['preview'];
+          currentWater = item['image'];
           break;
         case 'wheel':
-          currentWheel = item['preview'];
+          currentWheel = item['image'];
           break;
-        case 'acc':
-          if (currentAcc == item['preview']) {
-            currentAcc = null;
+        case 'accsory':
+          if (currentAccsory == item['image']) {
+            currentAccsory = null;
           } else {
-            currentAcc = item['preview'];
+            currentAccsory = item['image'];
           }
           break;
       }
@@ -118,7 +119,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 리스트를 두 개로 쪼개기! (치장용 vs 소모품용)
     final equipItems = myItems.where((i) => i['category'] != 'consumable').toList();
     final consumableItems = myItems.where((i) => i['category'] == 'consumable').toList();
 
@@ -168,19 +168,19 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     child: Image.asset('assets/images/main_images/ham_1.png', width: 180),
                   ),
                 ),
-                if (currentAcc != null)
+                if (currentAccsory != null)
                   Positioned(
                     bottom: 150, left: 0, right: 0,
                     child: Align(
                       alignment: Alignment.bottomCenter,
-                      child: Image.asset(currentAcc!, width: 80),
+                      child: Image.asset(currentAccsory!, width: 80),
                     ),
                   ),
               ],
             ),
           ),
 
-          // [2] 하단: 아이템 목록 (흰색 카드)
+          // [2] 하단: 아이템 목록
           Expanded(
             flex: 5,
             child: Container(
@@ -200,29 +200,25 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   ),
                 ],
               ),
-              
-              // [수정됨] GridView 하나가 아니라, ListView 안에 섹션을 나눔
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 1. 치장 아이템 섹션
                     const Text("치장 아이템", 
                         style: TextStyle(color: Color(0xFF4D3817), fontWeight: FontWeight.bold, fontSize: 14)),
                     const SizedBox(height: 10),
                     
-                    _buildGrid(equipItems), // 치장 아이템 그리드
+                    _buildGrid(equipItems),
 
-                    const SizedBox(height: 25), // 섹션 사이 간격
+                    const SizedBox(height: 25),
 
-                    // 2. 소모 아이템 섹션 (여기가 호미가 원하던 위치!)
                     const Text("소모 아이템", 
                         style: TextStyle(color: Color(0xFF4D3817), fontWeight: FontWeight.bold, fontSize: 14)),
                     const SizedBox(height: 10),
 
-                    _buildGrid(consumableItems), // 소모 아이템 그리드
+                    _buildGrid(consumableItems),
                     
-                    const SizedBox(height: 30), // 맨 밑 여백
+                    const SizedBox(height: 30),
                   ],
                 ),
               ),
@@ -233,11 +229,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
-  // 그리드 만드는 함수 (중복 제거용)
   Widget _buildGrid(List<Map<String, dynamic>> items) {
     return GridView.builder(
-      shrinkWrap: true, // [중요] Column 안에서 크기만큼만 차지하게 함
-      physics: const NeverScrollableScrollPhysics(), // 스크롤은 부모(SingleChildScrollView)한테 맡김
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: items.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
@@ -248,14 +243,14 @@ class _InventoryScreenState extends State<InventoryScreen> {
       itemBuilder: (context, index) {
         final item = items[index];
         
-        // 장착 여부 확인 (테두리용) - 소모품은 제외
+        // [수정됨] 장착 확인 로직: item['preview']가 아니라 item['image']와 비교
         bool isEquipped = false;
         if (item['category'] != 'consumable') {
            isEquipped = 
-             currentBowl == item['preview'] || 
-             currentWater == item['preview'] || 
-             currentWheel == item['preview'] || 
-             currentAcc == item['preview'];
+             currentBowl == item['image'] || 
+             currentWater == item['image'] || 
+             currentWheel == item['image'] || 
+             currentAccsory == item['image'];
         }
 
         return GestureDetector(
@@ -278,8 +273,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 ),
                 child: AspectRatio(
                   aspectRatio: 1,
+                  // [수정됨] 목록(Grid)에는 item['preview']를 보여줌!
                   child: Image.asset(
-                    item['image'],
+                    item['preview'],
                     fit: BoxFit.contain,
                     errorBuilder: (c, e, s) => const Icon(Icons.help_outline, color: Colors.grey),
                   ),
