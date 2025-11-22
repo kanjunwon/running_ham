@@ -39,13 +39,16 @@ class StoreItemCard extends StatelessWidget {
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.contain,
-                    errorBuilder: (c, e, s) => const Icon(Icons.image_not_supported, color: Colors.grey),
+                    errorBuilder: (c, e, s) => const Icon(
+                      Icons.image_not_supported,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
               ),
             ),
-            
-            // 2. 아이템 이름
+
+            // 아이템 이름
             Text(
               name,
               style: const TextStyle(
@@ -66,27 +69,32 @@ class StoreItemCard extends StatelessWidget {
                 ? const Text(
                     "보유중",
                     style: TextStyle(
-                        color: Colors.grey, // 회색 텍스트
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold),
+                      color: Colors.grey, // 회색 텍스트
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   )
                 : Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // 도토리 아이콘
-                      Image.asset('assets/images/main_images/money_main_back.png', width: 16),
+                      Image.asset(
+                        'assets/images/main_images/money_main_back.png',
+                        width: 16,
+                      ),
                       const SizedBox(width: 4),
                       // 가격 텍스트
                       Text(
                         "$price",
                         style: const TextStyle(
-                            color: Color(0xFF4D3817), // 진한 갈색
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500),
+                          color: Color(0xFF4D3817), // 진한 갈색
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
-            
+
             const SizedBox(height: 15), // 하단 여백 추가
           ],
         ),

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // ★ Provider 추가
+import 'package:running_ham/providers/user_provider.dart'; // ★ 뇌(Provider) 가져오기
 import 'store_screen_ui.dart'; // UI 파일 import
 
-// 상품 목록 데이터
+// [데이터] 상품 목록 (그대로 유지)
 final List<Map<String, dynamic>> storeItemsData = [
-  
-  // 밥그릇
+  // --- 밥그릇 ---
   {
     'id': 'bowl_basic',
     'name': '기본 밥그릇',
@@ -19,8 +20,7 @@ final List<Map<String, dynamic>> storeItemsData = [
     'image': 'assets/images/store_images/food_rare_store.png',
     'category': 'bowl',
   },
-  
-  // 챗바퀴
+  // --- 챗바퀴 ---
   {
     'id': 'wheel_basic',
     'name': '기본 챗바퀴',
@@ -35,8 +35,7 @@ final List<Map<String, dynamic>> storeItemsData = [
     'image': 'assets/images/store_images/chat_rare_store.png',
     'category': 'wheel',
   },
-  
-  // 액세서리
+  // --- 액세서리 ---
   {
     'id': 'water_basic',
     'name': '기본 물통',
@@ -65,8 +64,7 @@ final List<Map<String, dynamic>> storeItemsData = [
     'image': 'assets/images/store_images/hairpin_store.png',
     'category': 'accessory',
   },
-  
-  // 소모 아이템
+  // --- 소모 아이템 ---
   {
     'id': 'ticket_wheel',
     'name': '챗바퀴 타기(1일)',
@@ -98,37 +96,39 @@ class StoreScreen extends StatefulWidget {
 }
 
 class _StoreScreenState extends State<StoreScreen> {
-  // [테스트용 가짜 데이터]
-  int mySeeds = 999999;
-  List<String> myInventory = [];
-
-  // 구매 로직
+  // [진짜] 구매 로직 (Provider 사용)
   void _buyItem(String itemId, String itemName, int price) {
-    if (myInventory.contains(itemId)) return; // 이미 보유
-    
-    if (mySeeds < price) {
+    // ★ 뇌(Provider)한테 구매 요청! (성공 여부를 true/false로 받음)
+    bool isSuccess = context.read<UserProvider>().buyItem(itemId, price);
+
+    if (isSuccess) {
+      // 성공 시 알림
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('도토리가 부족해요!')),
+        SnackBar(
+          content: Text('$itemName 구매 완료!'),
+          duration: const Duration(milliseconds: 800),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
       );
-      return;
+    } else {
+      // 실패 시 (돈 부족)
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('도토리가 부족해요!')));
     }
-
-    setState(() {
-      mySeeds -= price;
-      myInventory.add(itemId);
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$itemName 구매 완료!'), duration: const Duration(milliseconds: 1000)),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // UI 파일만 리턴
+    // ★ 뇌(Provider)를 감시해서 내 돈이나 가방이 바뀌면 화면 다시 그림
+    final userProvider = context.watch<UserProvider>();
+
     return StoreScreenUI(
-      mySeeds: mySeeds,
-      myInventory: myInventory,
+      mySeeds: userProvider.seedCount, // 진짜 도토리
+      myInventory: userProvider.myInventory, // 진짜 가방
       storeItems: storeItemsData,
       onBuyItem: _buyItem,
     );

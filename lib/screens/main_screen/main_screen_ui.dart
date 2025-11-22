@@ -9,35 +9,34 @@ import 'main_screen_widget.dart'; // 헬퍼 함수 코드 import
 
 // UI만 담당 StatelessWidget
 class MainScreenUI extends StatelessWidget {
-
-  final int steps;  // 로직 파일로부터 걸음 수 데이터를 전달받음
+  final int steps; // 로직 파일로부터 걸음 수 데이터를 전달받음
   final HamsterState hamsterState; // 햄스터 상태 데이터를 전달받음
   final int seedCount; // 재화 (도토리) 데이터
 
   const MainScreenUI({
-      super.key,
-      required this.steps,
-      required this.hamsterState, // 햄스터 상태도 필수로 받기
-      required this.seedCount, // 재화 (도토리) 데이터
-    });
+    super.key,
+    required this.steps,
+    required this.hamsterState, // 햄스터 상태도 필수로 받기
+    required this.seedCount, // 재화 (도토리) 데이터
+  });
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     const designWidth = 390.0;
 
-  String hamsterImagePath;
-      switch (hamsterState) {
-        case HamsterState.fat1:
-          hamsterImagePath = 'assets/images/main_images/ham_2.png'; // 1단계 살찜
-          break;
-        case HamsterState.fat2:
-          hamsterImagePath = 'assets/images/main_images/ham_3.png'; // 2단계 살찜
-          break;
-        case HamsterState.normal:
-        default:
-          hamsterImagePath = 'assets/images/main_images/ham_1.png'; // 기본 햄스터
-      }
+    String hamsterImagePath;
+    switch (hamsterState) {
+      case HamsterState.fat1:
+        hamsterImagePath = 'assets/images/main_images/ham_2.png'; // 1단계 살찜
+        break;
+      case HamsterState.fat2:
+        hamsterImagePath = 'assets/images/main_images/ham_3.png'; // 2단계 살찜
+        break;
+      case HamsterState.normal:
+      default:
+        hamsterImagePath = 'assets/images/main_images/ham_1.png'; // 기본 햄스터
+    }
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -49,7 +48,6 @@ class MainScreenUI extends StatelessWidget {
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-
                 // 톳밥 (바닥 배경)
                 Positioned(
                   top: 400, // 햄스터 발밑 좌표
@@ -64,8 +62,8 @@ class MainScreenUI extends StatelessWidget {
 
                 // 챗바퀴 (배경)
                 Positioned(
-                  top: 195,  // 햄스터랑 비슷한 위치 (값 조절하기)
-                  left: -60,  // 왼쪽으로 치우치게 (값 조절하기)
+                  top: 195, // 햄스터랑 비슷한 위치 (값 조절하기)
+                  left: -60, // 왼쪽으로 치우치게 (값 조절하기)
                   child: Image.asset(
                     'assets/images/main_images/chat_normal_back.png',
                     width: 259, // 햄스터보다 조금 작게 (값 조절하기)
@@ -75,8 +73,8 @@ class MainScreenUI extends StatelessWidget {
 
                 // 밥그릇 (배경)
                 Positioned(
-                  top: 410,   // 햄스터: 180
-                  right: 10,   // 햄스터 중앙보다 오른쪽
+                  top: 410, // 햄스터: 180
+                  right: 10, // 햄스터 중앙보다 오른쪽
                   child: Image.asset(
                     'assets/images/main_images/food_normal_back.png',
                     width: 133,
@@ -96,7 +94,7 @@ class MainScreenUI extends StatelessWidget {
                       height: 262,
                       child: Image.asset(
                         // 상태에 따라 바뀐 이미지
-                        hamsterImagePath, 
+                        hamsterImagePath,
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -105,8 +103,8 @@ class MainScreenUI extends StatelessWidget {
 
                 // 물그릇
                 Positioned(
-                  top: 150,    // 햄스터: 180
-                  right: -50,   // 햄스터 중앙보다 오른쪽
+                  top: 150, // 햄스터: 180
+                  right: -50, // 햄스터 중앙보다 오른쪽
                   child: Image.asset(
                     'assets/images/main_images/water_normal_back.png',
                     width: 119,
@@ -126,7 +124,10 @@ class MainScreenUI extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.settings_outlined, color: Colors.grey.shade700),
+                            icon: Icon(
+                              Icons.settings_outlined,
+                              color: Colors.grey.shade700,
+                            ),
                             onPressed: () {
                               print("Settings tapped");
                             },
@@ -144,19 +145,22 @@ class MainScreenUI extends StatelessWidget {
                               const SizedBox(width: 4),
                               // 재화 (150)
                               Text(
-                                '$seedCount',  // 나중에 변수로 받아야 함
+                                '$seedCount', // 나중에 변수로 받아야 함
                                 style: TextStyle(
                                   color: Colors.brown.shade700,
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  fontFamily: 'AppleSDGothicNeoB00' // 폰트 적용
+                                  fontFamily: 'AppleSDGothicNeoB00', // 폰트 적용
                                 ),
                               ),
 
                               const SizedBox(width: 8), // 재화와 알람 사이 간격
                               // 알람 아이콘 (종 모양)
                               IconButton(
-                                icon: Icon(Icons.notifications_outlined, color: Colors.grey.shade700),
+                                icon: Icon(
+                                  Icons.notifications_outlined,
+                                  color: Colors.grey.shade700,
+                                ),
                                 onPressed: () {
                                   print("Notifications tapped");
                                 },
@@ -179,7 +183,7 @@ class MainScreenUI extends StatelessWidget {
                       color: Colors.grey.shade800,
                       fontSize: 15,
                       fontFamily: 'AppleSDGothicNeoM00', // 폰트 적용
-                      fontWeight: FontWeight.bold,  // 볼드체
+                      fontWeight: FontWeight.bold, // 볼드체
                     ),
                   ),
                 ),
@@ -192,11 +196,13 @@ class MainScreenUI extends StatelessWidget {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: steps < 0 ? (steps == -1 ? '!' : '?') : '$steps',
+                          text: steps < 0
+                              ? (steps == -1 ? '!' : '?')
+                              : '$steps',
                           style: const TextStyle(
                             color: Color(0xFFE45151),
                             fontSize: 32,
-                            fontFamily: 'Recipekorea',  // 폰트 적용
+                            fontFamily: 'Recipekorea', // 폰트 적용
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -204,11 +210,12 @@ class MainScreenUI extends StatelessWidget {
                         const TextSpan(
                           text: ' 걸음',
                           style: TextStyle(
-                              color: Color(0xFF1A1A1A),
-                              fontSize: 16,
-                              fontFamily: 'AppleSDGothicNeoB00',  // 폰트 적용
-                              fontWeight: FontWeight.w400,
-                              height: 2.2),
+                            color: Color(0xFF1A1A1A),
+                            fontSize: 16,
+                            fontFamily: 'AppleSDGothicNeoB00', // 폰트 적용
+                            fontWeight: FontWeight.w400,
+                            height: 2.2,
+                          ),
                         ),
                       ],
                     ),
@@ -226,7 +233,7 @@ class MainScreenUI extends StatelessWidget {
                     style: TextStyle(
                       color: const Color(0xFF1A1A1A),
                       fontSize: 20,
-                      fontFamily: 'Recipekorea',  // 폰트 적용
+                      fontFamily: 'Recipekorea', // 폰트 적용
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -238,7 +245,10 @@ class MainScreenUI extends StatelessWidget {
                   right: 20,
                   bottom: 40,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 25,
+                    ),
                     decoration: ShapeDecoration(
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
@@ -249,7 +259,7 @@ class MainScreenUI extends StatelessWidget {
                           color: Colors.grey.withOpacity(0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
-                        )
+                        ),
                       ],
                     ),
 
@@ -262,7 +272,7 @@ class MainScreenUI extends StatelessWidget {
                           TextSpan(
                             children: [
                               TextSpan(
-                                text: '3',  // 나중에 변수로 바꿔야 함.
+                                text: '3', // 나중에 변수로 바꿔야 함.
                                 style: TextStyle(
                                   color: const Color(0xFFE76F6F),
                                   fontSize: 20,
@@ -303,8 +313,8 @@ class MainScreenUI extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          const RecordScreen()),
+                                    builder: (context) => const RecordScreen(),
+                                  ),
                                 );
                               },
                             ),
@@ -318,7 +328,8 @@ class MainScreenUI extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const StoreScreen()),
+                                    builder: (context) => const StoreScreen(),
+                                  ),
                                 );
                               },
                             ),
@@ -332,8 +343,9 @@ class MainScreenUI extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          const InventoryScreen()),
+                                    builder: (context) =>
+                                        const InventoryScreen(),
+                                  ),
                                 );
                               },
                             ),
