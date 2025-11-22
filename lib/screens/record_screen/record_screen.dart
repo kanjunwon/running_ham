@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'record_screen_ui.dart'; // UI 파일 import
+import 'package:provider/provider.dart';
+import 'package:running_ham/providers/user_provider.dart';
+import 'record_screen_ui.dart';
 
 class RecordScreen extends StatefulWidget {
   const RecordScreen({super.key});
@@ -18,8 +20,11 @@ class _RecordScreenState extends State<RecordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+
     // UI 파일만 리턴
     return RecordScreenUI(
+      todaySteps: context.watch<UserProvider>().todaySteps,
       weeklySteps: weeklySteps,
       weekDays: weekDays,
       monthlySteps: monthlySteps,

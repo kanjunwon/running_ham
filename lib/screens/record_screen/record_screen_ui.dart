@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
-import 'record_screen_widgets.dart'; // 부품 파일 import
+import 'package:intl/intl.dart';
+import 'record_screen_widgets.dart';
 
 class RecordScreenUI extends StatelessWidget {
   // 로직에서 받아올 데이터들
+  final int todaySteps; // 오늘 걸음 수
   final List<int> weeklySteps;
   final List<String> weekDays;
   final Map<int, int> monthlySteps;
 
   const RecordScreenUI({
     super.key,
+    required this.todaySteps,
     required this.weeklySteps,
     required this.weekDays,
     required this.monthlySteps,
   });
+
+  // 숫자 3자리마다 콤마 찍기 (ex): 10000 -> 10,000)
+  String formatSteps(int steps) {
+    return NumberFormat('#,###').format(steps);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +51,15 @@ class RecordScreenUI extends StatelessWidget {
             // 상단 통계
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                RecordStatItem(label: "오늘 걸음 수", count: "5,102"),
-                RecordStatItem(label: "이번 주 걸음 수", count: "18,030"),
-                RecordStatItem(label: "이번 달 걸음 수", count: "18,030"),
+              children: [
+                // 걸음 수 연결
+                RecordStatItem(
+                  label: "오늘 걸음 수",
+                  count: formatSteps(todaySteps),
+                ),
+                // (주간/월간은 아직 가짜 데이터 유지)
+                const RecordStatItem(label: "이번 주 걸음 수", count: "9,030"),
+                const RecordStatItem(label: "이번 달 걸음 수", count: "18,030"),
               ],
             ),
 
