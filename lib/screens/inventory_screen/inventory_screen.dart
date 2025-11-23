@@ -74,14 +74,14 @@ class _InventoryScreenState extends State<InventoryScreen> {
       'image': 'assets/images/inventory_images/sunglass_inventory_image.png',
       'preview':
           'assets/images/inventory_images/sunglass_inventory_preview.png',
-      'category': 'accsory',
+      'category': 'glass',
     },
     {
       'id': 'hairpin',
       'name': '머리핀',
       'image': 'assets/images/inventory_images/hairpin_inventory_image.png',
       'preview': 'assets/images/inventory_images/hairpin_inventory_preview.png',
-      'category': 'accsory',
+      'category': 'hair',
     },
 
     // 소모 아이템
@@ -147,7 +147,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
       currentBowl: equipped['bowl'] ?? '',
       currentWater: equipped['water'] ?? '',
       currentWheel: equipped['wheel'] ?? '',
-      currentAccsory: equipped['accsory'],
+      currentGlass: equipped['glass'],
+      currentHair: equipped['hair'],
 
       equipItems: equipItems,
       consumableItems: consumableItems,

@@ -16,7 +16,8 @@ class UserProvider extends ChangeNotifier {
     'bowl': 'assets/images/main_images/food_normal_back.png', // 기본 밥그릇
     'water': 'assets/images/main_images/water_normal_back.png', // 기본 물통
     'wheel': 'assets/images/main_images/chat_normal_back.png', // 기본 챗바퀴
-    'accsory': '', // 액세서리 없음
+    'glass': '', // 선글라스
+    'hair': '', // 머리핀
   };
 
   // 데이터 가져오기
@@ -47,9 +48,12 @@ class UserProvider extends ChangeNotifier {
   // 아이템 장착
   void equipItem(String category, String imagePath) {
     // 액세서리는 이미 낀거 또 누르면 해제
-    if (category == 'acc' && _equippedItems['acc'] == imagePath) {
-      _equippedItems['acc'] = '';
+    if (category == 'glass' && _equippedItems['glass'] == imagePath) {
+      _equippedItems['glass'] = '';
+    } else if (category == 'hair' && _equippedItems['hair'] == imagePath) {
+      _equippedItems['hair'] = '';
     } else {
+      // 아니면 장착
       _equippedItems[category] = imagePath;
     }
     notifyListeners(); // 화면 갱신 알림

@@ -57,14 +57,14 @@ final List<Map<String, dynamic>> storeItemsData = [
     'name': '썬글라스',
     'price': 1000,
     'image': 'assets/images/store_images/sunglass_store.png',
-    'category': 'accessory',
+    'category': 'glass',
   },
   {
     'id': 'hairpin',
     'name': '머리핀',
     'price': 1000,
     'image': 'assets/images/store_images/hairpin_store.png',
-    'category': 'accessory',
+    'category': 'hair',
   },
 
   // 소모 아이템

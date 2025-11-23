@@ -120,10 +120,15 @@ class MainScreenUI extends StatelessWidget {
                           ),
                         ),
 
-                      // 치장 아이템 (선글라스/머리핀 등)
-                      if (equipped['accsory'] != null &&
-                          equipped['accsory']!.isNotEmpty)
-                        _buildAccessory(equipped['accsory']!),
+                      // 치장 아이템 (선글라스)
+                      if (equipped['glass'] != null &&
+                          equipped['glass']!.isNotEmpty)
+                        _buildAccessory(equipped['glass']!),
+
+                      // 치장 아이템 (머리핀)
+                      if (equipped['hair'] != null &&
+                          equipped['hair']!.isNotEmpty)
+                        _buildAccessory(equipped['hair']!),
 
                       // 하트
                       if (touchCount >= 5)

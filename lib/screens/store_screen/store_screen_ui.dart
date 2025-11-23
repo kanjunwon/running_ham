@@ -67,7 +67,8 @@ class StoreScreenUI extends StatelessWidget {
               // 카테고리별 섹션 구성
               _buildCategorySection("밥그릇", "bowl"),
               _buildCategorySection("챗바퀴", "wheel"),
-              _buildCategorySection("액세서리", "accessory"),
+              _buildCategorySection("썬글라스", "glass"),
+              _buildCategorySection("머리핀", "hair"),
               _buildCategorySection("소모 아이템", "consumable"),
 
               const SizedBox(height: 40),

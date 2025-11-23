@@ -6,7 +6,8 @@ class InventoryScreenUI extends StatelessWidget {
   final String currentBowl;
   final String currentWater;
   final String currentWheel;
-  final String? currentAccsory;
+  final String? currentGlass;
+  final String? currentHair;
 
   // 아이템 리스트
   final List<Map<String, dynamic>> equipItems;
@@ -20,7 +21,8 @@ class InventoryScreenUI extends StatelessWidget {
     required this.currentBowl,
     required this.currentWater,
     required this.currentWheel,
-    required this.currentAccsory,
+    required this.currentGlass,
+    required this.currentHair,
     required this.equipItems,
     required this.consumableItems,
     required this.onEquipItem,
@@ -87,7 +89,7 @@ class InventoryScreenUI extends StatelessWidget {
                   child: Image.asset(currentWater, width: 100, height: 200),
                 ),
 
-                // 햄스터
+                // 햄스터 (중앙)
                 Positioned(
                   bottom: 50,
                   left: 0,
@@ -101,17 +103,13 @@ class InventoryScreenUI extends StatelessWidget {
                   ),
                 ),
 
-                // 액세서리
-                if (currentAccsory != null)
-                  Positioned(
-                    bottom: 150,
-                    left: 0,
-                    right: 0,
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Image.asset(currentAccsory!, width: 80),
-                    ),
-                  ),
+                // 썬글라스
+                if (currentGlass != null && currentGlass!.isNotEmpty)
+                  _buildPreviewAccessory(currentGlass!),
+
+                // 머리핀
+                if (currentHair != null && currentHair!.isNotEmpty)
+                  _buildPreviewAccessory(currentHair!),
               ],
             ),
           ),
@@ -196,7 +194,8 @@ class InventoryScreenUI extends StatelessWidget {
               currentBowl == item['image'] ||
               currentWater == item['image'] ||
               currentWheel == item['image'] ||
-              currentAccsory == item['image'];
+              currentGlass == item['image'] ||
+              currentHair == item['image'];
         }
 
         // 부품 호출
@@ -210,4 +209,40 @@ class InventoryScreenUI extends StatelessWidget {
       },
     );
   }
+}
+
+// 보관함에서 미리 보는 치장 아이템
+Widget _buildPreviewAccessory(String imagePath) {
+  double bottom = 0;
+  double left = 0;
+  double width = 100;
+
+  // 썬글라스
+  if (imagePath.contains('sunglass')) {
+    width = 120; // 크기
+    bottom = 166; // 높이
+    left = 3; // 좌우 중앙
+
+    // 머리핀
+  } else if (imagePath.contains('hair')) {
+    width = 70; // 크기
+    bottom = 190; // 머리 위
+    left = 83; // 오른쪽 귀
+  } else {
+    bottom = 100;
+    left = 0;
+  }
+
+  return Positioned(
+    bottom: bottom,
+    left: 0,
+    right: 0,
+    child: Align(
+      alignment: Alignment.center,
+      child: Padding(
+        padding: EdgeInsets.only(left: left),
+        child: Image.asset(imagePath, width: width, fit: BoxFit.contain),
+      ),
+    ),
+  );
 }
