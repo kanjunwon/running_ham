@@ -256,7 +256,7 @@ class MainScreenUI extends StatelessWidget {
           Positioned(
             left: 0,
             right: 0,
-            top: 500,
+            top: 492,
             child: Text(
               '김햄찌', // 나중에 변수로 바꿔야 함.
               textAlign: TextAlign.center,
@@ -275,7 +275,7 @@ class MainScreenUI extends StatelessWidget {
             right: 20,
             bottom: 40,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               decoration: ShapeDecoration(
                 color: Colors.white, // 카드 배경색
                 shape: RoundedRectangleBorder(
@@ -319,12 +319,12 @@ class MainScreenUI extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
 
                   // 헬퍼 함수 프로그레스 바 호출
                   ProgressBar(currentSteps: steps),
 
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
 
                   // 메뉴 버튼 호출
                   Row(
