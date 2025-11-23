@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'inventory_screen_widgets.dart'; // 부품 import
+import 'inventory_screen_widgets.dart';
 
 class InventoryScreenUI extends StatelessWidget {
   // 현재 장착된 이미지 경로들
@@ -65,24 +65,28 @@ class InventoryScreenUI extends StatelessWidget {
                     fit: BoxFit.fill,
                   ),
                 ),
+
                 // 챗바퀴
                 Positioned(
                   top: 20,
                   left: -40,
                   child: Image.asset(currentWheel, width: 220, height: 220),
                 ),
+
                 // 밥그릇
                 Positioned(
                   bottom: 30,
                   right: 10,
                   child: Image.asset(currentBowl, width: 110, height: 60),
                 ),
+
                 // 물통
                 Positioned(
                   top: 20,
                   right: -30,
                   child: Image.asset(currentWater, width: 100, height: 200),
                 ),
+
                 // 햄스터
                 Positioned(
                   bottom: 50,
@@ -96,7 +100,8 @@ class InventoryScreenUI extends StatelessWidget {
                     ),
                   ),
                 ),
-                // 액세서리 (있으면 보여줌)
+
+                // 액세서리
                 if (currentAccsory != null)
                   Positioned(
                     bottom: 150,

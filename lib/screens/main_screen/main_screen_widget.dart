@@ -32,13 +32,11 @@ class ProgressBar extends StatelessWidget {
               return Stack(
                 clipBehavior: Clip.none, // 밖으로 튀어나가도 보이게
                 children: [
-                  
                   Positioned(
                     left: 0,
                     bottom: -15, // 게이지 바 아래에 텍스트 배치
                     child: Row(
                       children: [
-                        
                         Stack(
                           alignment: Alignment.center,
                           children: [
@@ -46,10 +44,13 @@ class ProgressBar extends StatelessWidget {
                               width: 26,
                               height: 26,
                               decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white, // 흰색 배경
-                                  border: Border.all(
-                                      color: const Color(0xFFE76F6F), width: 2)),
+                                shape: BoxShape.circle,
+                                color: Colors.white, // 흰색 배경
+                                border: Border.all(
+                                  color: const Color(0xFFE76F6F),
+                                  width: 2,
+                                ),
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(4.0),
@@ -61,13 +62,16 @@ class ProgressBar extends StatelessWidget {
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(width: 4), // 도토리와 텍스트 사이 간격
 
-                        Text('$displaySteps보',
-                            style: const TextStyle(
-                                fontSize: 15,
-                                fontFamily: 'AppleSDGothicNeoM00')),
+                        Text(
+                          '$displaySteps보',
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontFamily: 'AppleSDGothicNeoM00',
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -75,19 +79,25 @@ class ProgressBar extends StatelessWidget {
                   Positioned(
                     left: barWidth * reward1Progress - 15,
                     bottom: -15,
-                    child: const Text('50개 ',
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontFamily: 'AppleSDGothicNeoM00')),
+                    child: const Text(
+                      '50개 ',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontFamily: 'AppleSDGothicNeoM00',
+                      ),
+                    ),
                   ),
 
                   Positioned(
                     right: 0,
                     bottom: -15,
-                    child: const Text('100개',
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontFamily: 'AppleSDGothicNeoM00')),
+                    child: const Text(
+                      '100개',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontFamily: 'AppleSDGothicNeoM00',
+                      ),
+                    ),
                   ),
                 ],
               );
@@ -104,9 +114,13 @@ class ProgressBar extends StatelessWidget {
               if (barWidth == 0) {
                 return const SizedBox(height: 20); // 0이면 빈 공간
               }
-              
-              final double maxHandleLeft = (barWidth - 20).clamp(0.0, double.infinity); // (barWidth - 20)이 음수가 되지 않도록, 0.0으로 최소값 고정
-              final double calculatedHandleLeft = barWidth * progress - 10; // 게이지 핸들의 계산된 위치
+
+              final double maxHandleLeft = (barWidth - 20).clamp(
+                0.0,
+                double.infinity,
+              ); // (barWidth - 20)이 음수가 되지 않도록, 0.0으로 최소값 고정
+              final double calculatedHandleLeft =
+                  barWidth * progress - 10; // 게이지 핸들의 계산된 위치
 
               return Stack(
                 alignment: Alignment.centerLeft,
@@ -194,10 +208,7 @@ class MenuButton extends StatelessWidget {
         decoration: ShapeDecoration(
           color: Colors.white,
           shape: RoundedRectangleBorder(
-            side: BorderSide(
-              width: 1,
-              color: Colors.grey.shade300,
-            ),
+            side: BorderSide(width: 1, color: Colors.grey.shade300),
             borderRadius: BorderRadius.circular(15),
           ),
           shadows: [
@@ -205,7 +216,7 @@ class MenuButton extends StatelessWidget {
               color: Colors.grey.withOpacity(0.1),
               blurRadius: 4,
               offset: const Offset(0, 2),
-            )
+            ),
           ],
         ),
         child: Column(
@@ -216,6 +227,7 @@ class MenuButton extends StatelessWidget {
               width: 35, // 가로 크기
               height: 35, // 세로 크기
             ),
+
             const SizedBox(height: 5),
             Text(
               label,

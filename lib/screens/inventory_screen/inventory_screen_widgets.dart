@@ -26,6 +26,7 @@ class InventoryItemCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),
+
               // 장착 중이면 분홍색 테두리
               border: Border.all(
                 color: isEquipped
@@ -33,6 +34,7 @@ class InventoryItemCard extends StatelessWidget {
                     : Colors.grey.shade200,
                 width: isEquipped ? 2 : 1,
               ),
+
               // 장착 중이면 살짝 그림자
               boxShadow: [
                 if (isEquipped)

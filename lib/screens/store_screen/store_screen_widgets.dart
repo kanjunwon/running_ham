@@ -53,7 +53,7 @@ class StoreItemCard extends StatelessWidget {
               name,
               style: const TextStyle(
                 color: Color(0xFF4D3817), // 진한 갈색
-                fontSize: 14, // 폰트 크기 살짝 키움
+                fontSize: 14, // 폰트 크기
                 fontWeight: FontWeight.w500, // 굵기 조정
                 fontFamily: 'AppleSDGothicNeoM00', // 폰트 적용
               ),
@@ -83,6 +83,7 @@ class StoreItemCard extends StatelessWidget {
                         width: 16,
                       ),
                       const SizedBox(width: 4),
+
                       // 가격 텍스트
                       Text(
                         "$price",

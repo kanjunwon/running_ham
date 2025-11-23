@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // ★ Provider 추가
-import 'package:running_ham/providers/user_provider.dart'; // ★ 뇌(Provider) 가져오기
-import 'store_screen_ui.dart'; // UI 파일 import
+import 'package:provider/provider.dart';
+import 'package:running_ham/providers/user_provider.dart';
+import 'store_screen_ui.dart';
 
-// [데이터] 상품 목록 (그대로 유지)
+// 상품 목록
 final List<Map<String, dynamic>> storeItemsData = [
-  // --- 밥그릇 ---
+  // 밥그릇
   {
     'id': 'bowl_basic',
     'name': '기본 밥그릇',
@@ -20,7 +20,8 @@ final List<Map<String, dynamic>> storeItemsData = [
     'image': 'assets/images/store_images/food_rare_store.png',
     'category': 'bowl',
   },
-  // --- 챗바퀴 ---
+
+  // 챗바퀴
   {
     'id': 'wheel_basic',
     'name': '기본 챗바퀴',
@@ -35,7 +36,8 @@ final List<Map<String, dynamic>> storeItemsData = [
     'image': 'assets/images/store_images/chat_rare_store.png',
     'category': 'wheel',
   },
-  // --- 액세서리 ---
+
+  // 액세서리
   {
     'id': 'water_basic',
     'name': '기본 물통',
@@ -64,7 +66,8 @@ final List<Map<String, dynamic>> storeItemsData = [
     'image': 'assets/images/store_images/hairpin_store.png',
     'category': 'accessory',
   },
-  // --- 소모 아이템 ---
+
+  // 소모 아이템
   {
     'id': 'ticket_wheel',
     'name': '챗바퀴 타기(1일)',
@@ -96,9 +99,8 @@ class StoreScreen extends StatefulWidget {
 }
 
 class _StoreScreenState extends State<StoreScreen> {
-  // [진짜] 구매 로직 (Provider 사용)
+  // 구매 로직
   void _buyItem(String itemId, String itemName, int price) {
-    // ★ 뇌(Provider)한테 구매 요청! (성공 여부를 true/false로 받음)
     bool isSuccess = context.read<UserProvider>().buyItem(itemId, price);
 
     if (isSuccess) {
@@ -123,12 +125,11 @@ class _StoreScreenState extends State<StoreScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ★ 뇌(Provider)를 감시해서 내 돈이나 가방이 바뀌면 화면 다시 그림
     final userProvider = context.watch<UserProvider>();
 
     return StoreScreenUI(
-      mySeeds: userProvider.seedCount, // 진짜 도토리
-      myInventory: userProvider.myInventory, // 진짜 가방
+      mySeeds: userProvider.seedCount, // 도토리
+      myInventory: userProvider.myInventory, // 보관함
       storeItems: storeItemsData,
       onBuyItem: _buyItem,
     );

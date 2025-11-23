@@ -26,6 +26,7 @@ class _MainScreenState extends State<MainScreen> {
   int _steps = 0;
   HamsterState _hamsterState = HamsterState.normal;
   final int _targetSteps = 5; // 원래 5000보
+  int _touchCount = 0; // 햄스터 터치 카운트 (상호작용)
 
   // 보상 중복 방지용 로컬 변수
   String _lastRewardDateKey = '';
@@ -88,14 +89,28 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  void _onHamsterTap() {
+    setState(() {
+      _touchCount++;
+      print("햄찌 터치! 터치 횟수: $_touchCount");
+
+      // (옵션) 5번 터치 시 진동이나 소리 효과를 넣을 수도 있음
+      if (_touchCount == 5) {
+        print("햄찌 기모찌");
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
 
     return MainScreenUI(
-      steps: _steps,
-      hamsterState: _hamsterState,
-      seedCount: userProvider.seedCount,
+      steps: _steps, // 오늘 걸음수
+      hamsterState: _hamsterState, // 햄스터 상태
+      seedCount: userProvider.seedCount, // 도토리 개수
+      touchCount: _touchCount, // 햄스터 터치 횟수
+      onHamsterTap: _onHamsterTap, // 햄스터 터치 콜백
     );
   }
 }

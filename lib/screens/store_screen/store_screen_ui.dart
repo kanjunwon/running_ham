@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'store_screen_widgets.dart'; // 부품 파일 import
+import 'store_screen_widgets.dart';
 
 class StoreScreenUI extends StatelessWidget {
   final int mySeeds;
@@ -46,7 +46,10 @@ class StoreScreenUI extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Image.asset('assets/images/main_images/money_main_back.png', width: 22),
+                  Image.asset(
+                    'assets/images/main_images/money_main_back.png',
+                    width: 22,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     '$mySeeds',
@@ -77,7 +80,9 @@ class StoreScreenUI extends StatelessWidget {
 
   // 카테고리 섹션 빌더
   Widget _buildCategorySection(String title, String categoryCode) {
-    final items = storeItems.where((item) => item['category'] == categoryCode).toList();
+    final items = storeItems
+        .where((item) => item['category'] == categoryCode)
+        .toList();
 
     if (items.isEmpty) return const SizedBox.shrink();
 
@@ -117,7 +122,9 @@ class StoreScreenUI extends StatelessWidget {
               price: item['price'],
               imagePath: item['image'],
               isOwned: isOwned,
-              onTap: isOwned ? null : () => onBuyItem(item['id'], item['name'], item['price']),
+              onTap: isOwned
+                  ? null
+                  : () => onBuyItem(item['id'], item['name'], item['price']),
             );
           },
         ),

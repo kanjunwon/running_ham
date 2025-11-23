@@ -63,11 +63,11 @@ class UserProvider extends ChangeNotifier {
     } else if (itemId == 'ticket_rename') {
       _nickname = value; // value에 새 이름 들어옴
     }
-    // (소모품이니까 인벤토리에서 삭제하는 로직도 필요하면 추가)
+    // 소모품이니까 인벤토리에서 삭제하는 로직도 필요하면 추가
     notifyListeners();
   }
 
-  // 도토리 획득 (만보기 연동용)
+  // 도토리 획득
   void earnSeeds(int amount) {
     _seedCount += amount;
     notifyListeners();

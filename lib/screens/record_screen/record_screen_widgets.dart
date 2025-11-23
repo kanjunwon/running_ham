@@ -22,7 +22,7 @@ class RecordStatItem extends StatelessWidget {
             color: Color(0xFFE45151),
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Recipekorea', // 폰트 있으면 적용
+            fontFamily: 'Recipekorea',
           ),
         ),
       ],
@@ -80,7 +80,6 @@ class WeeklyChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 박스 제거됨 (SizedBox로 높이만 고정)
     return SizedBox(
       height: 250,
       child: Row(
@@ -99,6 +98,7 @@ class WeeklyChart extends StatelessWidget {
             ],
           ),
           const SizedBox(width: 10),
+
           // 오른쪽 그래프
           Expanded(
             child: LayoutBuilder(
@@ -156,7 +156,6 @@ class MonthlyCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 박스 제거됨 (Column 바로 시작)
     return Column(
       children: [
         // 헤더
