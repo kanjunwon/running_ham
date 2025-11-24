@@ -61,35 +61,10 @@ class MainScreenUI extends StatelessWidget {
             ),
           ),
 
-          // 가구 - 물그릇, 밥그릇, 챗바퀴
-          // 챗바퀴
-          Positioned(
-            top: 195, // 햄스터: 180
-            left: -60, // 왼쪽으로 치우치게 (값 조절하기)
-            child: Image.asset(
-              equipped['wheel']!,
-              width: 259, // 햄스터보다 조금 작게 (값 조절하기)
-              height: 261,
-            ),
-          ),
-
-          // 물통
-          Positioned(
-            top: 150, // 햄스터: 180
-            right: -50, // 햄스터 중앙보다 오른쪽
-            child: Image.asset(
-              equipped['water']!,
-              width: 119,
-              height: 231,
-            ), // (물통은 길쭉하니까)
-          ),
-
-          // 밥그릇
-          Positioned(
-            top: 410, // 햄스터: 180
-            right: 10, // 햄스터 중앙보다 오른쪽
-            child: Image.asset(equipped['bowl']!, width: 133, height: 72),
-          ),
+          // 물그릇, 밥그릇, 챗바퀴 (함수 호출)
+          _buildWheel(equipped['wheel']!),
+          _buildWater(equipped['water']!),
+          _buildBowl(equipped['bowl']!),
 
           // 햄스터 + 터치 상호작용 + 치장
           Positioned(
@@ -113,7 +88,7 @@ class MainScreenUI extends StatelessWidget {
                       if (touchCount >= 5)
                         Positioned(
                           top: -63,
-                          left: -70, // FIXME: 볼터치 위치 조정
+                          left: -70,
                           child: Image.asset(
                             'assets/images/main_images/blush.png',
                             width: 375,
@@ -256,7 +231,7 @@ class MainScreenUI extends StatelessWidget {
           Positioned(
             left: 0,
             right: 0,
-            top: 492,
+            top: 492, // 하단 카드에 안 겹치도록 위치 조정
             child: Text(
               '김햄찌', // 나중에 변수로 바꿔야 함.
               textAlign: TextAlign.center,
@@ -322,8 +297,6 @@ class MainScreenUI extends StatelessWidget {
                   const SizedBox(height: 15),
 
                   // 헬퍼 함수 프로그레스 바 호출
-                  ProgressBar(currentSteps: steps),
-
                   const SizedBox(height: 20),
 
                   // 메뉴 버튼 호출
@@ -383,6 +356,64 @@ class MainScreenUI extends StatelessWidget {
     );
   }
 
+  // 챗바퀴 위치 조절 함수
+  Widget _buildWheel(String imagePath) {
+    double top = 195; // [기본값]
+    double left = -60; // [기본값]
+    double width = 259;
+    double height = 261;
+
+    if (imagePath.contains('rare')) {
+      top = 260;
+      left = -50;
+    }
+
+    return Positioned(
+      top: top,
+      left: left,
+      child: Image.asset(imagePath, width: width, height: height),
+    );
+  }
+
+  // 물통 위치 조절 함수
+  Widget _buildWater(String imagePath) {
+    double top = 150; // [기본값]
+    double right = -50; // [기본값]
+    double width = 119;
+    double height = 231;
+
+    if (imagePath.contains('rare')) {
+      // 고급 물통 좌표 수정
+      top = 140;
+      right = -40;
+    }
+
+    return Positioned(
+      top: top,
+      right: right,
+      child: Image.asset(imagePath, width: width, height: height),
+    );
+  }
+
+  // 밥그릇 위치 조절 함수
+  Widget _buildBowl(String imagePath) {
+    double top = 410; // [기본값]
+    double right = 10; // [기본값]
+    double width = 133;
+    double height = 72;
+
+    if (imagePath.contains('rare')) {
+      top = 400;
+      right = 20;
+    }
+
+    return Positioned(
+      top: top,
+      right: right,
+      child: Image.asset(imagePath, width: width, height: height),
+    );
+  }
+
   // 액세서리 위치 조절 함수
   Widget _buildAccessory(String imagePath) {
     double top = 0;
@@ -391,13 +422,13 @@ class MainScreenUI extends StatelessWidget {
 
     if (imagePath.contains('sunglass')) {
       // 선글라스 위치
-      top = 64; // FIXME: 눈 높이에 맞게 조절
-      left = 43; // FIXME: 좌우 조절
-      width = 150; // FIXME: 크기 조절
+      top = 64;
+      left = 43;
+      width = 150;
     } else if (imagePath.contains('hairpin')) {
       // 머리핀 위치
-      top = 7; // FIXME: 머리 위에 맞게 조절
-      left = 130; // FIXME: 오른쪽 귀 쪽으로
+      top = 7;
+      left = 130;
       width = 80;
     } else {
       // 그 외 아이템 (기본값)

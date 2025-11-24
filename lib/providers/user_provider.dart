@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class UserProvider extends ChangeNotifier {
   // 내 정보
-  int _seedCount = 3000; // 도토리 (테스트용 3000개)
+  int _seedCount = 300000; // 도토리 (테스트용 300000개)
   int _todaySteps = 0; // 오늘 걸음 수
   String _nickname = "김햄찌"; // 닉네임
   String _hamsterImage =
