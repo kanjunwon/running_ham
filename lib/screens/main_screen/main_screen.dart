@@ -146,7 +146,6 @@ class _MainScreenState extends State<MainScreen> {
       steps: _steps, // 오늘 걸음수
       hamsterState: _hamsterState, // 햄스터 상태
       seedCount: userProvider.seedCount, // 도토리 개수
-      touchCount: _touchCount, // 햄스터 터치 횟수
       isHappyMode: _isHappyMode, // 해피 모드 여부
       onHamsterTap: _onHamsterTap, // 햄스터 터치 콜백
     );

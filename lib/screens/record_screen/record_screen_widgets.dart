@@ -22,7 +22,7 @@ class RecordStatItem extends StatelessWidget {
             color: Color(0xFFE45151),
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            fontFamily: 'Recipekorea',
+            fontFamily: 'Pretendard',
           ),
         ),
       ],

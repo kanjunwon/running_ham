@@ -23,10 +23,10 @@ class RunningHamApp extends StatelessWidget {
     return MaterialApp(
       title: '러닝햄',
       theme: ThemeData(
-        // 나중에 피그마 디자인에 맞춰서 수정해야함 (다크 or 라이트)
+        fontFamily: 'Pretendard',
+        scaffoldBackgroundColor: const Color(0xFFFAF3E6),
       ),
-
-      home: MainScreen(),
+      home: const MainScreen(),
     );
   }
 }

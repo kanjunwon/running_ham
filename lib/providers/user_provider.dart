@@ -5,11 +5,20 @@ class UserProvider extends ChangeNotifier {
   // 내 정보
   int _seedCount = 300000; // 도토리 (테스트용 300000개)
   int _todaySteps = 0; // 오늘 걸음 수
+  int _attendanceDays = 0; // 출석 일수
+
   String _nickname = "김햄찌"; // 닉네임
   String _hamsterImage =
       "assets/images/main_images/ham_1.png"; // 햄스터 본체 (기본 이미지)
 
   String _exemptionDate = ""; // 운동 면제권 날짜 (yyyyMMdd)
+
+  // 기록페이지 걸음 수
+  Map<String, int> _stepHistory = {
+    // 테스트용 데이터
+    '20251124': 8000,
+    '20251125': 12000,
+  };
 
   // 아이템 정보
   List<String> _myInventory = []; // 내가 가진 아이템 ID 리스트
@@ -25,11 +34,13 @@ class UserProvider extends ChangeNotifier {
 
   // 데이터 가져오기
   int get seedCount => _seedCount;
-  int get todaySteps => _todaySteps; // 걸음 수 가져오기
+  int get todaySteps => _todaySteps;
+  int get attendanceDays => _attendanceDays;
   String get nickname => _nickname;
   String get hamsterImage => _hamsterImage;
   List<String> get myInventory => _myInventory;
   Map<String, String> get equippedItems => _equippedItems;
+  Map<String, int> get stepHistory => _stepHistory;
 
   // 오늘이 운동 면제인지 확인하는 함수
   bool get isExemptToday {
@@ -40,6 +51,11 @@ class UserProvider extends ChangeNotifier {
   // 걸음 수 업데이트
   void updateSteps(int steps) {
     _todaySteps = steps;
+
+    // 오늘 날짜 기록
+    final String todayKey = DateFormat('yyyyMMdd').format(DateTime.now());
+    _stepHistory[todayKey] = steps;
+
     notifyListeners(); // 화면 갱신 알림
   }
 

@@ -12,16 +12,14 @@ class MainScreenUI extends StatelessWidget {
   final int steps; // 로직 파일로부터 걸음 수 데이터를 전달받음
   final HamsterState hamsterState; // 햄스터 상태 데이터를 전달받음
   final int seedCount; // 재화 (도토리) 데이터
-  final int touchCount; // 햄스터 터치 횟수
-  final VoidCallback onHamsterTap; // 햄스터 터치 콜백
   final bool isHappyMode; // 해피 모드 여부
+  final VoidCallback onHamsterTap; // 햄스터 터치 콜백
 
   const MainScreenUI({
     super.key,
     required this.steps,
     required this.hamsterState, // 햄스터 상태도 필수로 받기
     required this.seedCount, // 재화 (도토리) 데이터
-    required this.touchCount, // 햄스터 터치 횟수
     required this.onHamsterTap, // 햄스터 터치 콜백
     required this.isHappyMode, // 해피 모드 여부
   });
@@ -161,7 +159,7 @@ class MainScreenUI extends StatelessWidget {
                             color: Colors.brown.shade700,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'AppleSDGothicNeoB00', // 폰트 적용
+                            fontFamily: 'Pretendard', // 폰트 적용
                           ),
                         ),
 
@@ -193,7 +191,7 @@ class MainScreenUI extends StatelessWidget {
               style: TextStyle(
                 color: Colors.grey.shade800,
                 fontSize: 15,
-                fontFamily: 'AppleSDGothicNeoM00', // 폰트 적용
+                fontFamily: 'Pretendard', // 폰트 적용
                 fontWeight: FontWeight.bold, // 볼드체
               ),
             ),
@@ -220,7 +218,7 @@ class MainScreenUI extends StatelessWidget {
                     style: TextStyle(
                       color: Color(0xFF1A1A1A),
                       fontSize: 16,
-                      fontFamily: 'AppleSDGothicNeoB00', // 폰트 적용
+                      fontFamily: 'Pretendard', // 폰트 적용
                       fontWeight: FontWeight.w400,
                       height: 2.2,
                     ),
@@ -277,7 +275,7 @@ class MainScreenUI extends StatelessWidget {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: '3', // 나중에 변수로 바꿔야 함.
+                          text: '${userProvider.attendanceDays}',
                           style: TextStyle(
                             color: const Color(0xFFE76F6F),
                             fontSize: 20,
@@ -290,7 +288,7 @@ class MainScreenUI extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 16,
-                            fontFamily: 'AppleSDGothicNeoB00',
+                            fontFamily: 'Pretendard',
                             fontWeight: FontWeight.w400,
                           ),
                         ),

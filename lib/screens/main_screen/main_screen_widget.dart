@@ -69,7 +69,7 @@ class ProgressBar extends StatelessWidget {
                           '$displaySteps보',
                           style: const TextStyle(
                             fontSize: 15,
-                            fontFamily: 'AppleSDGothicNeoM00',
+                            fontFamily: 'Pretendard',
                           ),
                         ),
                       ],
@@ -81,10 +81,7 @@ class ProgressBar extends StatelessWidget {
                     bottom: -15,
                     child: const Text(
                       '50개 ',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: 'AppleSDGothicNeoM00',
-                      ),
+                      style: TextStyle(fontSize: 15, fontFamily: 'Pretendard'),
                     ),
                   ),
 
@@ -93,10 +90,7 @@ class ProgressBar extends StatelessWidget {
                     bottom: -15,
                     child: const Text(
                       '100개',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontFamily: 'AppleSDGothicNeoM00',
-                      ),
+                      style: TextStyle(fontSize: 15, fontFamily: 'Pretendard'),
                     ),
                   ),
                 ],
@@ -235,7 +229,7 @@ class MenuButton extends StatelessWidget {
               style: TextStyle(
                 color: Colors.grey.shade800,
                 fontSize: 13,
-                fontFamily: 'AppleSDGothicNeoM00', // 폰트 적용
+                fontFamily: 'Pretendard', // 폰트 적용
                 fontWeight: FontWeight.bold, // 볼드체
               ),
             ),

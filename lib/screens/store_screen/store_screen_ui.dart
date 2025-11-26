@@ -57,7 +57,7 @@ class StoreScreenUI extends StatelessWidget {
                       color: Color(0xFF1A1A1A),
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'AppleSDGothicNeoEB00',
+                      fontFamily: 'Pretendard',
                     ),
                   ),
                 ],

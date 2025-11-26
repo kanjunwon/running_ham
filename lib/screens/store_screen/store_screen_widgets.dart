@@ -55,7 +55,7 @@ class StoreItemCard extends StatelessWidget {
                 color: Color(0xFF4D3817), // 진한 갈색
                 fontSize: 14, // 폰트 크기
                 fontWeight: FontWeight.w500, // 굵기 조정
-                fontFamily: 'AppleSDGothicNeoM00', // 폰트 적용
+                fontFamily: 'Pretendard', // 폰트 적용
               ),
               textAlign: TextAlign.center,
               maxLines: 1,
