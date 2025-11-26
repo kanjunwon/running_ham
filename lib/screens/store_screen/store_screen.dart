@@ -7,14 +7,14 @@ import 'store_screen_ui.dart';
 final List<Map<String, dynamic>> storeItemsData = [
   // 밥그릇
   {
-    'id': 'bowl_basic',
+    'id': 'food_normal',
     'name': '기본 밥그릇',
     'price': 1000,
     'image': 'assets/images/store_images/food_normal_store.png',
     'category': 'bowl',
   },
   {
-    'id': 'bowl_adv',
+    'id': 'food_rare',
     'name': '고급 밥그릇',
     'price': 1500,
     'image': 'assets/images/store_images/food_rare_store.png',
@@ -23,14 +23,14 @@ final List<Map<String, dynamic>> storeItemsData = [
 
   // 챗바퀴
   {
-    'id': 'wheel_basic',
+    'id': 'chat_normal',
     'name': '기본 챗바퀴',
     'price': 1000,
     'image': 'assets/images/store_images/chat_normal_store.png',
     'category': 'wheel',
   },
   {
-    'id': 'wheel_adv',
+    'id': 'chat_rare',
     'name': '고급 챗바퀴',
     'price': 1500,
     'image': 'assets/images/store_images/chat_rare_store.png',
@@ -39,14 +39,14 @@ final List<Map<String, dynamic>> storeItemsData = [
 
   // 물통
   {
-    'id': 'water_basic',
+    'id': 'water_normal',
     'name': '기본 물통',
     'price': 1000,
     'image': 'assets/images/store_images/water_normal_store.png',
     'category': 'water',
   },
   {
-    'id': 'water_adv',
+    'id': 'water_rare',
     'name': '고급 물통',
     'price': 1500,
     'image': 'assets/images/store_images/water_rare_store.png',
@@ -71,21 +71,21 @@ final List<Map<String, dynamic>> storeItemsData = [
 
   // 소모 아이템
   {
-    'id': 'ticket_wheel',
+    'id': '1day',
     'name': '챗바퀴 타기(1일)',
     'price': 1500,
     'image': 'assets/images/store_images/1day_store.png',
     'category': 'consumable',
   },
   {
-    'id': 'item_dye',
+    'id': 'color_change',
     'name': '햄스터 염색권',
     'price': 1000,
     'image': 'assets/images/store_images/color_change_store.png',
     'category': 'consumable',
   },
   {
-    'id': 'ticket_name',
+    'id': 'nickname_change',
     'name': '이름변경권',
     'price': 1000,
     'image': 'assets/images/store_images/nickname_change_store.png',

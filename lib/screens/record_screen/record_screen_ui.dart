@@ -4,26 +4,44 @@ import 'record_screen_widgets.dart';
 
 class RecordScreenUI extends StatelessWidget {
   // 로직에서 받아올 데이터들
-  final int todaySteps; // 오늘 걸음 수
+  final int displaySteps; // 화면에 크게 보여줄 걸음 수
+  final DateTime selectedDate; // 선택된 날짜
+  final DateTime focusedDate; // 현재 보고 있는 달력 월
+
   final List<int> weeklySteps;
-  final List<String> weekDays;
   final Map<int, int> monthlySteps;
+
+  // 총합 데이터 받는 변수
+  final int weeklyTotal;
+  final int monthlyTotal;
+
+  // 콜백 함수들
+  final Function(bool) onMonthChanged;
+  final Function(int) onDateSelected;
 
   const RecordScreenUI({
     super.key,
-    required this.todaySteps,
+    required this.displaySteps,
+    required this.selectedDate,
+    required this.focusedDate,
     required this.weeklySteps,
-    required this.weekDays,
     required this.monthlySteps,
+    required this.weeklyTotal,
+    required this.monthlyTotal,
+    required this.onMonthChanged,
+    required this.onDateSelected,
   });
 
-  // 숫자 3자리마다 콤마 찍기 (ex): 10000 -> 10,000)
+  // 숫자 3자리마다 콤마 찍기 (ex): 12345 -> 12,345))
   String formatSteps(int steps) {
     return NumberFormat('#,###').format(steps);
   }
 
   @override
   Widget build(BuildContext context) {
+    // 요일 리스트
+    final List<String> weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
     return Scaffold(
       backgroundColor: Colors.white, // 배경 흰색
       appBar: AppBar(
@@ -52,14 +70,13 @@ class RecordScreenUI extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // 걸음 수 연결
+                // 선택한 날짜 데이터
                 RecordStatItem(
-                  label: "오늘 걸음 수",
-                  count: formatSteps(todaySteps),
+                  label: "${selectedDate.month}월 ${selectedDate.day}일",
+                  count: formatSteps(displaySteps),
                 ),
-                // (주간/월간은 아직 가짜 데이터 유지)
-                const RecordStatItem(label: "이번 주 걸음 수", count: "9,030"),
-                const RecordStatItem(label: "이번 달 걸음 수", count: "18,030"),
+                RecordStatItem(label: "이번 주", count: formatSteps(weeklyTotal)),
+                RecordStatItem(label: "이번 달", count: formatSteps(monthlyTotal)),
               ],
             ),
 
@@ -77,7 +94,14 @@ class RecordScreenUI extends StatelessWidget {
             const RecordSectionTitle(title: "월간 기록"),
             const SizedBox(height: 15),
             // 부품 호출
-            MonthlyCalendar(monthlySteps: monthlySteps, weekDays: weekDays),
+            MonthlyCalendar(
+              monthlySteps: monthlySteps,
+              weekDays: weekDays,
+              focusedDate: focusedDate,
+              selectedDate: selectedDate,
+              onMonthChanged: onMonthChanged,
+              onDateSelected: onDateSelected,
+            ),
 
             const SizedBox(height: 40),
           ],

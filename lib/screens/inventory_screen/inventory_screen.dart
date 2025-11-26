@@ -14,7 +14,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
   // 전체 아이템 데이터
   final List<Map<String, dynamic>> allItemsData = [
     {
-      'id': 'bowl_basic',
+      'id': 'food_normal',
       'name': '기본 밥그릇',
       'image': 'assets/images/inventory_images/food_normal_inventory_image.png',
       'preview':
@@ -22,7 +22,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       'category': 'bowl',
     },
     {
-      'id': 'bowl_adv',
+      'id': 'food_rare',
       'name': '고급 밥그릇',
       'image': 'assets/images/inventory_images/food_rare_inventory_image.png',
       'preview':
@@ -32,7 +32,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
     // 물통
     {
-      'id': 'water_basic',
+      'id': 'watre_normal',
       'name': '기본 물통',
       'image':
           'assets/images/inventory_images/water_normal_inventory_image.png',
@@ -41,7 +41,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       'category': 'water',
     },
     {
-      'id': 'water_adv',
+      'id': 'water_rare',
       'name': '고급 물통',
       'image': 'assets/images/inventory_images/water_rare_inventory_image.png',
       'preview':
@@ -51,7 +51,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
     // 챗바퀴
     {
-      'id': 'wheel_basic',
+      'id': 'chat_normal',
       'name': '기본 챗바퀴',
       'image': 'assets/images/inventory_images/chat_normal_inventory_image.png',
       'preview':
@@ -59,7 +59,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       'category': 'wheel',
     },
     {
-      'id': 'wheel_adv',
+      'id': 'chat_rare',
       'name': '고급 챗바퀴',
       'image': 'assets/images/inventory_images/chat_rare_inventory_image.png',
       'preview':
@@ -86,14 +86,14 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
     // 소모 아이템
     {
-      'id': 'ticket_wheel',
+      'id': '1day',
       'name': '챗바퀴 타기(1일)',
       'image': '',
       'preview': 'assets/images/inventory_images/1day_inventory_preview.png',
       'category': 'consumable',
     },
     {
-      'id': 'item_dye',
+      'id': 'color_change',
       'name': '햄스터 염색권',
       'image': '',
       'preview':
@@ -101,7 +101,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       'category': 'consumable',
     },
     {
-      'id': 'ticket_name',
+      'id': 'nickname_change',
       'name': '이름 변경권',
       'image': '',
       'preview':
@@ -117,19 +117,19 @@ class _InventoryScreenState extends State<InventoryScreen> {
     // 소모품 사용 로직
     if (item['category'] == 'consumable') {
       // 닉네임 변경권
-      if (item['id'] == 'ticket_name') {
+      if (item['id'] == 'nickname_change') {
         _showNicknameDialog(provider, item['id']);
         return;
       }
 
       // 염색권
-      if (item['id'] == 'item_dye') {
+      if (item['id'] == 'color_change') {
         _showDyeDialog(provider, item['id']);
         return;
       }
 
       // 챗바퀴 1일권
-      if (item['id'] == 'ticket_wheel') {
+      if (item['id'] == '1day') {
         provider.useExemptionTicket();
         // provider.consumeItem(item['id']); // (테스트라 소모는 주석처리함)
 
@@ -180,7 +180,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
-  // 2. 염색 팝업 (임시)
+  // 염색 팝업 (임시)
   void _showDyeDialog(UserProvider provider, String itemId) {
     showDialog(
       context: context,
@@ -214,7 +214,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final equipped = userProvider.equippedItems;
     final myItems = allItemsData.where((item) {
       // 기본 아이템들은 항상 보이게
-      if (item['id'].toString().contains('basic')) return true;
+      if (item['id'].toString().contains('normal')) return true;
       return myInventoryIds.contains(item['id']);
     }).toList();
 

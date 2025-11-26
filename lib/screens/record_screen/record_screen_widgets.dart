@@ -67,14 +67,13 @@ class WeeklyChart extends StatelessWidget {
     required this.weekDays,
   });
 
-  // 막대 색상 결정 함수
   Color _getBarColor(int steps) {
     if (steps >= 10000) {
-      return const Color(0xFFE45151); // 10,000보 (진한 빨강)
+      return const Color(0xFFE45151);
     } else if (steps >= 5000) {
-      return const Color(0xFFFD8F8F); // 5,000보 (중간 분홍)
+      return const Color(0xFFFD8F8F);
     } else {
-      return const Color(0xFFFFC0C0); // 실패 (연한 분홍)
+      return const Color(0xFFFFC0C0);
     }
   }
 
@@ -97,7 +96,7 @@ class WeeklyChart extends StatelessWidget {
               Text('0', style: TextStyle(fontSize: 10, color: Colors.grey)),
             ],
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 15),
 
           // 오른쪽 그래프
           Expanded(
@@ -145,35 +144,63 @@ class WeeklyChart extends StatelessWidget {
 
 // 월간 달력
 class MonthlyCalendar extends StatelessWidget {
-  final Map<int, int> monthlySteps; // 날짜 걸음수 데이터
+  final Map<int, int> monthlySteps;
   final List<String> weekDays;
+  final DateTime focusedDate; // 현재 보고 있는 달
+  final DateTime selectedDate; // 선택된 날짜
+  final Function(bool) onMonthChanged; // 달력 넘기기 콜백
+  final Function(int) onDateSelected; // 날짜 선택 콜백
 
   const MonthlyCalendar({
     super.key,
     required this.monthlySteps,
     required this.weekDays,
+    required this.focusedDate,
+    required this.selectedDate,
+    required this.onMonthChanged,
+    required this.onDateSelected,
   });
 
   @override
   Widget build(BuildContext context) {
+    // 해당 달의 마지막 날짜 계산
+    final daysInMonth = DateUtils.getDaysInMonth(
+      focusedDate.year,
+      focusedDate.month,
+    );
+    // 해당 달의 1일이 무슨 요일인지 계산 (월=1 ... 일=7 -> 일=0으로 보정 필요)
+    final firstDayWeekday = DateTime(
+      focusedDate.year,
+      focusedDate.month,
+      1,
+    ).weekday;
+    // 일요일(7)을 0으로, 월(1)을 1로... 이렇게 보정
+    final startOffset = firstDayWeekday == 7 ? 0 : firstDayWeekday;
+
     return Column(
       children: [
         // 헤더
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.chevron_left, color: Colors.grey),
+            IconButton(
+              icon: const Icon(Icons.chevron_left, color: Colors.grey),
+              onPressed: () => onMonthChanged(false), // 이전 달
+            ),
             const SizedBox(width: 10),
-            const Text(
-              "2025.10",
-              style: TextStyle(
+            Text(
+              "${focusedDate.year}.${focusedDate.month.toString().padLeft(2, '0')}",
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFFE45151),
               ),
             ),
             const SizedBox(width: 10),
-            const Icon(Icons.chevron_right, color: Colors.grey),
+            IconButton(
+              icon: const Icon(Icons.chevron_right, color: Colors.grey),
+              onPressed: () => onMonthChanged(true), // 다음 달
+            ),
           ],
         ),
         const SizedBox(height: 20),
@@ -200,50 +227,63 @@ class MonthlyCalendar extends StatelessWidget {
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: 31 + 3,
+          itemCount: daysInMonth + startOffset, // 빈칸 + 날짜 수
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 7,
             childAspectRatio: 0.8,
           ),
           itemBuilder: (context, index) {
-            if (index < 3) return const SizedBox();
+            // 앞부분 빈칸 처리
+            if (index < startOffset) return const SizedBox();
 
-            int day = index - 2;
-            // 데이터가 있으면 가져오고, 없으면 0
+            int day = index - startOffset + 1;
             int steps = monthlySteps[day] ?? 0;
             bool hasRecord = steps > 0;
 
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: hasRecord
-                        ? const Color(
-                            0xFFE45151,
-                          ).withOpacity(day == 1 ? 1.0 : 0.4)
-                        : Colors.transparent,
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "$day",
-                    style: TextStyle(
-                      color: hasRecord ? Colors.white : Colors.black,
-                      fontWeight: hasRecord
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+            // 선택된 날짜인지 확인 (연/월/일 모두 같아야 함)
+            bool isSelected =
+                selectedDate.year == focusedDate.year &&
+                selectedDate.month == focusedDate.month &&
+                selectedDate.day == day;
+
+            return GestureDetector(
+              onTap: () => onDateSelected(day),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      // 선택되면 테두리, 기록 있으면 배경색
+                      color: hasRecord
+                          ? const Color(
+                              0xFFE45151,
+                            ).withOpacity(day % 2 == 0 ? 0.4 : 1.0)
+                          : Colors.transparent,
+                      border: isSelected
+                          ? Border.all(color: const Color(0xFF4D3817), width: 2)
+                          : null,
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "$day",
+                      style: TextStyle(
+                        color: hasRecord ? Colors.white : Colors.black,
+                        fontWeight: isSelected || hasRecord
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
                     ),
                   ),
-                ),
-                if (hasRecord)
-                  Text(
-                    "$steps",
-                    style: const TextStyle(fontSize: 8, color: Colors.grey),
-                  ),
-              ],
+                  if (hasRecord)
+                    Text(
+                      "$steps",
+                      style: const TextStyle(fontSize: 8, color: Colors.grey),
+                    ),
+                ],
+              ),
             );
           },
         ),
