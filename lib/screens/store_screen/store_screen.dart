@@ -37,21 +37,23 @@ final List<Map<String, dynamic>> storeItemsData = [
     'category': 'wheel',
   },
 
-  // 액세서리
+  // 물통
   {
     'id': 'water_basic',
     'name': '기본 물통',
     'price': 1000,
     'image': 'assets/images/store_images/water_normal_store.png',
-    'category': 'accessory',
+    'category': 'water',
   },
   {
     'id': 'water_adv',
     'name': '고급 물통',
     'price': 1500,
     'image': 'assets/images/store_images/water_rare_store.png',
-    'category': 'accessory',
+    'category': 'water',
   },
+
+  // 악세서리
   {
     'id': 'sunglasses',
     'name': '썬글라스',

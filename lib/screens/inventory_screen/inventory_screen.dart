@@ -112,15 +112,99 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   // 아이템 장착 함수
   void _equipItem(Map<String, dynamic> item) {
+    final provider = context.read<UserProvider>(); // Provider 가져오기
+
+    // 소모품 사용 로직
     if (item['category'] == 'consumable') {
-      // 소모품 사용 로직
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('${item['name']} 사용!')));
+      // 닉네임 변경권
+      if (item['id'] == 'ticket_name') {
+        _showNicknameDialog(provider, item['id']);
+        return;
+      }
+
+      // 염색권
+      if (item['id'] == 'item_dye') {
+        _showDyeDialog(provider, item['id']);
+        return;
+      }
+
+      // 챗바퀴 1일권
+      if (item['id'] == 'ticket_wheel') {
+        provider.useExemptionTicket();
+        // provider.consumeItem(item['id']); // (테스트라 소모는 주석처리함)
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('오늘 하루 운동 면제')));
+        return;
+      }
+
       return;
     }
 
-    context.read<UserProvider>().equipItem(item['category'], item['image']);
+    // 치장 아이템 장착
+    provider.equipItem(item['category'], item['image']);
+  }
+
+  // 닉네임 변경 팝업
+  void _showNicknameDialog(UserProvider provider, String itemId) {
+    final textController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("닉네임 변경"),
+        content: TextField(
+          controller: textController,
+          decoration: const InputDecoration(hintText: "새 이름을 입력하세요"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("취소"),
+          ),
+          TextButton(
+            onPressed: () {
+              if (textController.text.isNotEmpty) {
+                provider.changeNickname(textController.text);
+                // provider.consumeItem(itemId); // 소모
+                Navigator.pop(context);
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('이름이 변경되었습니다!')));
+              }
+            },
+            child: const Text("변경"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 2. 염색 팝업 (임시)
+  void _showDyeDialog(UserProvider provider, String itemId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("햄스터 염색"),
+        content: const Text("어떤 색으로 염색할까요? (예시 기능)"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("취소"),
+          ),
+          TextButton(
+            onPressed: () {
+              // provider.changeHamsterSkin('assets/.../ham_black.png');  // 염색 햄스터
+              Navigator.pop(context);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('염색 완료! (기능 준비중)')));
+            },
+            child: const Text("확인"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

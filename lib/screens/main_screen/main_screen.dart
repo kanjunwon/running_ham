@@ -26,10 +26,12 @@ class _MainScreenState extends State<MainScreen> {
   int _steps = 0;
   HamsterState _hamsterState = HamsterState.normal;
   final int _targetSteps = 5; // 원래 5000보
-  int _touchCount = 0; // 햄스터 터치 카운트 (상호작용)
-
-  // 보상 중복 방지용 로컬 변수
   String _lastRewardDateKey = '';
+
+  // 터치 변수
+  int _touchCount = 0; // 햄스터 터치 카운트 (상호작용)
+  bool _isHappyMode = false; // 햄스터 해피 모드 여부
+  Timer? _happyModeTimer; // 해피 모드 2초 타이머
 
   @override
   void initState() {
@@ -37,9 +39,24 @@ class _MainScreenState extends State<MainScreen> {
     initPlatformState(); // 로그인 과정 없이 바로 센서 켜기
   }
 
+  // 이미지 미리 로딩
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(
+      const AssetImage('assets/images/main_images/heart.png'),
+      context,
+    );
+    precacheImage(
+      const AssetImage('assets/images/main_images/blush.png'),
+      context,
+    );
+  }
+
   @override
   void dispose() {
     _stepCountStreamSubscription?.cancel();
+    _happyModeTimer?.cancel(); // 타이머 취소
     super.dispose();
   }
 
@@ -53,6 +70,31 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
+  // 햄스터 터치 로직
+  void _onHamsterTap() {
+    setState(() {
+      _touchCount++;
+
+      // 5번 터치하면?
+      if (_touchCount >= 5) {
+        _isHappyMode = true; // 이펙트 켜기
+        _touchCount = 0; // 카운트 리셋 (다시 5번 누르게 하려면)
+
+        // 기존 타이머 있으면 취소 (연타 방지)
+        _happyModeTimer?.cancel();
+
+        // 2초 뒤에 끄기
+        _happyModeTimer = Timer(const Duration(seconds: 2), () {
+          if (mounted) {
+            setState(() {
+              _isHappyMode = false; // 이펙트 끄기
+            });
+          }
+        });
+      }
+    });
+  }
+
   // 만보기 스트림
   void startListening() {
     final String todayKey = DateFormat('yyyyMMdd').format(DateTime.now());
@@ -61,14 +103,21 @@ class _MainScreenState extends State<MainScreen> {
       (StepCount event) {
         if (!mounted) return;
 
+        // 운동 면제권 확인
+        final isExempt = context.read<UserProvider>().isExemptToday;
+
         setState(() {
           _steps = event.steps;
 
           // 햄스터 상태 로직
-          if (_steps < _targetSteps) {
-            _hamsterState = HamsterState.fat1;
+          if (isExempt) {
+            _hamsterState = HamsterState.normal; // 면제권 쓰면 정상
           } else {
-            _hamsterState = HamsterState.normal;
+            if (_steps < _targetSteps) {
+              _hamsterState = HamsterState.fat1;
+            } else {
+              _hamsterState = HamsterState.normal;
+            }
           }
 
           // 재화 획득 로직
@@ -89,18 +138,6 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  void _onHamsterTap() {
-    setState(() {
-      _touchCount++;
-      print("햄찌 터치! 터치 횟수: $_touchCount");
-
-      // (옵션) 5번 터치 시 진동이나 소리 효과를 넣을 수도 있음
-      if (_touchCount == 5) {
-        print("햄찌 기모찌");
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
@@ -110,6 +147,7 @@ class _MainScreenState extends State<MainScreen> {
       hamsterState: _hamsterState, // 햄스터 상태
       seedCount: userProvider.seedCount, // 도토리 개수
       touchCount: _touchCount, // 햄스터 터치 횟수
+      isHappyMode: _isHappyMode, // 해피 모드 여부
       onHamsterTap: _onHamsterTap, // 햄스터 터치 콜백
     );
   }

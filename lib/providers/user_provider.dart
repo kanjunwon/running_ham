@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // 날짜 포맷팅
 
 class UserProvider extends ChangeNotifier {
   // 내 정보
@@ -7,6 +8,8 @@ class UserProvider extends ChangeNotifier {
   String _nickname = "김햄찌"; // 닉네임
   String _hamsterImage =
       "assets/images/main_images/ham_1.png"; // 햄스터 본체 (기본 이미지)
+
+  String _exemptionDate = ""; // 운동 면제권 날짜 (yyyyMMdd)
 
   // 아이템 정보
   List<String> _myInventory = []; // 내가 가진 아이템 ID 리스트
@@ -27,6 +30,12 @@ class UserProvider extends ChangeNotifier {
   String get hamsterImage => _hamsterImage;
   List<String> get myInventory => _myInventory;
   Map<String, String> get equippedItems => _equippedItems;
+
+  // 오늘이 운동 면제인지 확인하는 함수
+  bool get isExemptToday {
+    final today = DateFormat('yyyyMMdd').format(DateTime.now());
+    return _exemptionDate == today;
+  }
 
   // 걸음 수 업데이트
   void updateSteps(int steps) {
@@ -74,6 +83,30 @@ class UserProvider extends ChangeNotifier {
   // 도토리 획득
   void earnSeeds(int amount) {
     _seedCount += amount;
+    notifyListeners();
+  }
+
+  // 닉네임 변경
+  void changeNickname(String newName) {
+    _nickname = newName;
+    notifyListeners();
+  }
+
+  // 햄스터 스킨 변경
+  void changeHamsterSkin(String newImagePath) {
+    _hamsterImage = newImagePath;
+    notifyListeners();
+  }
+
+  // 운동 면제권 사용
+  void useExemptionTicket() {
+    _exemptionDate = DateFormat('yyyyMMdd').format(DateTime.now());
+    notifyListeners();
+  }
+
+  // 아이템 소모
+  void consumeItem(String itemId) {
+    // _myInventory.remove(itemId); // 테스트용이라 삭제 안할거임
     notifyListeners();
   }
 }

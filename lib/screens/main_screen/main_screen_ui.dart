@@ -14,6 +14,7 @@ class MainScreenUI extends StatelessWidget {
   final int seedCount; // 재화 (도토리) 데이터
   final int touchCount; // 햄스터 터치 횟수
   final VoidCallback onHamsterTap; // 햄스터 터치 콜백
+  final bool isHappyMode; // 해피 모드 여부
 
   const MainScreenUI({
     super.key,
@@ -22,6 +23,7 @@ class MainScreenUI extends StatelessWidget {
     required this.seedCount, // 재화 (도토리) 데이터
     required this.touchCount, // 햄스터 터치 횟수
     required this.onHamsterTap, // 햄스터 터치 콜백
+    required this.isHappyMode, // 해피 모드 여부
   });
 
   @override
@@ -29,6 +31,7 @@ class MainScreenUI extends StatelessWidget {
     // Provider에서 장착된 아이템 정보 가져오기
     final userProvider = context.watch<UserProvider>();
     final equipped = userProvider.equippedItems;
+    final nickname = userProvider.nickname;
 
     // 햄스터 이미지
     String hamsterImagePath;
@@ -85,7 +88,7 @@ class MainScreenUI extends StatelessWidget {
                       Image.asset(hamsterImagePath, fit: BoxFit.contain),
 
                       // 볼터치
-                      if (touchCount >= 5)
+                      if (isHappyMode)
                         Positioned(
                           top: -63,
                           left: -70,
@@ -106,7 +109,7 @@ class MainScreenUI extends StatelessWidget {
                         _buildAccessory(equipped['hair']!),
 
                       // 하트
-                      if (touchCount >= 5)
+                      if (isHappyMode)
                         Positioned(
                           top: -60, // 햄스터 머리 위
                           child: Image.asset(
@@ -227,13 +230,13 @@ class MainScreenUI extends StatelessWidget {
             ),
           ),
 
-          // 김햄찌 텍스트
+          // 이름
           Positioned(
             left: 0,
             right: 0,
             top: 492, // 하단 카드에 안 겹치도록 위치 조정
             child: Text(
-              '김햄찌', // 나중에 변수로 바꿔야 함.
+              nickname, // 변수로 받기
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: const Color(0xFF1A1A1A),
@@ -248,7 +251,7 @@ class MainScreenUI extends StatelessWidget {
           Positioned(
             left: 20,
             right: 20,
-            bottom: 40,
+            bottom: 20,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               decoration: ShapeDecoration(
