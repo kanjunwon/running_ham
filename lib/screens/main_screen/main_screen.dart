@@ -51,6 +51,26 @@ class _MainScreenState extends State<MainScreen> {
       const AssetImage('assets/images/main_images/blush.png'),
       context,
     );
+    // 가구들 미리 로딩
+    final userProvider = context.read<UserProvider>();
+    final equipped = userProvider.equippedItems;
+
+    if (equipped['bowl'] != null && equipped['bowl']!.isNotEmpty) {
+      precacheImage(AssetImage(equipped['bowl']!), context);
+    }
+    if (equipped['water'] != null && equipped['water']!.isNotEmpty) {
+      precacheImage(AssetImage(equipped['water']!), context);
+    }
+    if (equipped['wheel'] != null && equipped['wheel']!.isNotEmpty) {
+      precacheImage(AssetImage(equipped['wheel']!), context);
+    }
+    // 액세서리도 필요하면 추가
+    if (equipped['glass'] != null && equipped['glass']!.isNotEmpty) {
+      precacheImage(AssetImage(equipped['glass']!), context);
+    }
+    if (equipped['hair'] != null && equipped['hair']!.isNotEmpty) {
+      precacheImage(AssetImage(equipped['hair']!), context);
+    }
   }
 
   @override

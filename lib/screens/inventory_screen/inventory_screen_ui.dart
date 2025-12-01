@@ -39,6 +39,7 @@ class InventoryScreenUI extends StatelessWidget {
           style: TextStyle(
             color: Color(0xFF4D3817),
             fontWeight: FontWeight.bold,
+            fontSize: 18,
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -56,7 +57,7 @@ class InventoryScreenUI extends StatelessWidget {
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                // 배경
+                // 배경 (톳밥)
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -64,7 +65,7 @@ class InventoryScreenUI extends StatelessWidget {
                   height: 150,
                   child: Image.asset(
                     'assets/images/main_images/ground.png',
-                    fit: BoxFit.fill,
+                    fit: BoxFit.cover, // 가로 꽉 채우기
                   ),
                 ),
 
@@ -110,27 +111,50 @@ class InventoryScreenUI extends StatelessWidget {
                 // 머리핀
                 if (currentHair != null && currentHair!.isNotEmpty)
                   _buildPreviewAccessory(currentHair!),
+
+                // 하단 그라데이션
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 60, // 그라데이션 높이
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.white.withOpacity(0.0), // 위쪽: 완전 투명
+                          Colors.white, // 아래쪽: 완전 흰색
+                        ],
+                        stops: const [0.0, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
 
           // 아이템 목록
           Expanded(
-            flex: 5,
+            flex: 6,
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(30),
                   topRight: Radius.circular(30),
                 ),
+                // 상단 그림자
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 10,
-                    offset: Offset(0, -5),
+                    color: Colors.grey.withOpacity(0.1), // 아주 연한 그림자
+                    spreadRadius: 2,
+                    blurRadius: 15,
+                    offset: const Offset(0, -5), // 위쪽으로 그림자 지게 함
                   ),
                 ],
               ),
@@ -179,7 +203,7 @@ class InventoryScreenUI extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: items.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4, // 한 줄에 4개
+        crossAxisCount: 4,
         childAspectRatio: 0.75,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
@@ -198,10 +222,8 @@ class InventoryScreenUI extends StatelessWidget {
               currentHair == item['image'];
         }
 
-        // 부품 호출
         return InventoryItemCard(
           name: item['name'],
-          // 목록에는 preview (작은 아이콘) 보여주기
           imagePath: item['preview'],
           isEquipped: isEquipped,
           onTap: () => onEquipItem(item),
@@ -219,15 +241,15 @@ Widget _buildPreviewAccessory(String imagePath) {
 
   // 썬글라스
   if (imagePath.contains('sunglass')) {
-    width = 120; // 크기
-    bottom = 166; // 높이
-    left = 3; // 좌우 중앙
+    width = 120;
+    bottom = 166;
+    left = 3;
 
     // 머리핀
   } else if (imagePath.contains('hair')) {
-    width = 70; // 크기
-    bottom = 190; // 머리 위
-    left = 83; // 오른쪽 귀
+    width = 70;
+    bottom = 190;
+    left = 83;
   } else {
     bottom = 100;
     left = 0;

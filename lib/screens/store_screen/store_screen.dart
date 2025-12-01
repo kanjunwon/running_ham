@@ -7,49 +7,49 @@ import 'store_screen_ui.dart';
 final List<Map<String, dynamic>> storeItemsData = [
   // 밥그릇
   {
-    'id': 'food_normal',
-    'name': '기본 밥그릇',
+    'id': 'food_rare',
+    'name': '고급 밥그릇',
     'price': 1000,
-    'image': 'assets/images/store_images/food_normal_store.png',
+    'image': 'assets/images/store_images/food_rare_store.png',
     'category': 'bowl',
   },
   {
-    'id': 'food_rare',
-    'name': '고급 밥그릇',
-    'price': 1500,
-    'image': 'assets/images/store_images/food_rare_store.png',
+    'id': 'food_epic',
+    'name': '최고급 밥그릇',
+    'price': 5000,
+    'image': 'assets/images/store_images/food_epic_store.png',
     'category': 'bowl',
   },
 
   // 챗바퀴
   {
-    'id': 'chat_normal',
-    'name': '기본 챗바퀴',
+    'id': 'chat_rare',
+    'name': '고급 챗바퀴',
     'price': 1000,
-    'image': 'assets/images/store_images/chat_normal_store.png',
+    'image': 'assets/images/store_images/chat_rare_store.png',
     'category': 'wheel',
   },
   {
-    'id': 'chat_rare',
-    'name': '고급 챗바퀴',
-    'price': 1500,
-    'image': 'assets/images/store_images/chat_rare_store.png',
+    'id': 'chat_epic',
+    'name': '최고급 챗바퀴',
+    'price': 5000,
+    'image': 'assets/images/store_images/chat_epic_store.png',
     'category': 'wheel',
   },
 
   // 물통
   {
-    'id': 'water_normal',
-    'name': '기본 물통',
+    'id': 'water_rare',
+    'name': '고급 물통',
     'price': 1000,
-    'image': 'assets/images/store_images/water_normal_store.png',
+    'image': 'assets/images/store_images/water_rare_store.png',
     'category': 'water',
   },
   {
-    'id': 'water_rare',
-    'name': '고급 물통',
-    'price': 1500,
-    'image': 'assets/images/store_images/water_rare_store.png',
+    'id': 'water_epic',
+    'name': '최고급 물통',
+    'price': 5000,
+    'image': 'assets/images/store_images/water_epic_store.png',
     'category': 'water',
   },
 

@@ -16,7 +16,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     {
       'id': 'food_normal',
       'name': '기본 밥그릇',
-      'image': 'assets/images/inventory_images/food_normal_inventory_image.png',
+      'image': 'assets/images/inventory_images/food_normal_inventory.png',
       'preview':
           'assets/images/inventory_images/food_normal_inventory_preview.png',
       'category': 'bowl',
@@ -24,9 +24,17 @@ class _InventoryScreenState extends State<InventoryScreen> {
     {
       'id': 'food_rare',
       'name': '고급 밥그릇',
-      'image': 'assets/images/inventory_images/food_rare_inventory_image.png',
+      'image': 'assets/images/inventory_images/food_rare_inventory.png',
       'preview':
           'assets/images/inventory_images/food_rare_inventory_preview.png',
+      'category': 'bowl',
+    },
+    {
+      'id': 'food_epic',
+      'name': '최고급 밥그릇',
+      'image': 'assets/images/inventory_images/food_epic_inventory.png',
+      'preview':
+          'assets/images/inventory_images/food_epic_inventory_preview.png',
       'category': 'bowl',
     },
 
@@ -34,8 +42,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     {
       'id': 'watre_normal',
       'name': '기본 물통',
-      'image':
-          'assets/images/inventory_images/water_normal_inventory_image.png',
+      'image': 'assets/images/inventory_images/water_normal_inventory.png',
       'preview':
           'assets/images/inventory_images/water_normal_inventory_preview.png',
       'category': 'water',
@@ -43,9 +50,17 @@ class _InventoryScreenState extends State<InventoryScreen> {
     {
       'id': 'water_rare',
       'name': '고급 물통',
-      'image': 'assets/images/inventory_images/water_rare_inventory_image.png',
+      'image': 'assets/images/inventory_images/water_rare_inventory.png',
       'preview':
           'assets/images/inventory_images/water_rare_inventory_preview.png',
+      'category': 'water',
+    },
+    {
+      'id': 'water_epic',
+      'name': '최고급 물통',
+      'image': 'assets/images/inventory_images/water_epic_inventory.png',
+      'preview':
+          'assets/images/inventory_images/water_epic_inventory_preview.png',
       'category': 'water',
     },
 
@@ -53,7 +68,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     {
       'id': 'chat_normal',
       'name': '기본 챗바퀴',
-      'image': 'assets/images/inventory_images/chat_normal_inventory_image.png',
+      'image': 'assets/images/inventory_images/chat_normal_inventory.png',
       'preview':
           'assets/images/inventory_images/chat_normal_inventory_preview.png',
       'category': 'wheel',
@@ -61,9 +76,17 @@ class _InventoryScreenState extends State<InventoryScreen> {
     {
       'id': 'chat_rare',
       'name': '고급 챗바퀴',
-      'image': 'assets/images/inventory_images/chat_rare_inventory_image.png',
+      'image': 'assets/images/inventory_images/chat_rare_inventory.png',
       'preview':
           'assets/images/inventory_images/chat_rare_inventory_preview.png',
+      'category': 'wheel',
+    },
+    {
+      'id': 'chat_epic',
+      'name': '최고급 챗바퀴',
+      'image': 'assets/images/inventory_images/chat_epic_inventory.png',
+      'preview':
+          'assets/images/inventory_images/chat_epic_inventory_preview.png',
       'category': 'wheel',
     },
 
@@ -71,7 +94,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     {
       'id': 'sunglasses',
       'name': '썬글라스',
-      'image': 'assets/images/inventory_images/sunglass_inventory_image.png',
+      'image': 'assets/images/inventory_images/sunglass_inventory.png',
       'preview':
           'assets/images/inventory_images/sunglass_inventory_preview.png',
       'category': 'glass',
@@ -79,7 +102,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     {
       'id': 'hairpin',
       'name': '머리핀',
-      'image': 'assets/images/inventory_images/hairpin_inventory_image.png',
+      'image': 'assets/images/inventory_images/hairpin_inventory.png',
       'preview': 'assets/images/inventory_images/hairpin_inventory_preview.png',
       'category': 'hair',
     },
@@ -131,7 +154,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       // 챗바퀴 1일권
       if (item['id'] == '1day') {
         provider.useExemptionTicket();
-        // provider.consumeItem(item['id']); // (테스트라 소모는 주석처리함)
+        provider.consumeItem(item['id']); // 사용 시 소모
 
         ScaffoldMessenger.of(
           context,
@@ -166,7 +189,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
             onPressed: () {
               if (textController.text.isNotEmpty) {
                 provider.changeNickname(textController.text);
-                // provider.consumeItem(itemId); // 소모
+                provider.consumeItem(itemId); // 사용 시 소모
                 Navigator.pop(context);
                 ScaffoldMessenger.of(
                   context,
@@ -215,6 +238,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final myItems = allItemsData.where((item) {
       // 기본 아이템들은 항상 보이게
       if (item['id'].toString().contains('normal')) return true;
+      // 내가 가진 아이템만 보이게
       return myInventoryIds.contains(item['id']);
     }).toList();
 
