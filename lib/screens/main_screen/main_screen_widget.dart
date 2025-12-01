@@ -58,6 +58,7 @@ class ProgressBar extends StatelessWidget {
                                 'assets/images/main_images/money_main_back.png',
                                 width: 14,
                                 height: 14,
+                                cacheWidth: 28, // 14 * 2 (메모리 최적화)
                               ),
                             ),
                           ],
@@ -229,6 +230,7 @@ class MenuButton extends StatelessWidget {
               imagePath,
               width: 35, // 가로 크기
               height: 35, // 세로 크기
+              cacheWidth: 70, // 35 * 2 (메모리 최적화)
             ),
 
             const SizedBox(height: 5),

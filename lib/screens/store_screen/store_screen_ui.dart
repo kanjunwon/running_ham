@@ -18,9 +18,12 @@ class StoreScreenUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 화면 크기 기반 스케일링 로직
+    // 화면 크기 기반 스케일링 (너비 + 높이 모두 고려)
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double scale = min(screenWidth / 390.0, 1.1);
+    final double screenHeight = MediaQuery.of(context).size.height;
+    const double baseWidth = 390.0;
+    const double baseHeight = 844.0;
+    final double scale = min(screenWidth / baseWidth, screenHeight / baseHeight);
 
     // 비율 적용 헬퍼 함수
     double s(double value) => value * scale;

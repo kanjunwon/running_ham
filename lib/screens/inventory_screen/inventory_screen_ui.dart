@@ -31,9 +31,18 @@ class InventoryScreenUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 화면 크기 기반 스케일링 로직
+    // 화면 크기 기반 스케일링 로직 (너비 + 높이 모두 고려)
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double scale = min(screenWidth / 390.0, 1.1);
+    final double screenHeight = MediaQuery.of(context).size.height;
+
+    // 피그마 기준 화면 크기 (iPhone 14 기준)
+    const double baseWidth = 390.0;
+    const double baseHeight = 844.0;
+
+    // 너비와 높이 중 더 작은 비율 사용
+    final double scaleWidth = screenWidth / baseWidth;
+    final double scaleHeight = screenHeight / baseHeight;
+    final double scale = min(scaleWidth, scaleHeight);
 
     // 비율 적용 헬퍼 함수
     double s(double value) => value * scale;
@@ -81,40 +90,13 @@ class InventoryScreenUI extends StatelessWidget {
                 ),
 
                 // 챗바퀴
-                Positioned(
-                  top: s(20),
-                  left: s(-40),
-                  child: Image.asset(
-                    currentWheel,
-                    width: s(220),
-                    height: s(220),
-                    cacheWidth: (s(220) * 2).toInt(),
-                  ),
-                ),
+                _buildPreviewWheel(currentWheel, scale),
 
                 // 밥그릇
-                Positioned(
-                  bottom: s(30),
-                  right: s(10),
-                  child: Image.asset(
-                    currentBowl,
-                    width: s(110),
-                    height: s(60),
-                    cacheWidth: (s(110) * 2).toInt(),
-                  ),
-                ),
+                _buildPreviewBowl(currentBowl, scale),
 
                 // 물통
-                Positioned(
-                  top: s(20),
-                  right: s(-30),
-                  child: Image.asset(
-                    currentWater,
-                    width: s(100),
-                    height: s(200),
-                    cacheWidth: (s(100) * 2).toInt(),
-                  ),
-                ),
+                _buildPreviewWater(currentWater, scale),
 
                 // 햄스터 (중앙)
                 Positioned(
@@ -299,6 +281,101 @@ class InventoryScreenUI extends StatelessWidget {
             cacheWidth: (width * 2).toInt(),
           ),
         ),
+      ),
+    );
+  }
+
+  // 보관함 챗바퀴 위치 조절
+  Widget _buildPreviewWheel(String imagePath, double scale) {
+    double top = 20 * scale;
+    double left = -40 * scale;
+    double width = 220 * scale;
+    double height = 220 * scale;
+
+    if (imagePath.contains('rare')) {
+      top = 18 * scale;
+      left = -35 * scale;
+    }
+
+    // 최고급 - 바닥에 붙게
+    if (imagePath.contains('epic')) {
+      top = 25 * scale;
+      left = -35 * scale;
+    }
+
+    return Positioned(
+      top: top,
+      left: left,
+      child: Image.asset(
+        imagePath,
+        width: width,
+        height: height,
+        cacheWidth: (width * 2).toInt(),
+      ),
+    );
+  }
+
+  // 보관함 밥그릇 위치 조절
+  Widget _buildPreviewBowl(String imagePath, double scale) {
+    double bottom = 35 * scale;
+    double right = 15 * scale;
+    double width = 130 * scale;
+    double height = 75 * scale;
+
+    if (imagePath.contains('rare')) {
+      bottom = 32 * scale;
+      right = 18 * scale;
+      width = 135 * scale;
+      height = 80 * scale;
+    }
+
+    if (imagePath.contains('epic')) {
+      bottom = 30 * scale;
+      right = 20 * scale;
+      width = 140 * scale;
+      height = 85 * scale;
+    }
+
+    return Positioned(
+      bottom: bottom,
+      right: right,
+      child: Image.asset(
+        imagePath,
+        width: width,
+        height: height,
+        cacheWidth: (width * 2).toInt(),
+      ),
+    );
+  }
+
+  // 보관함 물통 위치 조절
+  Widget _buildPreviewWater(String imagePath, double scale) {
+    double top = 15 * scale;
+    double right = -25 * scale;
+    double width = 110 * scale;
+    double height = 220 * scale;
+
+    if (imagePath.contains('rare')) {
+      top = 12 * scale;
+      right = -20 * scale;
+    }
+
+    // 최고급 - 크기 키우고 바닥에 붙게
+    if (imagePath.contains('epic')) {
+      width = 170 * scale;
+      height = 280 * scale;
+      top = 16 * scale;
+      right = -52 * scale;
+    }
+
+    return Positioned(
+      top: top,
+      right: right,
+      child: Image.asset(
+        imagePath,
+        width: width,
+        height: height,
+        cacheWidth: (width * 2).toInt(),
       ),
     );
   }

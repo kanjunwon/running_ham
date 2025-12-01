@@ -40,6 +40,7 @@ flutter:
     - assets/images/store_images/
     - assets/images/inventory_images/
     - assets/images/tutorial_images/
+    - assets/images/splash_images/
 
   # 폰트 경로
   fonts:

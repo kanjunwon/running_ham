@@ -31,11 +31,18 @@ class MainScreenUI extends StatelessWidget {
     final equipped = userProvider.equippedItems;
     final nickname = userProvider.nickname;
 
-    // 화면 크기에 따른 비율 조정
+    // 화면 크기에 따른 비율 조정 (너비 + 높이 모두 고려)
     final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
 
-    // 비율 계산
-    final double scale = min(screenWidth / 390.0, 1.1);
+    // 피그마 기준 화면 크기 (iPhone 14 기준)
+    const double baseWidth = 390.0;
+    const double baseHeight = 844.0;
+
+    // 너비와 높이 중 더 작은 비율 사용 (화면에 맞게 축소)
+    final double scaleWidth = screenWidth / baseWidth;
+    final double scaleHeight = screenHeight / baseHeight;
+    final double scale = min(scaleWidth, scaleHeight);
 
     // 비율 적용 헬퍼 함수
     double s(double value) => value * scale;
@@ -101,14 +108,14 @@ class MainScreenUI extends StatelessWidget {
                         cacheWidth: (s(231) * 2).toInt(), // 필요한 크기의 2배 정도로만 로딩
                       ),
 
-                      // 볼터치
+                      // 볼터치 (햄스터 볼 위치에 맞춤)
                       if (isHappyMode)
                         Positioned(
-                          top: s(100),
-                          left: s(40),
+                          top: s(-105),
+                          left: s(-110),
                           child: Image.asset(
                             'assets/images/main_images/blush.png',
-                            width: s(150),
+                            width: s(460),
                             cacheWidth: (s(150) * 2).toInt(),
                           ),
                         ),
@@ -371,21 +378,21 @@ class MainScreenUI extends StatelessWidget {
 
   // 챗바퀴 위치 조절 함수
   Widget _buildWheel(String imagePath, double scale) {
-    double top = 195 * scale;
+    double top = 208 * scale;
     double left = -60 * scale;
     double width = 259 * scale;
     double height = 261 * scale;
 
     // 고급 챗바퀴 좌표 수정
     if (imagePath.contains('rare')) {
-      top = 180 * scale;
-      left = -50 * scale;
+      top = 215 * scale;
+      left = -55 * scale;
     }
 
-    // 최고급 챗바퀴 좌표 수정
+    // 최고급 챗바퀴 좌표 수정 - 바닥에 붙게
     if (imagePath.contains('epic')) {
-      top = 180 * scale;
-      left = -50 * scale;
+      top = 210 * scale;
+      left = -55 * scale;
     }
 
     return Positioned(
@@ -395,28 +402,30 @@ class MainScreenUI extends StatelessWidget {
         imagePath,
         width: width,
         height: height,
-        cacheWidth: (width * 2).toInt(), // 필요한 크기의 2배까지만 로딩
+        cacheWidth: (width * 2).toInt(),
       ),
     );
   }
 
   // 물통 위치 조절 함수
   Widget _buildWater(String imagePath, double scale) {
-    double top = 150 * scale;
-    double right = -50 * scale;
-    double width = 119 * scale;
-    double height = 231 * scale;
+    double top = 198 * scale;
+    double right = -40 * scale;
+    double width = 130 * scale;
+    double height = 250 * scale;
 
+    // 고급 물통 좌표 수정
     if (imagePath.contains('rare')) {
-      // 고급 물통 좌표 수정
-      top = 140 * scale;
-      right = -40 * scale;
+      top = 185 * scale;
+      right = -35 * scale;
     }
 
+    // 최고급 물통 좌표 수정 - 크기 키우고 바닥에 붙게
     if (imagePath.contains('epic')) {
-      // 최고급 물통 좌표 수정
-      top = 140 * scale;
-      right = -40 * scale;
+      width = 207 * scale;
+      height = 357 * scale;
+      top = 219 * scale;
+      right = -65 * scale;
     }
 
     return Positioned(
@@ -431,27 +440,31 @@ class MainScreenUI extends StatelessWidget {
     );
   }
 
-  // 밥그릇 위치 조절 함수
+  // 밥그릇 위치 조절 함수 (보관함과 동일한 비율)
   Widget _buildBowl(String imagePath, double scale) {
-    double top = 410 * scale;
-    double right = 10 * scale;
-    double width = 133 * scale;
-    double height = 72 * scale;
+    double bottom = 285 * scale;
+    double right = 15 * scale;
+    double width = 130 * scale;
+    double height = 110 * scale;
 
     // 고급 밥그릇 좌표 수정
     if (imagePath.contains('rare')) {
-      top = 400 * scale;
-      right = 20 * scale;
+      bottom = 293 * scale;
+      right = 18 * scale;
+      width = 135 * scale;
+      height = 100 * scale;
     }
 
     // 최고급 밥그릇 좌표 수정
     if (imagePath.contains('epic')) {
-      top = 400 * scale;
+      bottom = 301 * scale;
       right = 20 * scale;
+      width = 140 * scale;
+      height = 93 * scale;
     }
 
     return Positioned(
-      top: top,
+      bottom: bottom,
       right: right,
       child: Image.asset(
         imagePath,

@@ -9,16 +9,22 @@ class DeathScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 반응형 스케일링 로직
+    // 반응형 스케일링 (너비 + 높이 모두 고려)
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double scale = min(screenWidth / 390.0, 1.1);
+    final double screenHeight = MediaQuery.of(context).size.height;
+    const double baseWidth = 390.0;
+    const double baseHeight = 844.0;
+    final double scale = min(
+      screenWidth / baseWidth,
+      screenHeight / baseHeight,
+    );
     double s(double value) => value * scale;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAF3E6), // 메인과 동일한 배경색
       body: Stack(
         children: [
-          // 1. 흙 바닥 배경
+          // 톳밥 (바닥)
           Positioned(
             bottom: 0,
             left: 0,
@@ -33,16 +39,16 @@ class DeathScreen extends StatelessWidget {
             ),
           ),
 
-          // 2. 유령 햄스터 & 이름
+          // 유령 햄스터, 이름
           Positioned(
             top: s(180),
             left: 0,
             right: 0,
             child: Column(
               children: [
-                // 유령 햄스터 이미지 (없으면 기본 햄스터라도 띄워놔야 에러 안 남)
+                // 유령 햄스터
                 Image.asset(
-                  'assets/images/tutorail_images/death_ham.png',
+                  'assets/images/tutorial_images/death_ham.png',
                   width: s(220),
                   cacheWidth: (s(220) * 2).toInt(),
                 ),
@@ -60,20 +66,20 @@ class DeathScreen extends StatelessWidget {
             ),
           ),
 
-          // 3. 하단 대화창 (클릭 시 부활/초기화)
+          // 클릭 시 부활
           Positioned(
             bottom: s(60),
             left: s(20),
             right: s(20),
             child: GestureDetector(
               onTap: () async {
-                // [중요] 데이터 초기화하고 튜토리얼로 이동
+                // 데이터 초기화하고 튜토리얼로 이동
                 final provider = context.read<UserProvider>();
-                await provider.resetData(); // Provider에 이 함수 있어야 함!
+                await provider.resetData();
 
                 if (!context.mounted) return;
 
-                // 튜토리얼로 이동 (뒤로가기 방지)
+                // 튜토리얼로 이동
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(

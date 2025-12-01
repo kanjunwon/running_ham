@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:running_ham/providers/user_provider.dart';
 import 'package:running_ham/screens/main_screen/main_screen.dart';
 
@@ -14,6 +13,12 @@ class NicknameScreen extends StatefulWidget {
 
 class _NicknameScreenState extends State<NicknameScreen> {
   final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose(); // 메모리 누수 방지
+    super.dispose();
+  }
 
   Future<void> _onDecide() async {
     final text = _controller.text.trim();
@@ -32,26 +37,28 @@ class _NicknameScreenState extends State<NicknameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 반응형 스케일링
+    // 반응형 스케일링 (너비 + 높이 모두 고려)
     final double screenWidth = MediaQuery.of(context).size.width;
-    final double scale = min(screenWidth / 390.0, 1.1);
+    final double screenHeight = MediaQuery.of(context).size.height;
+    const double baseWidth = 390.0;
+    const double baseHeight = 844.0;
+    final double scale = min(
+      screenWidth / baseWidth,
+      screenHeight / baseHeight,
+    );
     double s(double value) => value * scale;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFBDBD), // 배경색
-      // ★ 1. Stack으로 변경 (버튼을 띄우기 위해)
       body: Stack(
         children: [
-          // ------------------------------------------------
-          // [Layer 1] 스크롤 가능한 콘텐츠 (이미지, 입력창)
-          // ------------------------------------------------
           Positioned.fill(
             child: SingleChildScrollView(
               child: Column(
                 children: [
                   SizedBox(height: s(80)),
 
-                  // 1. 햄스터 이미지
+                  // 햄스터
                   Image.asset(
                     'assets/images/main_images/ham_1.png',
                     width: s(250),
@@ -60,7 +67,7 @@ class _NicknameScreenState extends State<NicknameScreen> {
 
                   SizedBox(height: s(40)),
 
-                  // 2. 질문 텍스트
+                  // 질문 텍스트
                   Text(
                     "햄스터의 이름을 지어주세요",
                     style: TextStyle(
@@ -73,7 +80,7 @@ class _NicknameScreenState extends State<NicknameScreen> {
 
                   SizedBox(height: s(20)),
 
-                  // 3. 입력창
+                  // 입력창
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: s(30)),
                     child: Container(
@@ -113,22 +120,17 @@ class _NicknameScreenState extends State<NicknameScreen> {
             ),
           ),
 
-          // ------------------------------------------------
-          // [Layer 2] 하단 고정 버튼 (튜토리얼과 위치 통일!)
-          // ------------------------------------------------
           Positioned(
-            bottom: s(40), // ★ 튜토리얼의 bottom: 40 과 동일 (s함수 적용)
-            left: s(20), // ★ left: 20
-            right: s(20), // ★ right: 20
+            bottom: s(40),
+            left: s(20),
+            right: s(20),
             child: ElevatedButton(
               onPressed: _onDecide,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFE86F6F), // ★ 색상 통일
+                backgroundColor: const Color(0xFFE86F6F),
                 foregroundColor: Colors.white,
-                // ★ 패딩 통일 (튜토리얼의 vertical: 23 적용)
                 padding: EdgeInsets.symmetric(vertical: s(23)),
                 shape: RoundedRectangleBorder(
-                  // ★ 둥글기 통일 (radius: 10)
                   borderRadius: BorderRadius.circular(s(10)),
                 ),
                 elevation: 0,

@@ -36,16 +36,22 @@ class _TutorialScreenState extends State<TutorialScreen> {
     );
   }
 
-  // ★ [핵심] 터치 위치에 따라 앞/뒤 이동
+  @override
+  void dispose() {
+    _pageController.dispose(); // 메모리 누수 방지
+    super.dispose();
+  }
+
+  // 터치 위치에 따라 앞/뒤 이동
   void _handleTap(TapUpDetails details) {
-    // 1. 화면 전체 너비 구하기
+    // 화면 전체 너비 구하기
     final screenWidth = MediaQuery.of(context).size.width;
-    // 2. 터치한 x좌표 구하기
+    // 터치한 x좌표 구하기
     final tapPosition = details.globalPosition.dx;
 
-    // 3. 반으로 나눠서 판별
+    // 반으로 나눠서 판별
     if (tapPosition < screenWidth / 2) {
-      // [왼쪽 터치] -> 이전 페이지
+      // 왼쪽 터치 → 이전 페이지
       if (_currentIndex > 0) {
         _pageController.previousPage(
           duration: const Duration(milliseconds: 300),
@@ -53,7 +59,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
         );
       }
     } else {
-      // [오른쪽 터치] -> 다음 페이지
+      // 오른쪽 터치 → 다음 페이지
       if (_currentIndex < _tutorialImages.length - 1) {
         _pageController.nextPage(
           duration: const Duration(milliseconds: 300),
@@ -65,9 +71,12 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 이미지 최적화를 위한 화면 크기
+    final screenWidth = MediaQuery.of(context).size.width;
+    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+
     return Scaffold(
       backgroundColor: Colors.white,
-      // ★ onTapUp을 사용해야 터치 위치(details)를 알 수 있음
       body: GestureDetector(
         onTapUp: _handleTap,
         child: Stack(
@@ -87,11 +96,13 @@ class _TutorialScreenState extends State<TutorialScreen> {
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
+                  cacheWidth: (screenWidth * devicePixelRatio)
+                      .toInt(), // 메모리 최적화
                 );
               },
             ),
 
-            // '시작하기' 버튼 (마지막 페이지)
+            // 시작하기 버튼 (마지막 페이지)
             if (_currentIndex == _tutorialImages.length - 1)
               Positioned(
                 bottom: 40,

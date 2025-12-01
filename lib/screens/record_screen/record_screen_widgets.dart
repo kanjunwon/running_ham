@@ -9,23 +9,30 @@ class RecordStatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: TextStyle(color: Colors.grey.shade800, fontSize: 12),
-        ),
-        const SizedBox(height: 5),
-        Text(
-          count,
-          style: const TextStyle(
-            color: Color(0xFFE45151),
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Pretendard',
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.grey.shade700,
+              fontSize: 11,
+              fontFamily: 'Pretendard',
+            ),
+            textAlign: TextAlign.center,
           ),
-        ),
-      ],
+          const SizedBox(height: 5),
+          Text(
+            count,
+            style: const TextStyle(
+              color: Color(0xFFE45151),
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Recipekorea',
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

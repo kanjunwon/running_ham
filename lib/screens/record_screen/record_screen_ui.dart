@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'record_screen_widgets.dart';
@@ -39,20 +40,31 @@ class RecordScreenUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 반응형 스케일링 (너비 + 높이 모두 고려)
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    const double baseWidth = 390.0;
+    const double baseHeight = 844.0;
+    final double scale = min(
+      screenWidth / baseWidth,
+      screenHeight / baseHeight,
+    );
+    double s(double value) => value * scale;
+
     // 요일 리스트
     final List<String> weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
     return Scaffold(
-      backgroundColor: Colors.white, // 배경 흰색
+      backgroundColor: const Color(0xFFFFF6F6), // 연한 핑크 배경
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
+        title: Text(
           '기록',
           style: TextStyle(
-            color: Color(0xFF4D3817),
+            color: const Color(0xFF4D3817),
             fontFamily: 'Pretendard',
             fontWeight: FontWeight.w600,
-            fontSize: 18,
+            fontSize: s(18),
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -63,7 +75,7 @@ class RecordScreenUI extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: s(30), vertical: s(10)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -71,40 +83,60 @@ class RecordScreenUI extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // 선택한 날짜 데이터
+                // 오늘 걸음 수
                 RecordStatItem(
-                  label: "${selectedDate.month}월 ${selectedDate.day}일",
+                  label: "오늘 걸음 수",
                   count: formatSteps(displaySteps),
                 ),
-                RecordStatItem(label: "이번 주", count: formatSteps(weeklyTotal)),
-                RecordStatItem(label: "이번 달", count: formatSteps(monthlyTotal)),
+                RecordStatItem(
+                  label: "이번 주 걸음 수",
+                  count: formatSteps(weeklyTotal),
+                ),
+                RecordStatItem(
+                  label: "이번 달 걸음 수",
+                  count: formatSteps(monthlyTotal),
+                ),
               ],
             ),
 
-            const SizedBox(height: 30),
+            SizedBox(height: s(30)),
 
             // 주간 기록
             const RecordSectionTitle(title: "주간 기록"),
-            const SizedBox(height: 15),
-            // 부품 호출
-            WeeklyChart(weeklySteps: weeklySteps, weekDays: weekDays),
+            SizedBox(height: s(15)),
+            // 주간 기록 흰색 박스
+            Container(
+              padding: EdgeInsets.all(s(15)),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(s(15)),
+              ),
+              child: WeeklyChart(weeklySteps: weeklySteps, weekDays: weekDays),
+            ),
 
-            const SizedBox(height: 30),
+            SizedBox(height: s(30)),
 
             // 월간 기록
             const RecordSectionTitle(title: "월간 기록"),
-            const SizedBox(height: 15),
-            // 부품 호출
-            MonthlyCalendar(
-              monthlySteps: monthlySteps,
-              weekDays: weekDays,
-              focusedDate: focusedDate,
-              selectedDate: selectedDate,
-              onMonthChanged: onMonthChanged,
-              onDateSelected: onDateSelected,
+            SizedBox(height: s(15)),
+            // 월간 기록 흰색 박스
+            Container(
+              padding: EdgeInsets.all(s(15)),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(s(15)),
+              ),
+              child: MonthlyCalendar(
+                monthlySteps: monthlySteps,
+                weekDays: weekDays,
+                focusedDate: focusedDate,
+                selectedDate: selectedDate,
+                onMonthChanged: onMonthChanged,
+                onDateSelected: onDateSelected,
+              ),
             ),
 
-            const SizedBox(height: 40),
+            SizedBox(height: s(40)),
           ],
         ),
       ),

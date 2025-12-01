@@ -1,8 +1,7 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:provider/provider.dart';
-import 'package:running_ham/providers/user_provider.dart';
 import 'package:running_ham/screens/main_screen/main_screen.dart';
 import 'package:running_ham/screens/tutorial_screen/tutorial_screen.dart';
 import 'package:running_ham/screens/tutorial_screen/death_screen.dart';
@@ -15,24 +14,52 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  // 햄스터 애니메이션용 변수들
+  int _currentHamsterIndex = 0;
+  Timer? _hamsterTimer;
+  final List<String> _hamsterImages = [
+    'assets/images/splash_images/loading_1.png', // 로딩 1
+    'assets/images/splash_images/loading_2.png', // 로딩 2
+    'assets/images/splash_images/loading_3.png', // 로딩 3
+  ];
+
   @override
   void initState() {
     super.initState();
-    _checkUserStatus(); // 1. 상태 체크 시작
+    _startHamsterAnimation(); // 햄스터 애니메이션 시작
+    _checkUserStatus(); // 유저 상태 체크 시작
+  }
+
+  @override
+  void dispose() {
+    _hamsterTimer?.cancel(); // 화면 종료 시 타이머 해제 (메모리 누수 방지)
+    super.dispose();
+  }
+
+  // 1초마다 햄스터 이미지 바꾸는 타이머
+  void _startHamsterAnimation() {
+    _hamsterTimer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
+      if (mounted) {
+        setState(() {
+          _currentHamsterIndex =
+              (_currentHamsterIndex + 1) % _hamsterImages.length;
+        });
+      }
+    });
   }
 
   Future<void> _checkUserStatus() async {
-    // 로고 보여주기 위해 2초 정도 딜레이 (로딩척)
-    await Future.delayed(const Duration(seconds: 10));
+    // 로고 보여주기 위해 2초 정도 딜레이
+    await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
 
     final prefs = await SharedPreferences.getInstance();
 
-    // A. 튜토리얼 봤는지 확인 (기본값 true)
+    // 튜토리얼 봤는지 확인 (기본값 true)
     bool isFirstTime = prefs.getBool('isFirstTime') ?? true;
 
-    // B. 마지막 접속일 확인 (죽음 판정용)
+    // 마지막 접속일 확인 (죽음 판정용)
     String? lastLoginStr = prefs.getString('lastLoginDate');
     bool isDead = false;
 
@@ -46,20 +73,20 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     }
 
-    // 접속 시간 갱신 (살았든 죽었든 일단 접속은 했으니까)
+    // 접속 시간 갱신
     await prefs.setString('lastLoginDate', DateTime.now().toIso8601String());
 
-    // C. 화면 이동 로직 (우선순위: 처음 > 죽음 > 메인)
+    // 화면 이동 로직 (우선순위: 처음 > 죽음 > 메인)
     Widget nextScreen;
 
     if (isFirstTime) {
-      // 1. 처음이면 무조건 튜토리얼
+      // 처음이면 무조건 튜토리얼
       nextScreen = const TutorialScreen();
     } else if (isDead) {
-      // 2. 7일 만에 왔으면 죽음 화면
+      // 7일 만에 왔으면 죽음 화면
       nextScreen = const DeathScreen();
     } else {
-      // 3. 아니면 메인으로
+      // 아니면 메인으로
       nextScreen = const MainScreen();
     }
 
@@ -74,21 +101,55 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 디자이너가 준 로딩 화면 디자인 (없으면 로고만 띄움)
+    // 반응형 스케일링 (너비 + 높이 모두 고려)
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    const double baseWidth = 390.0;
+    const double baseHeight = 844.0;
+    final double scale = min(
+      screenWidth / baseWidth,
+      screenHeight / baseHeight,
+    );
+    double s(double value) => value * scale;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF3E6),
+      backgroundColor: const Color(0xFFFFD5D5), // 디자인 시안 배경색
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // 로고 이미지
-            Image.asset(
-              'assets/images/main_images/ham_1.png', // 임시 로고
-              width: 150,
+            // 런 / 닝 / 햄 위치에 번갈아 나타남
+            SizedBox(
+              width: s(200), // 로고 너비와 맞춤
+              height: s(90),
+              child: Row(
+                children: List.generate(3, (index) {
+                  // 첫 번째 90, 두/세번째 70
+                  final double hamsterSize = index == 0 ? s(100) : s(70);
+                  return Expanded(
+                    child: Center(
+                      // 현재 인덱스만 보여주고, 나머지는 빈 공간
+                      child: _currentHamsterIndex == index
+                          ? Image.asset(
+                              _hamsterImages[index],
+                              width: hamsterSize,
+                              height: hamsterSize,
+                              cacheWidth: (hamsterSize * 2).toInt(),
+                              fit: BoxFit.contain,
+                            )
+                          : SizedBox(width: hamsterSize, height: hamsterSize),
+                    ),
+                  );
+                }),
+              ),
             ),
-            const SizedBox(height: 20),
-            // 로딩 인디케이터 (빙글빙글)
-            const CircularProgressIndicator(color: Color(0xFF4D3817)),
+            SizedBox(height: s(10)), // 햄스터와 로고 사이 간격
+            // 런닝햄 텍스트 로고
+            Image.asset(
+              'assets/images/splash_images/logo.png',
+              width: s(200),
+              cacheWidth: (s(200) * 2).toInt(),
+            ),
           ],
         ),
       ),
