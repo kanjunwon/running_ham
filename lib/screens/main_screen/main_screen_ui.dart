@@ -90,13 +90,15 @@ class MainScreenUI extends StatelessWidget {
           Positioned(
             left: 0,
             right: 0,
-            top: s(240), // 햄스터 기준 위치
+            top: hamsterState == HamsterState.normal
+                ? s(240)
+                : s(220), // 살찐 햄스터는 위로
             child: GestureDetector(
               onTap: onHamsterTap, // 터치하면 카운트 증가
               child: Center(
                 child: SizedBox(
-                  width: s(231),
-                  height: s(262),
+                  width: hamsterState == HamsterState.normal ? s(231) : s(270),
+                  height: hamsterState == HamsterState.normal ? s(262) : s(300),
                   child: Stack(
                     clipBehavior: Clip.none,
                     alignment: Alignment.center,
@@ -105,30 +107,42 @@ class MainScreenUI extends StatelessWidget {
                       Image.asset(
                         hamsterImagePath,
                         fit: BoxFit.contain,
-                        cacheWidth: (s(231) * 2).toInt(), // 필요한 크기의 2배 정도로만 로딩
+                        cacheWidth: hamsterState == HamsterState.normal
+                            ? (s(231) * 2).toInt()
+                            : (s(270) * 2).toInt(),
                       ),
 
-                      // 볼터치 (햄스터 볼 위치에 맞춤)
+                      // 볼터치 (햄스터 상태에 따라 위치 조정)
                       if (isHappyMode)
                         Positioned(
-                          top: s(-105),
-                          left: s(-110),
+                          top: hamsterState == HamsterState.normal
+                              ? s(-70)
+                              : s(-55), // 살찐 햄스터도 위로 올림
+                          left: hamsterState == HamsterState.normal
+                              ? s(-75)
+                              : s(-59), // 살찐 햄스터는 더 넓게
                           child: Image.asset(
                             'assets/images/main_images/blush.png',
-                            width: s(460),
-                            cacheWidth: (s(150) * 2).toInt(),
+                            width: hamsterState == HamsterState.normal
+                                ? s(380)
+                                : s(380), // 살찐 햄스터는 볼터치도 크게
+                            cacheWidth: (s(420) * 2).toInt(),
                           ),
                         ),
 
                       // 치장 아이템 (선글라스)
                       if (equipped['glass'] != null &&
                           equipped['glass']!.isNotEmpty)
-                        _buildAccessory(equipped['glass']!, scale),
+                        _buildAccessory(
+                          equipped['glass']!,
+                          scale,
+                          hamsterState,
+                        ),
 
                       // 치장 아이템 (머리핀)
                       if (equipped['hair'] != null &&
                           equipped['hair']!.isNotEmpty)
-                        _buildAccessory(equipped['hair']!, scale),
+                        _buildAccessory(equipped['hair']!, scale, hamsterState),
 
                       // 하트
                       if (isHappyMode)
@@ -475,22 +489,25 @@ class MainScreenUI extends StatelessWidget {
     );
   }
 
-  // 액세서리 위치 조절 함수
-  Widget _buildAccessory(String imagePath, double scale) {
+  // 액세서리 위치 조절 함수 (햄스터 상태에 따라 조정)
+  Widget _buildAccessory(String imagePath, double scale, HamsterState state) {
     double top = 0;
     double left = 0;
     double width = 100 * scale;
 
+    // 살찐 햄스터는 크기가 커서 액세서리 위치/크기도 조정
+    final bool isFat = state != HamsterState.normal;
+
     if (imagePath.contains('sunglass')) {
       // 선글라스 위치
-      top = 64 * scale;
-      left = 43 * scale;
-      width = 150 * scale;
+      top = isFat ? 75 * scale : 64 * scale;
+      left = isFat ? 46 * scale : 43 * scale;
+      width = isFat ? 175 * scale : 150 * scale;
     } else if (imagePath.contains('hairpin')) {
       // 머리핀 위치
-      top = 7 * scale;
-      left = 130 * scale;
-      width = 80 * scale;
+      top = isFat ? 10 * scale : 7 * scale;
+      left = isFat ? 152 * scale : 130 * scale;
+      width = isFat ? 95 * scale : 80 * scale;
     }
 
     return Positioned(

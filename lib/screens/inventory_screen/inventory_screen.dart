@@ -250,6 +250,17 @@ class _InventoryScreenState extends State<InventoryScreen> {
         .where((i) => i['category'] == 'consumable')
         .toList();
 
+    // 현재 걸음 수에 따른 햄스터 상태 계산
+    final int currentSteps = userProvider.todaySteps;
+    final bool isExempt = userProvider.isExemptToday;
+    String hamsterImagePath;
+    
+    if (isExempt || currentSteps >= 5000) {
+      hamsterImagePath = 'assets/images/main_images/ham_1.png'; // 기본
+    } else {
+      hamsterImagePath = 'assets/images/main_images/ham_2.png'; // 살찜
+    }
+
     return InventoryScreenUI(
       // Provider에 저장된 장착 이미지 경로 전달
       currentBowl: equipped['bowl'] ?? '',
@@ -257,6 +268,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       currentWheel: equipped['wheel'] ?? '',
       currentGlass: equipped['glass'],
       currentHair: equipped['hair'],
+      hamsterImagePath: hamsterImagePath, // 현재 햄스터 상태
 
       equipItems: equipItems,
       consumableItems: consumableItems,

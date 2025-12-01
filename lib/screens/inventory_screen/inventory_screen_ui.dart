@@ -9,6 +9,7 @@ class InventoryScreenUI extends StatelessWidget {
   final String currentWheel;
   final String? currentGlass;
   final String? currentHair;
+  final String hamsterImagePath; // 현재 햄스터 상태 이미지
 
   // 아이템 리스트
   final List<Map<String, dynamic>> equipItems;
@@ -24,6 +25,7 @@ class InventoryScreenUI extends StatelessWidget {
     required this.currentWheel,
     required this.currentGlass,
     required this.currentHair,
+    required this.hamsterImagePath,
     required this.equipItems,
     required this.consumableItems,
     required this.onEquipItem,
@@ -98,7 +100,7 @@ class InventoryScreenUI extends StatelessWidget {
                 // 물통
                 _buildPreviewWater(currentWater, scale),
 
-                // 햄스터 (중앙)
+                // 햄스터 (중앙) - 현재 상태에 맞는 이미지
                 Positioned(
                   bottom: s(50),
                   left: 0,
@@ -106,7 +108,7 @@ class InventoryScreenUI extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Image.asset(
-                      'assets/images/main_images/ham_1.png',
+                      hamsterImagePath, // 현재 햄스터 상태
                       width: s(180),
                       cacheWidth: (s(180) * 2).toInt(),
                     ),

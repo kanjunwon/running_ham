@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:running_ham/screens/tutorial_screen/nickname_screen.dart'; // 경로 확인!
+import 'package:running_ham/screens/tutorial_screen/nickname_screen.dart';
 
 class TutorialScreen extends StatefulWidget {
   const TutorialScreen({super.key});

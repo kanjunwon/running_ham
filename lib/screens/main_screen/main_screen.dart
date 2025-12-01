@@ -24,7 +24,7 @@ class _MainScreenState extends State<MainScreen> {
 
   // 로컬 데이터 DB가 아닌, 매일 초기화되는 변수
   int _steps = 0;
-  HamsterState _hamsterState = HamsterState.normal;
+  HamsterState _hamsterState = HamsterState.fat1; // 햄스터 초기 상태 변경
   final int _targetSteps = 5; // 원래 5000보
   String _lastRewardDateKey = '';
 
