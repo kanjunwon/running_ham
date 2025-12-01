@@ -70,6 +70,7 @@ class ProgressBar extends StatelessWidget {
                           style: const TextStyle(
                             fontSize: 15,
                             fontFamily: 'Pretendard',
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
@@ -81,7 +82,11 @@ class ProgressBar extends StatelessWidget {
                     bottom: -15,
                     child: const Text(
                       '50개 ',
-                      style: TextStyle(fontSize: 15, fontFamily: 'Pretendard'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontFamily: 'Pretendard',
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
 
@@ -90,7 +95,11 @@ class ProgressBar extends StatelessWidget {
                     bottom: -15,
                     child: const Text(
                       '100개',
-                      style: TextStyle(fontSize: 15, fontFamily: 'Pretendard'),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontFamily: 'Pretendard',
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],

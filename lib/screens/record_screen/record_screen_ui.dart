@@ -50,7 +50,8 @@ class RecordScreenUI extends StatelessWidget {
           '기록',
           style: TextStyle(
             color: Color(0xFF4D3817),
-            fontWeight: FontWeight.bold,
+            fontFamily: 'Pretendard',
+            fontWeight: FontWeight.w600,
             fontSize: 18,
           ),
         ),

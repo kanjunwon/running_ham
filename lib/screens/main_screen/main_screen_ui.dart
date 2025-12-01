@@ -55,7 +55,7 @@ class MainScreenUI extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF3E6), // 배경색
+      backgroundColor: const Color(0xFFFFF6F6), // 배경색
       body: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -208,7 +208,7 @@ class MainScreenUI extends StatelessWidget {
                 color: Colors.grey.shade800,
                 fontSize: s(15),
                 fontFamily: 'Pretendard', // 폰트 적용
-                fontWeight: FontWeight.bold, // 볼드체
+                fontWeight: FontWeight.w600, // 볼드체
               ),
             ),
           ),
@@ -236,7 +236,7 @@ class MainScreenUI extends StatelessWidget {
                       color: const Color(0xFF1A1A1A),
                       fontSize: s(16),
                       fontFamily: 'Pretendard',
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w600,
                       height: 2.2,
                     ),
                   ),
@@ -249,7 +249,7 @@ class MainScreenUI extends StatelessWidget {
           Positioned(
             left: 0,
             right: 0,
-            top: s(475), // 하단 카드에 안 겹치도록 위치 조정
+            top: s(490), // 하단 카드에 안 겹치도록 위치 조정
             child: Text(
               nickname, // 변수로 받기
               textAlign: TextAlign.center,
@@ -306,7 +306,7 @@ class MainScreenUI extends StatelessWidget {
                             color: Colors.black,
                             fontSize: s(16),
                             fontFamily: 'Pretendard',
-                            fontWeight: FontWeight.w400,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],

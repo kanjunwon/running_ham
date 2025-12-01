@@ -14,6 +14,7 @@ dependencies:
 
   pedometer: ^4.0.1 # 만보기 기능
   permission_handler: ^11.3.1 # 권한 핸들러
+  shared_preferences: ^2.2.0 # 로컬 DB
 
   firebase_core: ^3.1.1 # 파이어베이스 핵심
   firebase_auth: ^5.1.1 # 파이어베이스 로그인
@@ -38,6 +39,7 @@ flutter:
     - assets/images/record_images/
     - assets/images/store_images/
     - assets/images/inventory_images/
+    - assets/images/tutorial_images/
 
   # 폰트 경로
   fonts:
@@ -49,9 +51,7 @@ flutter:
       fonts:
         - asset: assets/fonts/Pretendard-Regular.ttf
           weight: 400
-        - asset: assets/fonts/Pretendard-Black.ttf
-          weight: 500
         - asset: assets/fonts/Pretendard-SemiBold.ttf
-          weight: 700
-        - asset: assets/fonts/Pretendard-ExtraBold.ttf
-          weight: 800
+          weight: 500
+        - asset: assets/fonts/Pretendard-Medium.ttf
+          weight: 600

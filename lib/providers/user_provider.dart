@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // 날짜 포맷팅
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider extends ChangeNotifier {
   // 내 정보
@@ -14,11 +15,7 @@ class UserProvider extends ChangeNotifier {
   String _exemptionDate = ""; // 운동 면제권 날짜 (yyyyMMdd)
 
   // 기록페이지 걸음 수
-  Map<String, int> _stepHistory = {
-    // 테스트용 데이터
-    '20251124': 8000,
-    '20251125': 12000,
-  };
+  Map<String, int> _stepHistory = {};
 
   // 아이템 정보
   List<String> _myInventory = []; // 내가 가진 아이템 ID 리스트
@@ -46,6 +43,44 @@ class UserProvider extends ChangeNotifier {
   bool get isExemptToday {
     final today = DateFormat('yyyyMMdd').format(DateTime.now());
     return _exemptionDate == today;
+  }
+
+  // 데이터 초기화 (죽음)
+  Future<void> resetData() async {
+    _nickname = "새로운 햄스터"; // 임시 이름
+    _seedCount = 0; // 돈 초기화
+    _todaySteps = 0;
+    _attendanceDays = 1;
+
+    // 인벤토리 비우기
+    _myInventory.clear();
+
+    // 장착 아이템 기본값으로 복구
+    _equippedItems = {
+      'bowl': 'assets/images/main_images/food_normal_back.png',
+      'water': 'assets/images/main_images/water_normal_back.png',
+      'wheel': 'assets/images/main_images/chat_normal_back.png',
+      'glass': '',
+      'hair': '',
+    };
+
+    // 햄스터 이미지도 기본으로
+    _hamsterImage = "assets/images/main_images/ham_1.png";
+
+    notifyListeners(); // 화면 갱신
+  }
+
+  // 닉네임 설정
+  void setNickname(String newName) {
+    _nickname = newName;
+    notifyListeners();
+  }
+
+  // 튜토리얼 완료 처리
+  Future<void> completeTutorial() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isFirstTime', false);
+    // 필요하면 여기서 추가 로직 수행
   }
 
   // 걸음 수 업데이트
