@@ -39,6 +39,7 @@ class StoreItemCard extends StatelessWidget {
                   child: Image.asset(
                     imagePath,
                     fit: BoxFit.contain,
+                    cacheWidth: 300, // 이미지 해상도 조절
                     errorBuilder: (c, e, s) => const Icon(
                       Icons.image_not_supported,
                       color: Colors.grey,

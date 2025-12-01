@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'inventory_screen_widgets.dart';
 
@@ -30,16 +31,23 @@ class InventoryScreenUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 화면 크기 기반 스케일링 로직
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double scale = min(screenWidth / 390.0, 1.1);
+
+    // 비율 적용 헬퍼 함수
+    double s(double value) => value * scale;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFAF3E6), // 배경색
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
+        title: Text(
           '보관함',
           style: TextStyle(
-            color: Color(0xFF4D3817),
+            color: const Color(0xFF4D3817),
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: s(18), // 반응형 폰트
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -62,62 +70,81 @@ class InventoryScreenUI extends StatelessWidget {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: 150,
+                  height: s(150),
                   child: Image.asset(
                     'assets/images/main_images/ground.png',
                     fit: BoxFit.cover, // 가로 꽉 채우기
+                    cacheWidth:
+                        (screenWidth * MediaQuery.of(context).devicePixelRatio)
+                            .toInt(),
                   ),
                 ),
 
                 // 챗바퀴
                 Positioned(
-                  top: 20,
-                  left: -40,
-                  child: Image.asset(currentWheel, width: 220, height: 220),
+                  top: s(20),
+                  left: s(-40),
+                  child: Image.asset(
+                    currentWheel,
+                    width: s(220),
+                    height: s(220),
+                    cacheWidth: (s(220) * 2).toInt(),
+                  ),
                 ),
 
                 // 밥그릇
                 Positioned(
-                  bottom: 30,
-                  right: 10,
-                  child: Image.asset(currentBowl, width: 110, height: 60),
+                  bottom: s(30),
+                  right: s(10),
+                  child: Image.asset(
+                    currentBowl,
+                    width: s(110),
+                    height: s(60),
+                    cacheWidth: (s(110) * 2).toInt(),
+                  ),
                 ),
 
                 // 물통
                 Positioned(
-                  top: 20,
-                  right: -30,
-                  child: Image.asset(currentWater, width: 100, height: 200),
+                  top: s(20),
+                  right: s(-30),
+                  child: Image.asset(
+                    currentWater,
+                    width: s(100),
+                    height: s(200),
+                    cacheWidth: (s(100) * 2).toInt(),
+                  ),
                 ),
 
                 // 햄스터 (중앙)
                 Positioned(
-                  bottom: 50,
+                  bottom: s(50),
                   left: 0,
                   right: 0,
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Image.asset(
                       'assets/images/main_images/ham_1.png',
-                      width: 180,
+                      width: s(180),
+                      cacheWidth: (s(180) * 2).toInt(),
                     ),
                   ),
                 ),
 
                 // 썬글라스
                 if (currentGlass != null && currentGlass!.isNotEmpty)
-                  _buildPreviewAccessory(currentGlass!),
+                  _buildPreviewAccessory(currentGlass!, scale),
 
                 // 머리핀
                 if (currentHair != null && currentHair!.isNotEmpty)
-                  _buildPreviewAccessory(currentHair!),
+                  _buildPreviewAccessory(currentHair!, scale),
 
                 // 하단 그라데이션
                 Positioned(
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: 60, // 그라데이션 높이
+                  height: s(60), // 그라데이션 높이
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -141,12 +168,12 @@ class InventoryScreenUI extends StatelessWidget {
             flex: 6,
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              padding: EdgeInsets.fromLTRB(s(20), s(20), s(20), 0),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(s(30)),
+                  topRight: Radius.circular(s(30)),
                 ),
                 // 상단 그림자
                 boxShadow: [
@@ -163,16 +190,16 @@ class InventoryScreenUI extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // 치장 아이템 섹션
-                    _buildSectionTitle("치장 아이템"),
-                    _buildGrid(equipItems),
+                    _buildSectionTitle("치장 아이템", s),
+                    _buildGrid(equipItems, s),
 
-                    const SizedBox(height: 25),
+                    SizedBox(height: s(25)),
 
                     // 소모 아이템 섹션
-                    _buildSectionTitle("소모 아이템"),
-                    _buildGrid(consumableItems),
+                    _buildSectionTitle("소모 아이템", s),
+                    _buildGrid(consumableItems, s),
 
-                    const SizedBox(height: 30),
+                    SizedBox(height: s(30)),
                   ],
                 ),
               ),
@@ -183,30 +210,33 @@ class InventoryScreenUI extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, double Function(double) s) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.only(bottom: s(10)),
       child: Text(
         title,
-        style: const TextStyle(
-          color: Color(0xFF4D3817),
+        style: TextStyle(
+          color: const Color(0xFF4D3817),
           fontWeight: FontWeight.bold,
-          fontSize: 14,
+          fontSize: s(14),
         ),
       ),
     );
   }
 
-  Widget _buildGrid(List<Map<String, dynamic>> items) {
+  Widget _buildGrid(
+    List<Map<String, dynamic>> items,
+    double Function(double) s,
+  ) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: items.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         childAspectRatio: 0.75,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
+        crossAxisSpacing: s(10),
+        mainAxisSpacing: s(10),
       ),
       itemBuilder: (context, index) {
         final item = items[index];
@@ -231,40 +261,45 @@ class InventoryScreenUI extends StatelessWidget {
       },
     );
   }
-}
 
-// 보관함에서 미리 보는 치장 아이템
-Widget _buildPreviewAccessory(String imagePath) {
-  double bottom = 0;
-  double left = 0;
-  double width = 100;
+  // 보관함에서 미리 보는 치장 아이템
+  Widget _buildPreviewAccessory(String imagePath, double scale) {
+    double bottom = 0;
+    double left = 0;
+    double width = 100 * scale;
 
-  // 썬글라스
-  if (imagePath.contains('sunglass')) {
-    width = 120;
-    bottom = 166;
-    left = 3;
+    // 썬글라스
+    if (imagePath.contains('sunglass')) {
+      width = 120 * scale;
+      bottom = 166 * scale;
+      left = 3 * scale;
 
-    // 머리핀
-  } else if (imagePath.contains('hair')) {
-    width = 70;
-    bottom = 190;
-    left = 83;
-  } else {
-    bottom = 100;
-    left = 0;
-  }
+      // 머리핀
+    } else if (imagePath.contains('hair')) {
+      width = 70 * scale;
+      bottom = 190 * scale;
+      left = 83 * scale;
+    } else {
+      bottom = 100 * scale;
+      left = 0;
+    }
 
-  return Positioned(
-    bottom: bottom,
-    left: 0,
-    right: 0,
-    child: Align(
-      alignment: Alignment.center,
-      child: Padding(
-        padding: EdgeInsets.only(left: left),
-        child: Image.asset(imagePath, width: width, fit: BoxFit.contain),
+    return Positioned(
+      bottom: bottom,
+      left: 0,
+      right: 0,
+      child: Align(
+        alignment: Alignment.center,
+        child: Padding(
+          padding: EdgeInsets.only(left: left),
+          child: Image.asset(
+            imagePath,
+            width: width,
+            fit: BoxFit.contain,
+            cacheWidth: (width * 2).toInt(),
+          ),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

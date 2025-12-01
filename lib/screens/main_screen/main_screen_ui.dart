@@ -176,7 +176,7 @@ class MainScreenUI extends StatelessWidget {
                             color: Colors.brown.shade700,
                             fontSize: s(15),
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'AppleSDGothicNeoB00',
+                            fontFamily: 'Pretendard',
                           ),
                         ),
 
@@ -207,7 +207,7 @@ class MainScreenUI extends StatelessWidget {
               style: TextStyle(
                 color: Colors.grey.shade800,
                 fontSize: s(15),
-                fontFamily: 'AppleSDGothicNeoM00', // 폰트 적용
+                fontFamily: 'Pretendard', // 폰트 적용
                 fontWeight: FontWeight.bold, // 볼드체
               ),
             ),
@@ -235,7 +235,7 @@ class MainScreenUI extends StatelessWidget {
                     style: TextStyle(
                       color: const Color(0xFF1A1A1A),
                       fontSize: s(16),
-                      fontFamily: 'AppleSDGothicNeoB00',
+                      fontFamily: 'Pretendard',
                       fontWeight: FontWeight.w400,
                       height: 2.2,
                     ),
@@ -305,7 +305,7 @@ class MainScreenUI extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: s(16),
-                            fontFamily: 'AppleSDGothicNeoB00',
+                            fontFamily: 'Pretendard',
                             fontWeight: FontWeight.w400,
                           ),
                         ),

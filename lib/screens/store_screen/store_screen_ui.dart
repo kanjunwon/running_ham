@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'store_screen_widgets.dart';
 
@@ -17,16 +18,23 @@ class StoreScreenUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 화면 크기 기반 스케일링 로직
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double scale = min(screenWidth / 390.0, 1.1);
+
+    // 비율 적용 헬퍼 함수
+    double s(double value) => value * scale;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF7F5F0),
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
+        title: Text(
           '상점',
           style: TextStyle(
-            color: Color(0xFF4D3817),
+            color: const Color(0xFF4D3817),
             fontWeight: FontWeight.bold,
-            fontSize: 18,
+            fontSize: s(18), // 폰트 크기 반응형
           ),
         ),
         backgroundColor: const Color(0xFFF7F5F0),
@@ -38,7 +46,7 @@ class StoreScreenUI extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          padding: EdgeInsets.symmetric(horizontal: s(20.0)), // 좌우 여백 반응형
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -48,31 +56,31 @@ class StoreScreenUI extends StatelessWidget {
                 children: [
                   Image.asset(
                     'assets/images/main_images/money_main_back.png',
-                    width: 22,
+                    width: s(22), // 아이콘 크기 반응형
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: s(6)),
                   Text(
                     '$mySeeds',
-                    style: const TextStyle(
-                      color: Color(0xFF1A1A1A),
-                      fontSize: 16,
+                    style: TextStyle(
+                      color: const Color(0xFF1A1A1A),
+                      fontSize: s(16),
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Pretendard',
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: s(10)),
 
               // 카테고리별 섹션 구성
-              _buildCategorySection("밥그릇", "bowl"),
-              _buildCategorySection("챗바퀴", "wheel"),
-              _buildCategorySection("물통", "water"),
-              _buildCategorySection("썬글라스", "glass"),
-              _buildCategorySection("머리핀", "hair"),
-              _buildCategorySection("소모 아이템", "consumable"),
+              _buildCategorySection("밥그릇", "bowl", s),
+              _buildCategorySection("챗바퀴", "wheel", s),
+              _buildCategorySection("물통", "water", s),
+              _buildCategorySection("썬글라스", "glass", s),
+              _buildCategorySection("머리핀", "hair", s),
+              _buildCategorySection("소모 아이템", "consumable", s),
 
-              const SizedBox(height: 40),
+              SizedBox(height: s(40)),
             ],
           ),
         ),
@@ -80,8 +88,12 @@ class StoreScreenUI extends StatelessWidget {
     );
   }
 
-  // 카테고리 섹션 빌더
-  Widget _buildCategorySection(String title, String categoryCode) {
+  // 카테고리 섹션 빌더 (s 함수를 인자로 받아서 내부 크기 조절)
+  Widget _buildCategorySection(
+    String title,
+    String categoryCode,
+    double Function(double) s,
+  ) {
     final items = storeItems
         .where((item) => item['category'] == categoryCode)
         .toList();
@@ -91,28 +103,28 @@ class StoreScreenUI extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 20),
+        SizedBox(height: s(20)),
         // 섹션 제목
         Text(
           title,
-          style: const TextStyle(
-            color: Color(0xFF4D3817),
-            fontSize: 14,
+          style: TextStyle(
+            color: const Color(0xFF4D3817),
+            fontSize: s(14),
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: s(10)),
 
         // 아이템 나열
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: items.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            childAspectRatio: 0.65,
-            crossAxisSpacing: 15,
-            mainAxisSpacing: 20,
+            childAspectRatio: 0.65, // 비율은 고정
+            crossAxisSpacing: s(15), // 간격 반응형
+            mainAxisSpacing: s(20), // 간격 반응형
           ),
           itemBuilder: (context, index) {
             final item = items[index];
