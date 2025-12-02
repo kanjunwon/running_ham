@@ -117,11 +117,15 @@ class InventoryScreenUI extends StatelessWidget {
 
                 // 썬글라스
                 if (currentGlass != null && currentGlass!.isNotEmpty)
-                  _buildPreviewAccessory(currentGlass!, scale),
+                  _buildPreviewAccessory(
+                    currentGlass!,
+                    scale,
+                    hamsterImagePath,
+                  ),
 
                 // 머리핀
                 if (currentHair != null && currentHair!.isNotEmpty)
-                  _buildPreviewAccessory(currentHair!, scale),
+                  _buildPreviewAccessory(currentHair!, scale, hamsterImagePath),
 
                 // 하단 그라데이션
                 Positioned(
@@ -246,23 +250,54 @@ class InventoryScreenUI extends StatelessWidget {
     );
   }
 
-  // 보관함에서 미리 보는 치장 아이템
-  Widget _buildPreviewAccessory(String imagePath, double scale) {
+  // 보관함에서 미리 보는 치장 아이템 (햄스터 상태에 따라 위치 조정)
+  Widget _buildPreviewAccessory(
+    String imagePath,
+    double scale,
+    String hamsterPath,
+  ) {
     double bottom = 0;
     double left = 0;
     double width = 100 * scale;
 
-    // 썬글라스
-    if (imagePath.contains('sunglass')) {
-      width = 120 * scale;
-      bottom = 166 * scale;
-      left = 3 * scale;
+    // 햄스터 상태 확인
+    final bool isNormal = hamsterPath.contains('ham_1');
+    final bool isFat1 = hamsterPath.contains('ham_2');
+    // ham_3 = fat2
 
-      // 머리핀
+    // 썬글라스 (normal / fat1 / fat2)
+    if (imagePath.contains('sunglass')) {
+      if (isNormal) {
+        width = 100 * scale;
+        bottom = 152 * scale;
+        left = 0 * scale;
+      } else if (isFat1) {
+        width = 115 * scale;
+        bottom = 145 * scale;
+        left = 3 * scale;
+      } else {
+        // fat2
+        width = 118 * scale;
+        bottom = 148 * scale;
+        left = 4 * scale;
+      }
+
+      // 머리핀 (normal / fat1 / fat2)
     } else if (imagePath.contains('hair')) {
-      width = 70 * scale;
-      bottom = 190 * scale;
-      left = 83 * scale;
+      if (isNormal) {
+        width = 55 * scale;
+        bottom = 185 * scale;
+        left = 72 * scale;
+      } else if (isFat1) {
+        width = 65 * scale;
+        bottom = 178 * scale;
+        left = 85 * scale;
+      } else {
+        // fat2
+        width = 58 * scale;
+        bottom = 175 * scale;
+        left = 88 * scale;
+      }
     } else {
       bottom = 100 * scale;
       left = 0;

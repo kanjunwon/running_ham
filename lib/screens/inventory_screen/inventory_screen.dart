@@ -256,9 +256,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
     String hamsterImagePath;
     
     if (isExempt || currentSteps >= 5000) {
-      hamsterImagePath = 'assets/images/main_images/ham_1.png'; // 기본
+      hamsterImagePath = 'assets/images/main_images/ham_1.png'; // normal
+    } else if (currentSteps >= 2500) {
+      hamsterImagePath = 'assets/images/main_images/ham_2.png'; // fat1
     } else {
-      hamsterImagePath = 'assets/images/main_images/ham_2.png'; // 살찜
+      hamsterImagePath = 'assets/images/main_images/ham_3.png'; // fat2 (더 살찜)
     }
 
     return InventoryScreenUI(

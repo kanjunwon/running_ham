@@ -119,7 +119,7 @@ class MainScreenUI extends StatelessWidget {
                               ? s(-70)
                               : hamsterState == HamsterState.fat1
                               ? s(-50) // fat1
-                              : s(-45), // fat2
+                              : s(-59), // fat2
                           left: hamsterState == HamsterState.normal
                               ? s(-75)
                               : hamsterState == HamsterState.fat1
@@ -515,9 +515,9 @@ class MainScreenUI extends StatelessWidget {
           width = 175 * scale;
           break;
         case HamsterState.fat2:
-          top = 80 * scale;
+          top = 72 * scale;
           left = 50 * scale;
-          width = 180 * scale;
+          width = 173 * scale;
           break;
       }
     } else if (imagePath.contains('hairpin')) {
@@ -536,7 +536,7 @@ class MainScreenUI extends StatelessWidget {
         case HamsterState.fat2:
           top = 12 * scale;
           left = 155 * scale;
-          width = 100 * scale;
+          width = 85 * scale; // 15 줄임
           break;
       }
     }

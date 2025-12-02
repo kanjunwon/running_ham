@@ -24,7 +24,7 @@ class _MainScreenState extends State<MainScreen> {
 
   // 로컬 데이터 DB가 아닌, 매일 초기화되는 변수
   int _steps = 0;
-  HamsterState _hamsterState = HamsterState.normal; // 햄스터 초기 상태 변경
+  HamsterState _hamsterState = HamsterState.fat2; // 햄스터 초기 상태 변경
   final int _targetSteps = 5; // 원래 5000보
   String _lastRewardDateKey = '';
 
@@ -133,10 +133,12 @@ class _MainScreenState extends State<MainScreen> {
           if (isExempt) {
             _hamsterState = HamsterState.normal; // 면제권 쓰면 정상
           } else {
-            if (_steps < _targetSteps) {
-              _hamsterState = HamsterState.fat1;
-            } else {
+            if (_steps >= _targetSteps) {
               _hamsterState = HamsterState.normal;
+            } else if (_steps >= _targetSteps ~/ 2) {
+              _hamsterState = HamsterState.fat1; // 2500 이상
+            } else {
+              _hamsterState = HamsterState.fat2; // 2500 미만 (더 살찜)
             }
           }
 
