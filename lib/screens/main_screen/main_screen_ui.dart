@@ -117,15 +117,21 @@ class MainScreenUI extends StatelessWidget {
                         Positioned(
                           top: hamsterState == HamsterState.normal
                               ? s(-70)
-                              : s(-55), // 살찐 햄스터도 위로 올림
+                              : hamsterState == HamsterState.fat1
+                              ? s(-50) // fat1
+                              : s(-45), // fat2
                           left: hamsterState == HamsterState.normal
                               ? s(-75)
-                              : s(-59), // 살찐 햄스터는 더 넓게
+                              : hamsterState == HamsterState.fat1
+                              ? s(-58) // fat1
+                              : s(-55), // fat2
                           child: Image.asset(
                             'assets/images/main_images/blush.png',
                             width: hamsterState == HamsterState.normal
                                 ? s(380)
-                                : s(380), // 살찐 햄스터는 볼터치도 크게
+                                : hamsterState == HamsterState.fat1
+                                ? s(380) // fat1
+                                : s(390), // fat2
                             cacheWidth: (s(420) * 2).toInt(),
                           ),
                         ),
@@ -495,19 +501,44 @@ class MainScreenUI extends StatelessWidget {
     double left = 0;
     double width = 100 * scale;
 
-    // 살찐 햄스터는 크기가 커서 액세서리 위치/크기도 조정
-    final bool isFat = state != HamsterState.normal;
-
     if (imagePath.contains('sunglass')) {
-      // 선글라스 위치
-      top = isFat ? 75 * scale : 64 * scale;
-      left = isFat ? 46 * scale : 43 * scale;
-      width = isFat ? 175 * scale : 150 * scale;
+      // 선글라스 위치 (normal / fat1 / fat2)
+      switch (state) {
+        case HamsterState.normal:
+          top = 64 * scale;
+          left = 43 * scale;
+          width = 150 * scale;
+          break;
+        case HamsterState.fat1:
+          top = 75 * scale;
+          left = 47 * scale;
+          width = 175 * scale;
+          break;
+        case HamsterState.fat2:
+          top = 80 * scale;
+          left = 50 * scale;
+          width = 180 * scale;
+          break;
+      }
     } else if (imagePath.contains('hairpin')) {
-      // 머리핀 위치
-      top = isFat ? 10 * scale : 7 * scale;
-      left = isFat ? 152 * scale : 130 * scale;
-      width = isFat ? 95 * scale : 80 * scale;
+      // 머리핀 위치 (normal / fat1 / fat2)
+      switch (state) {
+        case HamsterState.normal:
+          top = 7 * scale;
+          left = 130 * scale;
+          width = 80 * scale;
+          break;
+        case HamsterState.fat1:
+          top = 10 * scale;
+          left = 152 * scale;
+          width = 95 * scale;
+          break;
+        case HamsterState.fat2:
+          top = 12 * scale;
+          left = 155 * scale;
+          width = 100 * scale;
+          break;
+      }
     }
 
     return Positioned(
