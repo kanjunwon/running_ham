@@ -23,13 +23,16 @@ class StoreScreenUI extends StatelessWidget {
     final double screenHeight = MediaQuery.of(context).size.height;
     const double baseWidth = 390.0;
     const double baseHeight = 844.0;
-    final double scale = min(screenWidth / baseWidth, screenHeight / baseHeight);
+    final double scale = min(
+      screenWidth / baseWidth,
+      screenHeight / baseHeight,
+    );
 
     // 비율 적용 헬퍼 함수
     double s(double value) => value * scale;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F5F0),
+      backgroundColor: const Color(0xFFFFF6F6), // 배경색
       appBar: AppBar(
         centerTitle: true,
         title: Text(
@@ -40,7 +43,7 @@ class StoreScreenUI extends StatelessWidget {
             fontSize: s(18), // 폰트 크기 반응형
           ),
         ),
-        backgroundColor: const Color(0xFFF7F5F0),
+        backgroundColor: const Color(0xFFFFF6F6),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF4D3817)),

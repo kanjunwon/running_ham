@@ -178,7 +178,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
         title: const Text("닉네임 변경"),
         content: TextField(
           controller: textController,
-          decoration: const InputDecoration(hintText: "새 이름을 입력하세요"),
+          maxLength: 6, // 최대 6글자 제한
+          decoration: const InputDecoration(
+            hintText: "새 이름을 입력하세요",
+            //counterText: "", // 글자 수 카운터 숨기기
+          ),
         ),
         actions: [
           TextButton(
@@ -218,6 +222,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
           TextButton(
             onPressed: () {
               // provider.changeHamsterSkin('assets/.../ham_black.png');  // 염색 햄스터
+              provider.consumeItem(itemId); // 사용 시 소모
               Navigator.pop(context);
               ScaffoldMessenger.of(
                 context,
@@ -250,17 +255,21 @@ class _InventoryScreenState extends State<InventoryScreen> {
         .where((i) => i['category'] == 'consumable')
         .toList();
 
-    // 현재 걸음 수에 따른 햄스터 상태 계산
-    final int currentSteps = userProvider.todaySteps;
-    final bool isExempt = userProvider.isExemptToday;
+    // 메인 페이지의 햄스터 상태를 Provider에서 가져오기
+    final String hamsterState = userProvider.currentHamsterState;
     String hamsterImagePath;
 
-    if (isExempt || currentSteps >= 5000) {
-      hamsterImagePath = 'assets/images/main_images/ham_1.png'; // normal
-    } else if (currentSteps >= 2500) {
-      hamsterImagePath = 'assets/images/main_images/ham_2.png'; // fat1
-    } else {
-      hamsterImagePath = 'assets/images/main_images/ham_3.png'; // fat2 (더 살찜)
+    switch (hamsterState) {
+      case 'normal':
+        hamsterImagePath = 'assets/images/main_images/ham_1.png';
+        break;
+      case 'fat1':
+        hamsterImagePath = 'assets/images/main_images/ham_2.png';
+        break;
+      case 'fat2':
+      default:
+        hamsterImagePath = 'assets/images/main_images/ham_3.png';
+        break;
     }
 
     return InventoryScreenUI(

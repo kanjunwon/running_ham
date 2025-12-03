@@ -24,7 +24,7 @@ class _MainScreenState extends State<MainScreen> {
 
   // 로컬 데이터 DB가 아닌, 매일 초기화되는 변수
   int _steps = 0;
-  HamsterState _hamsterState = HamsterState.fat2; // 햄스터 초기 상태 변경
+  HamsterState _hamsterState = HamsterState.normal; // 기본값 (Provider에서 덮어씀)
   final int _targetSteps = 5; // 원래 5000보
   String _lastRewardDateKey = '';
 
@@ -36,6 +36,18 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Provider에서 초기 햄스터 상태 읽어오기
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final state = context.read<UserProvider>().currentHamsterState;
+      setState(() {
+        _hamsterState = HamsterState.values.firstWhere(
+          (e) => e.name == state,
+          orElse: () => HamsterState.fat2,
+        );
+      });
+    });
+
     initPlatformState(); // 로그인 과정 없이 바로 센서 켜기
   }
 
@@ -151,6 +163,8 @@ class _MainScreenState extends State<MainScreen> {
           }
         });
 
+        // Provider에 햄스터 상태 업데이트 (보관함에서 사용)
+        context.read<UserProvider>().updateHamsterState(_hamsterState.name);
         context.read<UserProvider>().updateSteps(_steps);
       },
       onError: (error) {

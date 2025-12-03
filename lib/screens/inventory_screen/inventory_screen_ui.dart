@@ -50,7 +50,7 @@ class InventoryScreenUI extends StatelessWidget {
     double s(double value) => value * scale;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF3E6), // 배경색
+      backgroundColor: const Color(0xFFFFFFFF), // 배경색
       appBar: AppBar(
         centerTitle: true,
         title: Text(
@@ -127,7 +127,7 @@ class InventoryScreenUI extends StatelessWidget {
                 if (currentHair != null && currentHair!.isNotEmpty)
                   _buildPreviewAccessory(currentHair!, scale, hamsterImagePath),
 
-                // 하단 그라데이션
+                // 하단 그라데이션 (상단 화이트 → 하단 아이템 목록 배경색)
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -140,7 +140,7 @@ class InventoryScreenUI extends StatelessWidget {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.white.withOpacity(0.0), // 위쪽: 완전 투명
-                          Colors.white, // 아래쪽: 완전 흰색
+                          const Color(0xFFFFF6F6), // 아래쪽: 하단 배경색
                         ],
                         stops: const [0.0, 1.0],
                       ),
@@ -158,7 +158,7 @@ class InventoryScreenUI extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.fromLTRB(s(20), s(20), s(20), 0),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color(0xFFFFF6F6), // 하단 아이템 목록 배경색
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(s(30)),
                   topRight: Radius.circular(s(30)),
@@ -268,13 +268,13 @@ class InventoryScreenUI extends StatelessWidget {
     // 썬글라스 (normal / fat1 / fat2)
     if (imagePath.contains('sunglass')) {
       if (isNormal) {
-        width = 100 * scale;
-        bottom = 152 * scale;
-        left = 0 * scale;
+        width = 110 * scale;
+        bottom = 172 * scale;
+        left = 3 * scale;
       } else if (isFat1) {
         width = 115 * scale;
-        bottom = 145 * scale;
-        left = 3 * scale;
+        bottom = 155 * scale;
+        left = 0 * scale;
       } else {
         // fat2
         width = 118 * scale;
@@ -285,9 +285,9 @@ class InventoryScreenUI extends StatelessWidget {
       // 머리핀 (normal / fat1 / fat2)
     } else if (imagePath.contains('hair')) {
       if (isNormal) {
-        width = 55 * scale;
-        bottom = 185 * scale;
-        left = 72 * scale;
+        width = 65 * scale;
+        bottom = 210 * scale;
+        left = 85 * scale;
       } else if (isFat1) {
         width = 65 * scale;
         bottom = 178 * scale;

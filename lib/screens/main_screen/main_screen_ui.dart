@@ -66,12 +66,27 @@ class MainScreenUI extends StatelessWidget {
       body: Stack(
         clipBehavior: Clip.none,
         children: [
-          // 톳밥 (바닥)
+          // 톳밥 아래 그라데이션 (down_ground)
           Positioned(
-            top: s(400),
+            top: s(550), // 톳밥 밑에 붙게
             left: 0,
             right: 0,
-            height: s(300), // 톳밥 높이
+            bottom: 0, // 화면 하단까지
+            child: Image.asset(
+              'assets/images/main_images/down_ground.png',
+              fit: BoxFit.fill,
+              cacheWidth:
+                  (screenWidth * MediaQuery.of(context).devicePixelRatio)
+                      .toInt(),
+            ),
+          ),
+
+          // 톳밥 (바닥)
+          Positioned(
+            top: s(430),
+            left: 0,
+            right: 0,
+            height: s(130), // 톳밥 높이
             child: Image.asset(
               'assets/images/main_images/ground.png',
               fit: BoxFit.fill,

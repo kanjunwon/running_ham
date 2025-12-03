@@ -8,17 +8,20 @@ class UserProvider extends ChangeNotifier {
   int _todaySteps = 0; // 오늘 걸음 수
   int _attendanceDays = 0; // 출석 일수
 
-  String _nickname = "김햄찌"; // 닉네임
+  String _nickname = ""; // 닉네임 (튜토리얼에서 설정)
   String _hamsterImage =
       "assets/images/main_images/ham_1.png"; // 햄스터 본체 (기본 이미지)
+
+  // 현재 햄스터 상태 (메인 페이지에서 업데이트)
+  String _currentHamsterState = 'normal'; // 'normal', 'fat1', 'fat2'
 
   String _exemptionDate = ""; // 운동 면제권 날짜 (yyyyMMdd)
 
   // 기록페이지 걸음 수
-  Map<String, int> _stepHistory = {};
+  final Map<String, int> _stepHistory = {};
 
   // 아이템 정보
-  List<String> _myInventory = []; // 내가 가진 아이템 ID 리스트
+  final List<String> _myInventory = []; // 내가 가진 아이템 ID 리스트
 
   // 현재 장착 중인 아이템
   Map<String, String> _equippedItems = {
@@ -35,6 +38,7 @@ class UserProvider extends ChangeNotifier {
   int get attendanceDays => _attendanceDays;
   String get nickname => _nickname;
   String get hamsterImage => _hamsterImage;
+  String get currentHamsterState => _currentHamsterState; // 현재 햄스터 상태
   List<String> get myInventory => _myInventory;
   Map<String, String> get equippedItems => _equippedItems;
   Map<String, int> get stepHistory => _stepHistory;
@@ -149,15 +153,21 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 햄스터 상태 업데이트 (메인 페이지에서 호출)
+  void updateHamsterState(String state) {
+    _currentHamsterState = state;
+    notifyListeners();
+  }
+
   // 운동 면제권 사용
   void useExemptionTicket() {
     _exemptionDate = DateFormat('yyyyMMdd').format(DateTime.now());
     notifyListeners();
   }
 
-  // 아이템 소모
+  // 아이템 소모 (사용 시 인벤토리에서 삭제)
   void consumeItem(String itemId) {
-    // _myInventory.remove(itemId); // 테스트용이라 삭제 안할거임
+    _myInventory.remove(itemId); // 인벤토리에서 삭제 → 상점에서 다시 구매 가능
     notifyListeners();
   }
 }
