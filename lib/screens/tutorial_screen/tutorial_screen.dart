@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:running_ham/screens/tutorial_screen/nickname_screen.dart';
 
@@ -71,74 +72,86 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 이미지 최적화를 위한 화면 크기
+    // 반응형 스케일링 (너비 + 높이 모두 고려)
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    const double baseWidth = 390.0;
+    const double baseHeight = 844.0;
+    final double scale = min(
+      screenWidth / baseWidth,
+      screenHeight / baseHeight,
+    );
+    double s(double value) => value * scale;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: GestureDetector(
-        onTapUp: _handleTap,
-        child: Stack(
-          children: [
-            // 슬라이드 화면
-            PageView.builder(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              itemCount: _tutorialImages.length,
-              itemBuilder: (context, index) {
-                return Image.asset(
-                  _tutorialImages[index],
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                  cacheWidth: (screenWidth * devicePixelRatio)
-                      .toInt(), // 메모리 최적화
-                );
-              },
-            ),
+      backgroundColor: const Color(0xFFFFC8C8),
+      body: SafeArea(
+        child: GestureDetector(
+          onTapUp: _handleTap,
+          child: Stack(
+            children: [
+              // 슬라이드 화면
+              PageView.builder(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                },
+                itemCount: _tutorialImages.length,
+                itemBuilder: (context, index) {
+                  return Image.asset(
+                    _tutorialImages[index],
+                    fit: BoxFit.contain, // cover → contain (잘림 방지)
+                    width: double.infinity,
+                    height: double.infinity,
+                    cacheWidth: (screenWidth * devicePixelRatio).toInt(),
+                  );
+                },
+              ),
 
-            // 시작하기 버튼 (마지막 페이지)
-            if (_currentIndex == _tutorialImages.length - 1)
-              Positioned(
-                bottom: 40,
-                left: 20,
-                right: 20,
-                child: ElevatedButton(
-                  onPressed: _goToNickname,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE86F6F),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 23),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+              // 시작하기 버튼 (마지막 페이지)
+              if (_currentIndex == _tutorialImages.length - 1)
+                Positioned(
+                  bottom: s(40),
+                  left: s(20),
+                  right: s(20),
+                  child: ElevatedButton(
+                    onPressed: _goToNickname,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFE86F6F),
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: s(23)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(s(10)),
+                      ),
+                    ),
+                    child: Text(
+                      "런닝햄 시작하기",
+                      style: TextStyle(
+                        fontSize: s(18),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  child: const Text(
-                    "런닝햄 시작하기",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
                 ),
-              ),
 
-            // 건너뛰기 버튼 (마지막 아닐 때)
-            if (_currentIndex != _tutorialImages.length - 1)
-              Positioned(
-                top: 30,
-                right: 20,
-                child: TextButton(
-                  onPressed: _goToNickname,
-                  child: const Text(
-                    "건너뛰기",
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
+              // 건너뛰기 버튼 (마지막 아닐 때)
+              if (_currentIndex != _tutorialImages.length - 1)
+                Positioned(
+                  top: s(10),
+                  right: s(20),
+                  child: TextButton(
+                    onPressed: _goToNickname,
+                    child: Text(
+                      "건너뛰기",
+                      style: TextStyle(color: Colors.grey, fontSize: s(14)),
+                    ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
