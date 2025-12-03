@@ -254,7 +254,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final int currentSteps = userProvider.todaySteps;
     final bool isExempt = userProvider.isExemptToday;
     String hamsterImagePath;
-    
+
     if (isExempt || currentSteps >= 5000) {
       hamsterImagePath = 'assets/images/main_images/ham_1.png'; // normal
     } else if (currentSteps >= 2500) {

@@ -36,9 +36,9 @@ class _SplashScreenState extends State<SplashScreen> {
     super.dispose();
   }
 
-  // 1초마다 햄스터 이미지 바꾸는 타이머
+  // 0.5초마다 햄스터 이미지 바꾸는 타이머
   void _startHamsterAnimation() {
-    _hamsterTimer = Timer.periodic(const Duration(milliseconds: 1000), (timer) {
+    _hamsterTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       if (mounted) {
         setState(() {
           _currentHamsterIndex =
@@ -124,8 +124,8 @@ class _SplashScreenState extends State<SplashScreen> {
               height: s(90),
               child: Row(
                 children: List.generate(3, (index) {
-                  // 첫 번째 90, 두/세번째 70
-                  final double hamsterSize = index == 0 ? s(100) : s(70);
+                  // 첫번째 : 두,세번째 크기
+                  final double hamsterSize = index == 0 ? s(110) : s(70);
                   return Expanded(
                     child: Center(
                       // 현재 인덱스만 보여주고, 나머지는 빈 공간

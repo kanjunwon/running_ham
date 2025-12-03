@@ -294,9 +294,9 @@ class InventoryScreenUI extends StatelessWidget {
         left = 85 * scale;
       } else {
         // fat2
-        width = 58 * scale;
-        bottom = 175 * scale;
-        left = 88 * scale;
+        width = 60 * scale;
+        bottom = 177 * scale;
+        left = 83 * scale;
       }
     } else {
       bottom = 100 * scale;

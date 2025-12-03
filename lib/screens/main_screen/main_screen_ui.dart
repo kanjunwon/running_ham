@@ -35,7 +35,7 @@ class MainScreenUI extends StatelessWidget {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
 
-    // 피그마 기준 화면 크기 (iPhone 14 기준)
+    // 피그마 기준 화면 크기
     const double baseWidth = 390.0;
     const double baseHeight = 844.0;
 
@@ -62,7 +62,7 @@ class MainScreenUI extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF6F6), // 배경색
+      backgroundColor: const Color(0xFFFFFFFF), // 배경색
       body: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -116,22 +116,22 @@ class MainScreenUI extends StatelessWidget {
                       if (isHappyMode)
                         Positioned(
                           top: hamsterState == HamsterState.normal
-                              ? s(-70)
+                              ? s(-60)
                               : hamsterState == HamsterState.fat1
                               ? s(-50) // fat1
-                              : s(-59), // fat2
+                              : s(-49), // fat2
                           left: hamsterState == HamsterState.normal
-                              ? s(-75)
+                              ? s(-62)
                               : hamsterState == HamsterState.fat1
                               ? s(-58) // fat1
-                              : s(-55), // fat2
+                              : s(-47), // fat2
                           child: Image.asset(
                             'assets/images/main_images/blush.png',
                             width: hamsterState == HamsterState.normal
-                                ? s(380)
+                                ? s(360)
                                 : hamsterState == HamsterState.fat1
                                 ? s(380) // fat1
-                                : s(390), // fat2
+                                : s(370), // fat2
                             cacheWidth: (s(420) * 2).toInt(),
                           ),
                         ),
@@ -153,7 +153,7 @@ class MainScreenUI extends StatelessWidget {
                       // 하트
                       if (isHappyMode)
                         Positioned(
-                          top: s(-60), // 햄스터 머리 위
+                          top: s(-40), // 햄스터 머리 위
                           child: Image.asset(
                             'assets/images/main_images/heart.png',
                             width: s(50),
@@ -276,7 +276,7 @@ class MainScreenUI extends StatelessWidget {
           Positioned(
             left: 0,
             right: 0,
-            top: s(490), // 하단 카드에 안 겹치도록 위치 조정
+            top: s(500), // 하단 카드에 안 겹치도록 위치 조정
             child: Text(
               nickname, // 변수로 받기
               textAlign: TextAlign.center,
@@ -515,8 +515,8 @@ class MainScreenUI extends StatelessWidget {
           width = 175 * scale;
           break;
         case HamsterState.fat2:
-          top = 72 * scale;
-          left = 50 * scale;
+          top = 74 * scale;
+          left = 51 * scale;
           width = 173 * scale;
           break;
       }
@@ -536,7 +536,7 @@ class MainScreenUI extends StatelessWidget {
         case HamsterState.fat2:
           top = 12 * scale;
           left = 155 * scale;
-          width = 85 * scale; // 15 줄임
+          width = 85 * scale;
           break;
       }
     }

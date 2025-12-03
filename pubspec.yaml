@@ -41,6 +41,7 @@ flutter:
     - assets/images/inventory_images/
     - assets/images/tutorial_images/
     - assets/images/splash_images/
+    - assets/images/change_images/
 
   # 폰트 경로
   fonts:
