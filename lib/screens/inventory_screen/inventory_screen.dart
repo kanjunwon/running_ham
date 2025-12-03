@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:running_ham/providers/user_provider.dart';
@@ -207,13 +208,18 @@ class _InventoryScreenState extends State<InventoryScreen> {
     );
   }
 
-  // 염색 팝업 (임시)
+  // 염색 팝업 (랜덤 색상 적용)
   void _showDyeDialog(UserProvider provider, String itemId) {
+    // 가능한 색상 리스트 (현재 색상 제외)
+    final allColors = ['default', 'black', 'pink', 'sky'];
+    final currentColor = provider.hamsterColor;
+    final availableColors = allColors.where((c) => c != currentColor).toList();
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("햄스터 염색"),
-        content: const Text("어떤 색으로 염색할까요? (예시 기능)"),
+        content: const Text("랜덤으로 색상이 변경됩니다!\n사용하시겠습니까?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -221,14 +227,36 @@ class _InventoryScreenState extends State<InventoryScreen> {
           ),
           TextButton(
             onPressed: () {
-              // provider.changeHamsterSkin('assets/.../ham_black.png');  // 염색 햄스터
+              // 랜덤 색상 선택 (현재 색상 제외)
+              final random = Random();
+              final newColor =
+                  availableColors[random.nextInt(availableColors.length)];
+
+              provider.changeHamsterColor(newColor);
               provider.consumeItem(itemId); // 사용 시 소모
               Navigator.pop(context);
+
+              // 색상 이름 한글로 변환
+              String colorName;
+              switch (newColor) {
+                case 'black':
+                  colorName = '검정';
+                  break;
+                case 'pink':
+                  colorName = '핑크';
+                  break;
+                case 'sky':
+                  colorName = '하늘';
+                  break;
+                default:
+                  colorName = '원래';
+              }
+
               ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(const SnackBar(content: Text('염색 완료! (기능 준비중)')));
+              ).showSnackBar(SnackBar(content: Text('$colorName색으로 염색되었습니다!')));
             },
-            child: const Text("확인"),
+            child: const Text("염색하기"),
           ),
         ],
       ),
@@ -255,21 +283,29 @@ class _InventoryScreenState extends State<InventoryScreen> {
         .where((i) => i['category'] == 'consumable')
         .toList();
 
-    // 메인 페이지의 햄스터 상태를 Provider에서 가져오기
+    // 메인 페이지의 햄스터 상태 + 색상을 Provider에서 가져오기
     final String hamsterState = userProvider.currentHamsterState;
+    final String hamsterColor = userProvider.hamsterColor;
     String hamsterImagePath;
 
-    switch (hamsterState) {
-      case 'normal':
-        hamsterImagePath = 'assets/images/main_images/ham_1.png';
-        break;
-      case 'fat1':
-        hamsterImagePath = 'assets/images/main_images/ham_2.png';
-        break;
-      case 'fat2':
-      default:
-        hamsterImagePath = 'assets/images/main_images/ham_3.png';
-        break;
+    if (hamsterColor == 'default') {
+      // 기본 색상
+      switch (hamsterState) {
+        case 'normal':
+          hamsterImagePath = 'assets/images/main_images/ham_1.png';
+          break;
+        case 'fat1':
+          hamsterImagePath = 'assets/images/main_images/ham_2.png';
+          break;
+        case 'fat2':
+        default:
+          hamsterImagePath = 'assets/images/main_images/ham_3.png';
+          break;
+      }
+    } else {
+      // 염색된 색상 (black, pink, sky)
+      hamsterImagePath =
+          'assets/images/change_images/${hamsterColor}_$hamsterState.png';
     }
 
     return InventoryScreenUI(

@@ -47,18 +47,39 @@ class MainScreenUI extends StatelessWidget {
     // 비율 적용 헬퍼 함수
     double s(double value) => value * scale;
 
-    // 햄스터 이미지
+    // 햄스터 이미지 (색상 + 상태에 따라 결정)
+    final hamsterColor = userProvider.hamsterColor;
     String hamsterImagePath;
-    switch (hamsterState) {
-      case HamsterState.fat1:
-        hamsterImagePath = 'assets/images/main_images/ham_2.png'; // 1단계 살찜
-        break;
-      case HamsterState.fat2:
-        hamsterImagePath = 'assets/images/main_images/ham_3.png'; // 2단계 살찜
-        break;
-      case HamsterState.normal:
-      default:
-        hamsterImagePath = 'assets/images/main_images/ham_1.png'; // 기본 햄스터
+
+    if (hamsterColor == 'default') {
+      // 기본 색상
+      switch (hamsterState) {
+        case HamsterState.fat1:
+          hamsterImagePath = 'assets/images/main_images/ham_2.png';
+          break;
+        case HamsterState.fat2:
+          hamsterImagePath = 'assets/images/main_images/ham_3.png';
+          break;
+        case HamsterState.normal:
+        default:
+          hamsterImagePath = 'assets/images/main_images/ham_1.png';
+      }
+    } else {
+      // 염색된 색상 (black, pink, sky)
+      String stateSuffix;
+      switch (hamsterState) {
+        case HamsterState.fat1:
+          stateSuffix = 'fat1';
+          break;
+        case HamsterState.fat2:
+          stateSuffix = 'fat2';
+          break;
+        case HamsterState.normal:
+        default:
+          stateSuffix = 'normal';
+      }
+      hamsterImagePath =
+          'assets/images/change_images/${hamsterColor}_$stateSuffix.png';
     }
 
     return Scaffold(

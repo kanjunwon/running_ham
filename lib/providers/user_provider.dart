@@ -15,6 +15,9 @@ class UserProvider extends ChangeNotifier {
   // 현재 햄스터 상태 (메인 페이지에서 업데이트)
   String _currentHamsterState = 'normal'; // 'normal', 'fat1', 'fat2'
 
+  // 현재 햄스터 색상 (염색권 사용 시 변경)
+  String _hamsterColor = 'default'; // 'default', 'black', 'pink', 'sky'
+
   String _exemptionDate = ""; // 운동 면제권 날짜 (yyyyMMdd)
 
   // 기록페이지 걸음 수
@@ -39,6 +42,7 @@ class UserProvider extends ChangeNotifier {
   String get nickname => _nickname;
   String get hamsterImage => _hamsterImage;
   String get currentHamsterState => _currentHamsterState; // 현재 햄스터 상태
+  String get hamsterColor => _hamsterColor; // 현재 햄스터 색상
   List<String> get myInventory => _myInventory;
   Map<String, String> get equippedItems => _equippedItems;
   Map<String, int> get stepHistory => _stepHistory;
@@ -156,6 +160,12 @@ class UserProvider extends ChangeNotifier {
   // 햄스터 상태 업데이트 (메인 페이지에서 호출)
   void updateHamsterState(String state) {
     _currentHamsterState = state;
+    notifyListeners();
+  }
+
+  // 햄스터 색상 변경 (염색권 사용 시)
+  void changeHamsterColor(String color) {
+    _hamsterColor = color;
     notifyListeners();
   }
 
