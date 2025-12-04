@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:running_ham/providers/user_provider.dart';
 import 'inventory_screen_ui.dart';
@@ -179,10 +180,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
         title: const Text("닉네임 변경"),
         content: TextField(
           controller: textController,
-          maxLength: 6, // 최대 6글자 제한
+          maxLength: 6,
+          inputFormatters: [
+            LengthLimitingTextInputFormatter(6), // 6글자 이상 입력 자체를 막음
+          ],
           decoration: const InputDecoration(
-            hintText: "새 이름을 입력하세요",
-            //counterText: "", // 글자 수 카운터 숨기기
+            hintText: "새 이름을 입력하세요 (최대 6글자)",
+            counterText: "", // 글자 수 카운터 숨기기
           ),
         ),
         actions: [

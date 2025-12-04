@@ -139,9 +139,15 @@ class MainScreenUI extends StatelessWidget {
                     clipBehavior: Clip.none,
                     alignment: Alignment.center,
                     children: [
-                      // 햄스터 본체
+                      // 햄스터 본체 (염색 여부 상관없이 동일한 크기)
                       Image.asset(
                         hamsterImagePath,
+                        width: hamsterState == HamsterState.normal
+                            ? s(231)
+                            : s(270),
+                        height: hamsterState == HamsterState.normal
+                            ? s(262)
+                            : s(300),
                         fit: BoxFit.contain,
                         cacheWidth: hamsterState == HamsterState.normal
                             ? (s(231) * 2).toInt()

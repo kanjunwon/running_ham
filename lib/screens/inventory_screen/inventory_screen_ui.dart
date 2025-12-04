@@ -100,17 +100,29 @@ class InventoryScreenUI extends StatelessWidget {
                 // 물통
                 _buildPreviewWater(currentWater, scale),
 
-                // 햄스터 (중앙) - 현재 상태에 맞는 이미지
+                // 햄스터 (중앙) - 현재 상태에 맞는 이미지 (염색 여부 상관없이 동일한 크기)
                 Positioned(
                   bottom: s(50),
                   left: 0,
                   right: 0,
                   child: Align(
                     alignment: Alignment.bottomCenter,
-                    child: Image.asset(
-                      hamsterImagePath, // 현재 햄스터 상태
-                      width: s(180),
-                      cacheWidth: (s(180) * 2).toInt(),
+                    child: Builder(
+                      builder: (context) {
+                        // 햄스터 상태 확인 (기본/염색 모두 지원)
+                        final bool isNormal =
+                            hamsterImagePath.contains('ham_1') ||
+                            hamsterImagePath.contains('_normal');
+                        final double hamWidth = isNormal ? s(180) : s(200);
+                        final double hamHeight = isNormal ? s(200) : s(220);
+                        return Image.asset(
+                          hamsterImagePath,
+                          width: hamWidth,
+                          height: hamHeight,
+                          fit: BoxFit.contain,
+                          cacheWidth: (hamWidth * 2).toInt(),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -260,10 +272,12 @@ class InventoryScreenUI extends StatelessWidget {
     double left = 0;
     double width = 100 * scale;
 
-    // 햄스터 상태 확인
-    final bool isNormal = hamsterPath.contains('ham_1');
-    final bool isFat1 = hamsterPath.contains('ham_2');
-    // ham_3 = fat2
+    // 햄스터 상태 확인 (기본/염색 모두 지원)
+    final bool isNormal =
+        hamsterPath.contains('ham_1') || hamsterPath.contains('_normal');
+    final bool isFat1 =
+        hamsterPath.contains('ham_2') || hamsterPath.contains('_fat1');
+    // ham_3 또는 _fat2 = fat2
 
     // 썬글라스 (normal / fat1 / fat2)
     if (imagePath.contains('sunglass')) {

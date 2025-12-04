@@ -50,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkUserStatus() async {
     // 로고 보여주기 위해 2초 정도 딜레이
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 10));
 
     if (!mounted) return;
 
