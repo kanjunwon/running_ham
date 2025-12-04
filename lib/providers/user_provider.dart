@@ -13,7 +13,7 @@ class UserProvider extends ChangeNotifier {
       "assets/images/main_images/ham_1.png"; // 햄스터 본체 (기본 이미지)
 
   // 현재 햄스터 상태 (메인 페이지에서 업데이트)
-  String _currentHamsterState = 'normal'; // 'normal', 'fat1', 'fat2'
+  String _currentHamsterState = 'fat2'; // 'normal', 'fat1', 'fat2'
 
   // 현재 햄스터 색상 (염색권 사용 시 변경)
   String _hamsterColor = 'default'; // 'default', 'black', 'pink', 'sky'

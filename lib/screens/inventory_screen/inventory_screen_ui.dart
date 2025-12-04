@@ -283,16 +283,16 @@ class InventoryScreenUI extends StatelessWidget {
     if (imagePath.contains('sunglass')) {
       if (isNormal) {
         width = 110 * scale;
-        bottom = 172 * scale;
+        bottom = 166 * scale;
         left = 3 * scale;
       } else if (isFat1) {
         width = 115 * scale;
-        bottom = 155 * scale;
+        bottom = 176 * scale;
         left = 0 * scale;
       } else {
         // fat2
         width = 118 * scale;
-        bottom = 148 * scale;
+        bottom = 176 * scale;
         left = 4 * scale;
       }
 
@@ -300,17 +300,17 @@ class InventoryScreenUI extends StatelessWidget {
     } else if (imagePath.contains('hair')) {
       if (isNormal) {
         width = 65 * scale;
-        bottom = 210 * scale;
+        bottom = 205 * scale;
         left = 85 * scale;
       } else if (isFat1) {
         width = 65 * scale;
-        bottom = 178 * scale;
+        bottom = 209 * scale;
         left = 85 * scale;
       } else {
         // fat2
         width = 60 * scale;
-        bottom = 177 * scale;
-        left = 83 * scale;
+        bottom = 209 * scale;
+        left = 85 * scale;
       }
     } else {
       bottom = 100 * scale;
