@@ -11,7 +11,7 @@ class UserProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String? _uid; // 사용자 고유 ID
 
-  // 🎯 DB 저장 최적화용 타이머 (디바운싱)
+  // DB 저장 최적화용 타이머 (디바운싱)
   Timer? _saveDebounceTimer;
 
   // 내 정보
@@ -37,6 +37,10 @@ class UserProvider extends ChangeNotifier {
   // 햄스터 뚱뚱 레벨 (0: normal, 1: fat1, 2: fat2)
   int _fatLevel = 0;
   String _lastCheckedDate = ""; // 마지막으로 체크한 날짜
+
+  // 걸음수 자정 기준점 (하루 단위 리셋용)
+  int _baseSteps = 0; // 자정 기준 센서값
+  String _baseStepsDate = ""; // 기준점 저장 날짜
 
   // 기록페이지 걸음 수
   Map<String, int> _stepHistory = {};
@@ -87,6 +91,9 @@ class UserProvider extends ChangeNotifier {
         _exemptionDate = data['exemptionDate'] ?? '';
         _fatLevel = data['fatLevel'] ?? 0;
         _lastCheckedDate = data['lastCheckedDate'] ?? '';
+        _isDevMode = data['isDevMode'] ?? false; // 개발자 모드 불러오기
+        _baseSteps = data['baseSteps'] ?? 0; // 걸음수 기준점
+        _baseStepsDate = data['baseStepsDate'] ?? ''; // 기준점 날짜
         _myInventory = List<String>.from(data['myInventory'] ?? []);
         _equippedItems = Map<String, String>.from(
           data['equippedItems'] ??
@@ -123,6 +130,9 @@ class UserProvider extends ChangeNotifier {
         'exemptionDate': _exemptionDate,
         'fatLevel': _fatLevel,
         'lastCheckedDate': _lastCheckedDate,
+        'isDevMode': _isDevMode, // 개발자 모드 저장
+        'baseSteps': _baseSteps, // 걸음수 기준점
+        'baseStepsDate': _baseStepsDate, // 기준점 날짜
         'myInventory': _myInventory,
         'equippedItems': _equippedItems,
         'stepHistory': _stepHistory,
@@ -133,21 +143,27 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  // 🎯 디바운싱된 저장 (걸음 수 업데이트용 - 10초 후 저장)
+  // 디바운싱된 저장 (걸음 수 업데이트용 - 3초 후 저장)
   void _debouncedSave() {
     _saveDebounceTimer?.cancel(); // 기존 타이머 취소
-    _saveDebounceTimer = Timer(const Duration(seconds: 10), () {
+    _saveDebounceTimer = Timer(const Duration(seconds: 3), () {
       _saveDataToFirestore();
     });
   }
 
-  // 🎯 타이머 정리 (앱 종료 시 호출)
+  // 타이머 정리 (앱 종료 시 호출)
   @override
   void dispose() {
     _saveDebounceTimer?.cancel();
     // 마지막 데이터 저장
     _saveDataToFirestore();
     super.dispose();
+  }
+
+  // 강제 저장
+  void forceSave() {
+    _saveDebounceTimer?.cancel(); // 대기 중인 타이머 취소
+    _saveDataToFirestore(); // 즉시 저장
   }
 
   // 데이터 가져오기
@@ -170,6 +186,22 @@ class UserProvider extends ChangeNotifier {
     return _exemptionDate == today;
   }
 
+  // 오늘 걸음수 계산 (센서값 - 기준점)
+  int getTodaySteps(int sensorSteps) {
+    final today = DateFormat('yyyyMMdd').format(DateTime.now());
+
+    // 날짜가 바뀌었으면 기준점 업데이트
+    if (_baseStepsDate != today) {
+      _baseSteps = sensorSteps; // 현재 센서값을 기준점으로
+      _baseStepsDate = today;
+      _saveDataToFirestore(); // 저장
+    }
+
+    // 오늘 걸음수 = 현재 센서값 - 기준점
+    final todaySteps = sensorSteps - _baseSteps;
+    return todaySteps < 0 ? 0 : todaySteps; // 음수 방지
+  }
+
   // 어제 걸음 수 체크해서 햄스터 상태 업데이트 + 출석 일수 증가
   void _checkYesterdaySteps() {
     final today = DateFormat('yyyyMMdd').format(DateTime.now());
@@ -177,7 +209,7 @@ class UserProvider extends ChangeNotifier {
     // 오늘 이미 체크했으면 스킵
     if (_lastCheckedDate == today) return;
 
-    // 🎯 출석 일수 증가 (새로운 날이 시작되면 +1)
+    // 출석 일수 증가 (새로운 날이 시작되면 +1)
     _attendanceDays++;
 
     // 어제 날짜 계산
@@ -220,7 +252,7 @@ class UserProvider extends ChangeNotifier {
   // 오늘 5000보 달성 시 호출 → fatLevel 한 단계 감소
   void achieveDailyGoal() {
     if (_fatLevel > 0) {
-      _fatLevel--; // 🎯 한 단계만 감소 (fat2 → fat1 → normal)
+      _fatLevel--; // 한 단계만 감소 (fat2 → fat1 → normal)
       _updateHamsterStateFromFatLevel();
       notifyListeners();
       _saveDataToFirestore();
@@ -238,7 +270,7 @@ class UserProvider extends ChangeNotifier {
   // 개발자 모드: 햄스터 날씬하게 (fatLevel 한 단계 감소)
   void devMakeSlim() {
     if (_fatLevel > 0) {
-      _fatLevel--; // 🎯 한 단계만 감소 (fat2 → fat1 → normal)
+      _fatLevel--; // 한 단계만 감소 (fat2 → fat1 → normal)
       _updateHamsterStateFromFatLevel();
       notifyListeners();
       _saveDataToFirestore();
@@ -275,8 +307,8 @@ class UserProvider extends ChangeNotifier {
     await _saveDataToFirestore(); // Firebase 저장
   }
 
-  // 닉네임 설정
-  void setNickname(String newName) {
+  // 닉네임 설정 (async로 변경 - 저장 완료 보장)
+  Future<void> setNickname(String newName) async {
     _nickname = newName;
 
     // 개발자 모드
@@ -286,7 +318,7 @@ class UserProvider extends ChangeNotifier {
     }
 
     notifyListeners();
-    _saveDataToFirestore(); // Firebase 저장
+    await _saveDataToFirestore(); // 저장 완료 대기
   }
 
   // 튜토리얼 완료 처리
@@ -294,7 +326,7 @@ class UserProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isFirstTime', false);
 
-    // 🎯 첫 출석 일수 설정 (1일차 시작)
+    // 첫 출석 일수 설정 (1일차 시작)
     _attendanceDays = 1;
     _lastCheckedDate = DateFormat('yyyyMMdd').format(DateTime.now());
 
@@ -302,7 +334,7 @@ class UserProvider extends ChangeNotifier {
     await _saveDataToFirestore(); // Firebase 저장
   }
 
-  // 걸음 수 업데이트 (🎯 디바운싱 적용 - 10초 후 저장)
+  // 걸음 수 업데이트 (디바운싱 적용)
   void updateSteps(int steps) {
     _todaySteps = steps;
 
@@ -311,7 +343,7 @@ class UserProvider extends ChangeNotifier {
     _stepHistory[todayKey] = steps;
 
     notifyListeners(); // 화면 갱신 알림
-    _debouncedSave(); // 🎯 디바운싱된 저장 (매번 저장 X, 10초 후 저장)
+    _debouncedSave(); // 디바운싱된 저장
   }
 
   // 아이템 구매

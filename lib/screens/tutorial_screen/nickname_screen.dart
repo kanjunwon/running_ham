@@ -25,7 +25,7 @@ class _NicknameScreenState extends State<NicknameScreen> {
     if (text.isEmpty) return;
 
     final provider = context.read<UserProvider>();
-    provider.setNickname(text); // 닉네임 설정
+    await provider.setNickname(text); // 닉네임 저장 완료 대기
     await provider.completeTutorial(); // 튜토리얼 완료 처리
 
     if (!mounted) return;
@@ -50,98 +50,100 @@ class _NicknameScreenState extends State<NicknameScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFBDBD), // 배경색
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(height: s(80)),
+      resizeToAvoidBottomInset: true, // 키보드가 올라오면 화면 리사이즈
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: s(20)),
+            child: Column(
+              children: [
+                SizedBox(height: s(60)),
 
-                  // 햄스터
-                  Image.asset(
-                    'assets/images/main_images/ham_1.png',
-                    width: s(250),
-                    cacheWidth: (s(250) * 2).toInt(),
-                  ),
-
-                  SizedBox(height: s(40)),
-
-                  // 질문 텍스트
-                  Text(
-                    "햄스터의 이름을 지어주세요",
-                    style: TextStyle(
-                      fontSize: s(18),
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFFE45151),
-                      fontFamily: 'Pretendard',
-                    ),
-                  ),
-
-                  SizedBox(height: s(20)),
-
-                  // 입력창
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: s(30)),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(s(15)),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        controller: _controller,
-                        textAlign: TextAlign.center,
-                        maxLength: 6,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: "최대 6글자",
-                          hintStyle: TextStyle(
-                            color: Colors.grey.shade400,
-                            fontSize: s(16),
-                          ),
-                          counterText: "",
-                          contentPadding: EdgeInsets.symmetric(vertical: s(15)),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // 키보드가 올라와도 내용을 볼 수 있게 하단 여백 추가
-                  SizedBox(height: s(150)),
-                ],
-              ),
-            ),
-          ),
-
-          Positioned(
-            bottom: s(40),
-            left: s(20),
-            right: s(20),
-            child: ElevatedButton(
-              onPressed: _onDecide,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFE86F6F),
-                foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: s(23)),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(s(10)),
+                // 햄스터
+                Image.asset(
+                  'assets/images/main_images/ham_1.png',
+                  width: s(250),
+                  cacheWidth: (s(250) * 2).toInt(),
                 ),
-                elevation: 0,
-              ),
-              child: Text(
-                "결정!",
-                style: TextStyle(fontSize: s(18), fontWeight: FontWeight.bold),
-              ),
+
+                SizedBox(height: s(40)),
+
+                // 질문 텍스트
+                Text(
+                  "햄스터의 이름을 지어주세요",
+                  style: TextStyle(
+                    fontSize: s(18),
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFFE45151),
+                    fontFamily: 'Pretendard',
+                  ),
+                ),
+
+                SizedBox(height: s(20)),
+
+                // 입력창
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: s(10)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(s(15)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: _controller,
+                    textAlign: TextAlign.center,
+                    maxLength: 6,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "최대 6글자",
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade400,
+                        fontSize: s(16),
+                      ),
+                      counterText: "",
+                      contentPadding: EdgeInsets.symmetric(vertical: s(15)),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: s(40)),
+
+                // 결정 버튼
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _onDecide,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFE86F6F),
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: s(23)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(s(10)),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      "결정!",
+                      style: TextStyle(
+                        fontSize: s(18),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+
+                // 키보드 올라왔을 때 여백
+                SizedBox(height: s(40)),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

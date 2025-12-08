@@ -20,7 +20,7 @@ class MainScreen extends StatefulWidget {
 }
 
 // 로직을 담당하는 State 클래스
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   StreamSubscription<StepCount>? _stepCountStreamSubscription;
 
   // 로컬 데이터 DB가 아닌, 매일 초기화되는 변수
@@ -38,6 +38,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this); // 앱 생명주기 옵저버 등록
 
     // Provider에서 초기 햄스터 상태 읽어오기 (fatLevel 기반)
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -86,9 +87,19 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // 옵저버 해제
     _stepCountStreamSubscription?.cancel();
     _happyModeTimer?.cancel(); // 타이머 취소
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      // 앱이 백그라운드로 가거나 비활성화될 때 강제 저장
+      context.read<UserProvider>().forceSave();
+    }
   }
 
   // 권한 요청 및 만보기 시작
@@ -128,16 +139,16 @@ class _MainScreenState extends State<MainScreen> {
 
   // 만보기 스트림
   void startListening() {
-    final String todayKey = DateFormat('yyyyMMdd').format(DateTime.now());
-
     _stepCountStreamSubscription = Pedometer.stepCountStream.listen(
       (StepCount event) {
         if (!mounted) return;
 
         final userProvider = context.read<UserProvider>();
+        final String todayKey = DateFormat('yyyyMMdd').format(DateTime.now());
 
         setState(() {
-          _steps = event.steps;
+          // 오늘 걸음수 계산 (센서값 - 자정 기준점)
+          _steps = userProvider.getTodaySteps(event.steps);
 
           // 햄스터 상태는 fatLevel에서 가져옴 (연속 미달 일수 기반)
           _hamsterState = HamsterState.values[userProvider.fatLevel];
@@ -145,12 +156,13 @@ class _MainScreenState extends State<MainScreen> {
           // 5000보 달성 시 보상 + 햄스터 한 단계 회복
           if (_steps >= _targetSteps && _last5kRewardDate != todayKey) {
             userProvider.earnSeeds(50);
-            userProvider.achieveDailyGoal(); // 🎯 fatLevel 한 단계 감소
-            _hamsterState = HamsterState.values[userProvider.fatLevel]; // 🎯 현재 fatLevel로 설정
+            userProvider.achieveDailyGoal(); // fatLevel 한 단계 감소
+            _hamsterState =
+                HamsterState.values[userProvider.fatLevel]; // 현재 fatLevel로 설정
             _last5kRewardDate = todayKey;
           }
 
-          // 🎯 10000보 달성 시 추가 50 도토리 보상
+          // 10000보 달성 시 추가 50 도토리 보상
           if (_steps >= 10000 && _last10kRewardDate != todayKey) {
             userProvider.earnSeeds(50);
             _last10kRewardDate = todayKey;
@@ -185,11 +197,12 @@ class _MainScreenState extends State<MainScreen> {
   void _makeSlim() {
     context.read<UserProvider>().devMakeSlim();
     setState(() {
-      _hamsterState = HamsterState.values[context.read<UserProvider>().fatLevel]; // 🎯 현재 fatLevel로 설정
+      _hamsterState = HamsterState
+          .values[context.read<UserProvider>().fatLevel]; // 현재 fatLevel로 설정
     });
   }
 
-  // 개발자 모드: 햄스터 죽이기 💀
+  // 개발자 모드: 햄스터 죽이기
   void _killHamster() {
     Navigator.pushReplacement(
       context,
@@ -208,8 +221,9 @@ class _MainScreenState extends State<MainScreen> {
       // 5000보 달성 시 보상 + 햄스터 한 단계 회복
       if (_steps >= _targetSteps && _last5kRewardDate != todayKey) {
         userProvider.earnSeeds(50);
-        userProvider.achieveDailyGoal(); // 🎯 fatLevel 한 단계 감소
-        _hamsterState = HamsterState.values[userProvider.fatLevel]; // 🎯 현재 fatLevel로 설정
+        userProvider.achieveDailyGoal(); // fatLevel 한 단계 감소
+        _hamsterState =
+            HamsterState.values[userProvider.fatLevel]; // 현재 fatLevel로 설정
         _last5kRewardDate = todayKey;
       }
 
