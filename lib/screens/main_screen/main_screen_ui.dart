@@ -248,14 +248,6 @@ class MainScreenUI extends StatelessWidget {
                               height: s(14),
                             ),
                             SizedBox(width: s(2)),
-                            Text(
-                              '+100',
-                              style: TextStyle(
-                                color: Colors.brown.shade800,
-                                fontSize: s(11),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -282,14 +274,6 @@ class MainScreenUI extends StatelessWidget {
                               color: Colors.white,
                             ),
                             SizedBox(width: s(2)),
-                            Text(
-                              '+100',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: s(11),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                           ],
                         ),
                       ),
