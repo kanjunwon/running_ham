@@ -20,10 +20,10 @@ class UserProvider extends ChangeNotifier {
       "assets/images/main_images/ham_1.png"; // 햄스터 본체 (기본 이미지)
 
   // 현재 햄스터 상태 (메인 페이지에서 업데이트)
-  String _currentHamsterState = 'normal'; // 'normal', 'fat1', 'fat2'
+  String _currentHamsterState = 'normal'; // normal, fat1, fat2
 
   // 현재 햄스터 색상 (염색권 사용 시 변경)
-  String _hamsterColor = 'default'; // 'default', 'black', 'pink', 'sky'
+  String _hamsterColor = 'default'; // default, black, pink, sky
 
   String _exemptionDate = ""; // 운동 면제권 날짜 (yyyyMMdd)
 
@@ -48,8 +48,6 @@ class UserProvider extends ChangeNotifier {
     'glass': '', // 선글라스
     'hair': '', // 머리핀
   };
-
-  // ========== Firebase 연동 함수 ==========
 
   // 익명 로그인 + 데이터 불러오기
   Future<void> initializeUser() async {
@@ -255,7 +253,7 @@ class UserProvider extends ChangeNotifier {
   void setNickname(String newName) {
     _nickname = newName;
 
-    // 이스터에그: 개발자 이름 입력 시 개발자 모드 활성화
+    // 개발자 모드
     const devNames = ['간준원', '오은채', '송지호'];
     if (devNames.contains(newName)) {
       _isDevMode = true;

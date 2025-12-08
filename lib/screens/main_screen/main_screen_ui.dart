@@ -28,10 +28,10 @@ class MainScreenUI extends StatelessWidget {
     required this.isHappyMode, // 햄스터 터치 롤백
     required this.onHamsterTap, // 해피 모드 여부
     this.isDevMode = false, // 개발자 모드 (기본값 false)
-    this.onAddSeeds, // 개발자 모드: 도토리 추가
-    this.onAddSteps, // 개발자 모드: 걸음 수 추가
-    this.onMakeFat, // 개발자 모드: 살찌게
-    this.onMakeSlim, // 개발자 모드: 날씬하게
+    this.onAddSeeds, // 개발자 모드 도토리 추가
+    this.onAddSteps, // 개발자 모드 걸음 수 추가
+    this.onMakeFat, // 개발자 모드 살찌게
+    this.onMakeSlim, // 개발자 모드 날씬하게
   });
 
   @override
@@ -97,7 +97,7 @@ class MainScreenUI extends StatelessWidget {
       body: Stack(
         clipBehavior: Clip.none,
         children: [
-          // 톳밥 아래 그라데이션 (down_ground)
+          // 톳밥 아래 그라데이션
           Positioned(
             top: s(550), // 톳밥 밑에 붙게
             left: 0,

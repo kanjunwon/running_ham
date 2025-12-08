@@ -129,7 +129,7 @@ class _SplashScreenState extends State<SplashScreen> {
               height: s(90),
               child: Row(
                 children: List.generate(3, (index) {
-                  // 첫번째 : 두,세번째 크기
+                  // 첫번째 / 두,세번째 크기
                   final double hamsterSize = index == 0 ? s(110) : s(70);
                   return Expanded(
                     child: Center(

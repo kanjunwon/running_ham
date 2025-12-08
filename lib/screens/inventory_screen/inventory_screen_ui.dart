@@ -33,11 +33,11 @@ class InventoryScreenUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 화면 크기 기반 스케일링 로직 (너비 + 높이 모두 고려)
+    // 화면 크기 기반 스케일링 로직
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
 
-    // 피그마 기준 화면 크기 (iPhone 14 기준)
+    // 피그마 기준 화면 크기
     const double baseWidth = 390.0;
     const double baseHeight = 844.0;
 
@@ -151,8 +151,8 @@ class InventoryScreenUI extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.white.withOpacity(0.0), // 위쪽: 완전 투명
-                          const Color(0xFFFFF6F6), // 아래쪽: 하단 배경색
+                          Colors.white.withOpacity(0.0), // 위쪽 완전 투명
+                          const Color(0xFFFFF6F6), // 아래쪽 하단 배경색
                         ],
                         stops: const [0.0, 1.0],
                       ),
