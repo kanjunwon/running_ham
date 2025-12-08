@@ -30,6 +30,10 @@ class UserProvider extends ChangeNotifier {
   // 개발자 모드 (이스터에그)
   bool _isDevMode = false;
 
+  // 햄스터 뚱뚱 레벨 (0: normal, 1: fat1, 2: fat2)
+  int _fatLevel = 0;
+  String _lastCheckedDate = ""; // 마지막으로 체크한 날짜
+
   // 기록페이지 걸음 수
   Map<String, int> _stepHistory = {};
 
@@ -79,6 +83,8 @@ class UserProvider extends ChangeNotifier {
         _attendanceDays = data['attendanceDays'] ?? 0;
         _hamsterColor = data['hamsterColor'] ?? 'default';
         _exemptionDate = data['exemptionDate'] ?? '';
+        _fatLevel = data['fatLevel'] ?? 0;
+        _lastCheckedDate = data['lastCheckedDate'] ?? '';
         _myInventory = List<String>.from(data['myInventory'] ?? []);
         _equippedItems = Map<String, String>.from(
           data['equippedItems'] ??
@@ -91,6 +97,9 @@ class UserProvider extends ChangeNotifier {
               },
         );
         _stepHistory = Map<String, int>.from(data['stepHistory'] ?? {});
+
+        // 어제 걸음 수 체크해서 햄스터 상태 업데이트
+        _checkYesterdaySteps();
 
         notifyListeners();
       }
@@ -110,6 +119,8 @@ class UserProvider extends ChangeNotifier {
         'attendanceDays': _attendanceDays,
         'hamsterColor': _hamsterColor,
         'exemptionDate': _exemptionDate,
+        'fatLevel': _fatLevel,
+        'lastCheckedDate': _lastCheckedDate,
         'myInventory': _myInventory,
         'equippedItems': _equippedItems,
         'stepHistory': _stepHistory,
@@ -129,6 +140,7 @@ class UserProvider extends ChangeNotifier {
   String get currentHamsterState => _currentHamsterState; // 현재 햄스터 상태
   String get hamsterColor => _hamsterColor; // 현재 햄스터 색상
   bool get isDevMode => _isDevMode; // 개발자 모드 여부
+  int get fatLevel => _fatLevel; // 햄스터 뚱뚱 레벨
   List<String> get myInventory => _myInventory;
   Map<String, String> get equippedItems => _equippedItems;
   Map<String, int> get stepHistory => _stepHistory;
@@ -139,6 +151,76 @@ class UserProvider extends ChangeNotifier {
     return _exemptionDate == today;
   }
 
+  // 어제 걸음 수 체크해서 햄스터 상태 업데이트
+  void _checkYesterdaySteps() {
+    final today = DateFormat('yyyyMMdd').format(DateTime.now());
+
+    // 오늘 이미 체크했으면 스킵
+    if (_lastCheckedDate == today) return;
+
+    // 어제 날짜 계산
+    final yesterday = DateTime.now().subtract(const Duration(days: 1));
+    final yesterdayKey = DateFormat('yyyyMMdd').format(yesterday);
+
+    // 어제 걸음 수 확인
+    final yesterdaySteps = _stepHistory[yesterdayKey] ?? 0;
+
+    // 어제가 면제일이었는지 확인 (면제일이면 미달로 안 침)
+    final wasExemptYesterday = _exemptionDate == yesterdayKey;
+
+    if (!wasExemptYesterday && yesterdaySteps < 5000) {
+      // 어제 5000보 미달 → fatLevel 증가 (최대 2)
+      _fatLevel = (_fatLevel + 1).clamp(0, 2);
+    }
+    // 어제 5000보 이상이면 fatLevel은 그대로 유지 (오늘 달성해야 복구)
+
+    _lastCheckedDate = today;
+
+    // 햄스터 상태 업데이트
+    _updateHamsterStateFromFatLevel();
+  }
+
+  // fatLevel에 따라 햄스터 상태 설정
+  void _updateHamsterStateFromFatLevel() {
+    switch (_fatLevel) {
+      case 0:
+        _currentHamsterState = 'normal';
+        break;
+      case 1:
+        _currentHamsterState = 'fat1';
+        break;
+      case 2:
+        _currentHamsterState = 'fat2';
+        break;
+    }
+  }
+
+  // 오늘 5000보 달성 시 호출 → fatLevel 리셋
+  void achieveDailyGoal() {
+    if (_fatLevel > 0) {
+      _fatLevel = 0;
+      _updateHamsterStateFromFatLevel();
+      notifyListeners();
+      _saveDataToFirestore();
+    }
+  }
+
+  // 개발자 모드: 햄스터 살찌게 (fatLevel +1)
+  void devMakeFat() {
+    _fatLevel = (_fatLevel + 1).clamp(0, 2);
+    _updateHamsterStateFromFatLevel();
+    notifyListeners();
+    _saveDataToFirestore();
+  }
+
+  // 개발자 모드: 햄스터 날씬하게 (fatLevel 리셋)
+  void devMakeSlim() {
+    _fatLevel = 0;
+    _updateHamsterStateFromFatLevel();
+    notifyListeners();
+    _saveDataToFirestore();
+  }
+
   // 데이터 초기화 (죽음)
   Future<void> resetData() async {
     _nickname = "새로운 햄스터"; // 임시 이름
@@ -146,6 +228,9 @@ class UserProvider extends ChangeNotifier {
     _todaySteps = 0;
     _attendanceDays = 1;
     _hamsterColor = 'default'; // 색상 초기화
+    _fatLevel = 0; // 뚱뚱 레벨 초기화
+    _lastCheckedDate = ""; // 체크 날짜 초기화
+    _currentHamsterState = 'normal'; // 햄스터 상태 초기화
 
     // 인벤토리 비우기
     _myInventory.clear();

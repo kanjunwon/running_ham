@@ -37,14 +37,11 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
 
-    // Provider에서 초기 햄스터 상태 읽어오기
+    // Provider에서 초기 햄스터 상태 읽어오기 (fatLevel 기반)
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final state = context.read<UserProvider>().currentHamsterState;
+      final fatLevel = context.read<UserProvider>().fatLevel;
       setState(() {
-        _hamsterState = HamsterState.values.firstWhere(
-          (e) => e.name == state,
-          orElse: () => HamsterState.fat2,
-        );
+        _hamsterState = HamsterState.values[fatLevel];
       });
     });
 
@@ -135,35 +132,25 @@ class _MainScreenState extends State<MainScreen> {
       (StepCount event) {
         if (!mounted) return;
 
-        // 운동 면제권 확인
-        final isExempt = context.read<UserProvider>().isExemptToday;
+        final userProvider = context.read<UserProvider>();
 
         setState(() {
           _steps = event.steps;
 
-          // 햄스터 상태 로직
-          if (isExempt) {
-            _hamsterState = HamsterState.normal; // 면제권 쓰면 정상
-          } else {
-            if (_steps >= _targetSteps) {
-              _hamsterState = HamsterState.normal;
-            } else if (_steps >= _targetSteps ~/ 2) {
-              _hamsterState = HamsterState.fat1; // 2500 이상
-            } else {
-              _hamsterState = HamsterState.fat2; // 2500 미만 (더 살찜)
-            }
-          }
+          // 햄스터 상태는 fatLevel에서 가져옴 (연속 미달 일수 기반)
+          _hamsterState = HamsterState.values[userProvider.fatLevel];
 
-          // 재화 획득 로직
+          // 5000보 달성 시 보상 + 햄스터 회복
           if (_steps >= _targetSteps && _lastRewardDateKey != todayKey) {
-            context.read<UserProvider>().earnSeeds(50);
+            userProvider.earnSeeds(50);
+            userProvider.achieveDailyGoal(); // fatLevel 리셋 → 햄스터 회복
+            _hamsterState = HamsterState.normal;
             _lastRewardDateKey = todayKey;
           }
         });
 
-        // Provider에 햄스터 상태 업데이트 (보관함에서 사용)
-        context.read<UserProvider>().updateHamsterState(_hamsterState.name);
-        context.read<UserProvider>().updateSteps(_steps);
+        // Provider에 걸음 수 업데이트
+        userProvider.updateSteps(_steps);
       },
       onError: (error) {
         debugPrint("만보기 에러: $error");
@@ -177,43 +164,48 @@ class _MainScreenState extends State<MainScreen> {
     context.read<UserProvider>().earnSeeds(100);
   }
 
+  // 개발자 모드: 햄스터 살찌게
+  void _makeFat() {
+    context.read<UserProvider>().devMakeFat();
+    setState(() {
+      _hamsterState =
+          HamsterState.values[context.read<UserProvider>().fatLevel];
+    });
+  }
+
+  // 개발자 모드: 햄스터 날씬하게
+  void _makeSlim() {
+    context.read<UserProvider>().devMakeSlim();
+    setState(() {
+      _hamsterState = HamsterState.normal;
+    });
+  }
+
   // 개발자 모드: 걸음 수 추가
   void _addSteps() {
     final String todayKey = DateFormat('yyyyMMdd').format(DateTime.now());
-    final isExempt = context.read<UserProvider>().isExemptToday;
+    final userProvider = context.read<UserProvider>();
 
     setState(() {
       _steps += 100;
 
-      // 햄스터 상태 업데이트
-      if (isExempt) {
-        _hamsterState = HamsterState.normal;
-      } else {
-        if (_steps >= _targetSteps) {
-          _hamsterState = HamsterState.normal;
-        } else if (_steps >= _targetSteps ~/ 2) {
-          _hamsterState = HamsterState.fat1;
-        } else {
-          _hamsterState = HamsterState.fat2;
-        }
-      }
-
-      // 5000보 달성 시 50 도토리 보상
+      // 5000보 달성 시 보상 + 햄스터 회복
       if (_steps >= _targetSteps && _lastRewardDateKey != todayKey) {
-        context.read<UserProvider>().earnSeeds(50);
+        userProvider.earnSeeds(50);
+        userProvider.achieveDailyGoal(); // fatLevel 리셋 → 햄스터 회복
+        _hamsterState = HamsterState.normal;
         _lastRewardDateKey = todayKey;
       }
 
       // 10000보 달성 시 추가 50 도토리 보상 (총 100개)
       if (_steps >= 10000 && _lastRewardDateKey != '${todayKey}_10k') {
-        context.read<UserProvider>().earnSeeds(50);
+        userProvider.earnSeeds(50);
         _lastRewardDateKey = '${todayKey}_10k';
       }
     });
 
-    // Provider 업데이트
-    context.read<UserProvider>().updateHamsterState(_hamsterState.name);
-    context.read<UserProvider>().updateSteps(_steps);
+    // Provider에 걸음 수 업데이트
+    userProvider.updateSteps(_steps);
   }
 
   @override
@@ -229,6 +221,8 @@ class _MainScreenState extends State<MainScreen> {
       isDevMode: userProvider.isDevMode, // 개발자 모드 여부
       onAddSeeds: _addSeeds, // 개발자 모드: 도토리 추가
       onAddSteps: _addSteps, // 개발자 모드: 걸음 수 추가
+      onMakeFat: _makeFat, // 개발자 모드: 살찌게
+      onMakeSlim: _makeSlim, // 개발자 모드: 날씬하게
     );
   }
 }

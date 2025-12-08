@@ -17,6 +17,8 @@ class MainScreenUI extends StatelessWidget {
   final bool isDevMode; // 개발자 모드 여부
   final VoidCallback? onAddSeeds; // 개발자 모드: 도토리 추가
   final VoidCallback? onAddSteps; // 개발자 모드: 걸음 수 추가
+  final VoidCallback? onMakeFat; // 개발자 모드: 살찌게
+  final VoidCallback? onMakeSlim; // 개발자 모드: 날씬하게
 
   const MainScreenUI({
     super.key,
@@ -28,6 +30,8 @@ class MainScreenUI extends StatelessWidget {
     this.isDevMode = false, // 개발자 모드 (기본값 false)
     this.onAddSeeds, // 개발자 모드: 도토리 추가
     this.onAddSteps, // 개발자 모드: 걸음 수 추가
+    this.onMakeFat, // 개발자 모드: 살찌게
+    this.onMakeSlim, // 개발자 모드: 날씬하게
   });
 
   @override
@@ -288,6 +292,38 @@ class MainScreenUI extends StatelessWidget {
                             ),
                           ],
                         ),
+                      ),
+                    ),
+                    SizedBox(width: s(6)),
+                    // 살찌게 버튼
+                    GestureDetector(
+                      onTap: onMakeFat,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: s(8),
+                          vertical: s(4),
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF9800).withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(s(8)),
+                        ),
+                        child: Text('🐷', style: TextStyle(fontSize: s(12))),
+                      ),
+                    ),
+                    SizedBox(width: s(6)),
+                    // 날씬하게 버튼
+                    GestureDetector(
+                      onTap: onMakeSlim,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: s(8),
+                          vertical: s(4),
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4CAF50).withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(s(8)),
+                        ),
+                        child: Text('🏃', style: TextStyle(fontSize: s(12))),
                       ),
                     ),
                   ],
