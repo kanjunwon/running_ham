@@ -27,6 +27,9 @@ class UserProvider extends ChangeNotifier {
 
   String _exemptionDate = ""; // 운동 면제권 날짜 (yyyyMMdd)
 
+  // 개발자 모드 (이스터에그)
+  bool _isDevMode = false;
+
   // 기록페이지 걸음 수
   Map<String, int> _stepHistory = {};
 
@@ -125,6 +128,7 @@ class UserProvider extends ChangeNotifier {
   String get hamsterImage => _hamsterImage;
   String get currentHamsterState => _currentHamsterState; // 현재 햄스터 상태
   String get hamsterColor => _hamsterColor; // 현재 햄스터 색상
+  bool get isDevMode => _isDevMode; // 개발자 모드 여부
   List<String> get myInventory => _myInventory;
   Map<String, String> get equippedItems => _equippedItems;
   Map<String, int> get stepHistory => _stepHistory;
@@ -165,6 +169,13 @@ class UserProvider extends ChangeNotifier {
   // 닉네임 설정
   void setNickname(String newName) {
     _nickname = newName;
+
+    // 이스터에그: 개발자 이름 입력 시 개발자 모드 활성화
+    const devNames = ['간준원', '오은채', '송지호'];
+    if (devNames.contains(newName)) {
+      _isDevMode = true;
+    }
+
     notifyListeners();
     _saveDataToFirestore(); // Firebase 저장
   }
@@ -212,18 +223,6 @@ class UserProvider extends ChangeNotifier {
       _equippedItems[category] = imagePath;
     }
     notifyListeners(); // 화면 갱신 알림
-    _saveDataToFirestore(); // Firebase 저장
-  }
-
-  // 소모품 사용 (염색, 닉네임 변경 등)
-  void useConsumable(String itemId, String value) {
-    // itemId에 따라 다른 동작
-    if (itemId == 'item_dye') {
-      _hamsterImage = value; // value에 이미지 경로 들어옴
-    } else if (itemId == 'ticket_rename') {
-      _nickname = value; // value에 새 이름 들어옴
-    }
-    notifyListeners();
     _saveDataToFirestore(); // Firebase 저장
   }
 

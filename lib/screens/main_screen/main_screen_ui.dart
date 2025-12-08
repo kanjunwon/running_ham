@@ -14,6 +14,9 @@ class MainScreenUI extends StatelessWidget {
   final int seedCount; // 재화 (도토리) 데이터
   final bool isHappyMode; // 해피 모드 여부
   final VoidCallback onHamsterTap; // 햄스터 터치 콜백
+  final bool isDevMode; // 개발자 모드 여부
+  final VoidCallback? onAddSeeds; // 개발자 모드: 도토리 추가
+  final VoidCallback? onAddSteps; // 개발자 모드: 걸음 수 추가
 
   const MainScreenUI({
     super.key,
@@ -22,6 +25,9 @@ class MainScreenUI extends StatelessWidget {
     required this.seedCount, // 재화 (도토리) 데이터
     required this.isHappyMode, // 햄스터 터치 롤백
     required this.onHamsterTap, // 해피 모드 여부
+    this.isDevMode = false, // 개발자 모드 (기본값 false)
+    this.onAddSeeds, // 개발자 모드: 도토리 추가
+    this.onAddSteps, // 개발자 모드: 걸음 수 추가
   });
 
   @override
@@ -208,6 +214,86 @@ class MainScreenUI extends StatelessWidget {
               ),
             ),
           ),
+
+          // 개발자 모드 버튼 (왼쪽 상단)
+          if (isDevMode)
+            Positioned(
+              left: s(10),
+              top: 0,
+              child: SafeArea(
+                child: Row(
+                  children: [
+                    // 도토리 +100 버튼
+                    GestureDetector(
+                      onTap: onAddSeeds,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: s(8),
+                          vertical: s(4),
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFD700).withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(s(8)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/images/main_images/money_main_back.png',
+                              width: s(14),
+                              height: s(14),
+                            ),
+                            SizedBox(width: s(2)),
+                            Text(
+                              '+100',
+                              style: TextStyle(
+                                color: Colors.brown.shade800,
+                                fontSize: s(11),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: s(6)),
+                    // 걸음 +100 버튼
+                    GestureDetector(
+                      onTap: onAddSteps,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: s(8),
+                          vertical: s(4),
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE76F6F).withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(s(8)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.directions_walk,
+                              size: s(14),
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: s(2)),
+                            Text(
+                              '+100',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: s(11),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
           // 상단 도토리 표시
           Positioned(

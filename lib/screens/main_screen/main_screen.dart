@@ -25,7 +25,7 @@ class _MainScreenState extends State<MainScreen> {
   // 로컬 데이터 DB가 아닌, 매일 초기화되는 변수
   int _steps = 0;
   HamsterState _hamsterState = HamsterState.normal; // 기본값 (Provider에서 덮어씀)
-  final int _targetSteps = 5; // 원래 5000보
+  final int _targetSteps = 5000; // 목표 걸음 수
   String _lastRewardDateKey = '';
 
   // 터치 변수
@@ -157,9 +157,7 @@ class _MainScreenState extends State<MainScreen> {
           // 재화 획득 로직
           if (_steps >= _targetSteps && _lastRewardDateKey != todayKey) {
             context.read<UserProvider>().earnSeeds(50);
-
             _lastRewardDateKey = todayKey;
-            print("5000보 달성! 도토리 획득!");
           }
         });
 
@@ -168,10 +166,54 @@ class _MainScreenState extends State<MainScreen> {
         context.read<UserProvider>().updateSteps(_steps);
       },
       onError: (error) {
-        print("만보기 에러: $error");
+        debugPrint("만보기 에러: $error");
         if (mounted) setState(() => _steps = -2);
       },
     );
+  }
+
+  // 개발자 모드: 도토리 추가
+  void _addSeeds() {
+    context.read<UserProvider>().earnSeeds(100);
+  }
+
+  // 개발자 모드: 걸음 수 추가
+  void _addSteps() {
+    final String todayKey = DateFormat('yyyyMMdd').format(DateTime.now());
+    final isExempt = context.read<UserProvider>().isExemptToday;
+
+    setState(() {
+      _steps += 100;
+
+      // 햄스터 상태 업데이트
+      if (isExempt) {
+        _hamsterState = HamsterState.normal;
+      } else {
+        if (_steps >= _targetSteps) {
+          _hamsterState = HamsterState.normal;
+        } else if (_steps >= _targetSteps ~/ 2) {
+          _hamsterState = HamsterState.fat1;
+        } else {
+          _hamsterState = HamsterState.fat2;
+        }
+      }
+
+      // 5000보 달성 시 50 도토리 보상
+      if (_steps >= _targetSteps && _lastRewardDateKey != todayKey) {
+        context.read<UserProvider>().earnSeeds(50);
+        _lastRewardDateKey = todayKey;
+      }
+
+      // 10000보 달성 시 추가 50 도토리 보상 (총 100개)
+      if (_steps >= 10000 && _lastRewardDateKey != '${todayKey}_10k') {
+        context.read<UserProvider>().earnSeeds(50);
+        _lastRewardDateKey = '${todayKey}_10k';
+      }
+    });
+
+    // Provider 업데이트
+    context.read<UserProvider>().updateHamsterState(_hamsterState.name);
+    context.read<UserProvider>().updateSteps(_steps);
   }
 
   @override
@@ -184,6 +226,9 @@ class _MainScreenState extends State<MainScreen> {
       seedCount: userProvider.seedCount, // 도토리 개수
       isHappyMode: _isHappyMode, // 해피 모드 여부
       onHamsterTap: _onHamsterTap, // 햄스터 터치 콜백
+      isDevMode: userProvider.isDevMode, // 개발자 모드 여부
+      onAddSeeds: _addSeeds, // 개발자 모드: 도토리 추가
+      onAddSteps: _addSteps, // 개발자 모드: 걸음 수 추가
     );
   }
 }

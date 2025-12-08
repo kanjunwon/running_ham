@@ -42,7 +42,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
     // 물통
     {
-      'id': 'watre_normal',
+      'id': 'water_normal',
       'name': '기본 물통',
       'image': 'assets/images/inventory_images/water_normal_inventory.png',
       'preview':
