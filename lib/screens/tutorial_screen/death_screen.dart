@@ -24,18 +24,60 @@ class DeathScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFFAF3E6), // 메인과 동일한 배경색
       body: Stack(
         children: [
-          // 톳밥 (바닥)
+          // 톳밥 아래 그라데이션 (메인과 동일)
           Positioned(
-            bottom: 0,
+            top: s(550),
             left: 0,
             right: 0,
-            height: s(300),
+            bottom: 0,
+            child: Image.asset(
+              'assets/images/main_images/down_ground.png',
+              fit: BoxFit.fill,
+              cacheWidth:
+                  (screenWidth * MediaQuery.of(context).devicePixelRatio)
+                      .toInt(),
+            ),
+          ),
+
+          // 톳밥 (바닥)
+          Positioned(
+            top: s(430),
+            left: 0,
+            right: 0,
+            height: s(130),
             child: Image.asset(
               'assets/images/main_images/ground.png',
               fit: BoxFit.fill,
               cacheWidth:
                   (screenWidth * MediaQuery.of(context).devicePixelRatio)
                       .toInt(),
+            ),
+          ),
+
+          // 상단 도토리 표시 (기존 도토리 수)
+          Positioned(
+            right: s(20),
+            top: 15,
+            child: SafeArea(
+              child: Row(
+                children: [
+                  Image.asset(
+                    'assets/images/main_images/money_main_back.png',
+                    width: s(20),
+                    height: s(20),
+                  ),
+                  SizedBox(width: s(4)),
+                  Text(
+                    '${context.watch<UserProvider>().seedCount}',
+                    style: TextStyle(
+                      color: Colors.brown.shade700,
+                      fontSize: s(15),
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Pretendard',
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -108,6 +150,7 @@ class DeathScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: s(16),
                         fontFamily: 'Pretendard',
+                        fontWeight: FontWeight.w600, // SemiBold
                         color: Colors.black87,
                         height: 1.5,
                       ),
@@ -116,9 +159,9 @@ class DeathScreen extends StatelessWidget {
                     Align(
                       alignment: Alignment.centerRight,
                       child: Icon(
-                        Icons.arrow_drop_down_circle_outlined,
+                        Icons.arrow_drop_down,
                         color: const Color(0xFFE45151),
-                        size: s(30),
+                        size: s(40),
                       ),
                     ),
                   ],

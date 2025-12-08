@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:running_ham/providers/user_provider.dart';
+import 'package:running_ham/screens/tutorial_screen/death_screen.dart';
 import 'main_screen_ui.dart';
 
 // 햄스터 상태를 종류별로 정의
@@ -26,7 +27,8 @@ class _MainScreenState extends State<MainScreen> {
   int _steps = 0;
   HamsterState _hamsterState = HamsterState.normal; // 기본값 (Provider에서 덮어씀)
   final int _targetSteps = 5000; // 목표 걸음 수
-  String _lastRewardDateKey = '';
+  String _last5kRewardDate = ''; // 5000보 보상 받은 날짜
+  String _last10kRewardDate = ''; // 10000보 보상 받은 날짜
 
   // 터치 변수
   int _touchCount = 0; // 햄스터 터치 카운트 (상호작용)
@@ -140,12 +142,18 @@ class _MainScreenState extends State<MainScreen> {
           // 햄스터 상태는 fatLevel에서 가져옴 (연속 미달 일수 기반)
           _hamsterState = HamsterState.values[userProvider.fatLevel];
 
-          // 5000보 달성 시 보상 + 햄스터 회복
-          if (_steps >= _targetSteps && _lastRewardDateKey != todayKey) {
+          // 5000보 달성 시 보상 + 햄스터 한 단계 회복
+          if (_steps >= _targetSteps && _last5kRewardDate != todayKey) {
             userProvider.earnSeeds(50);
-            userProvider.achieveDailyGoal(); // fatLevel 리셋 → 햄스터 회복
-            _hamsterState = HamsterState.normal;
-            _lastRewardDateKey = todayKey;
+            userProvider.achieveDailyGoal(); // 🎯 fatLevel 한 단계 감소
+            _hamsterState = HamsterState.values[userProvider.fatLevel]; // 🎯 현재 fatLevel로 설정
+            _last5kRewardDate = todayKey;
+          }
+
+          // 🎯 10000보 달성 시 추가 50 도토리 보상
+          if (_steps >= 10000 && _last10kRewardDate != todayKey) {
+            userProvider.earnSeeds(50);
+            _last10kRewardDate = todayKey;
           }
         });
 
@@ -173,12 +181,20 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  // 개발자 모드: 햄스터 날씬하게
+  // 개발자 모드: 햄스터 날씬하게 (한 단계씩)
   void _makeSlim() {
     context.read<UserProvider>().devMakeSlim();
     setState(() {
-      _hamsterState = HamsterState.normal;
+      _hamsterState = HamsterState.values[context.read<UserProvider>().fatLevel]; // 🎯 현재 fatLevel로 설정
     });
+  }
+
+  // 개발자 모드: 햄스터 죽이기 💀
+  void _killHamster() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const DeathScreen()),
+    );
   }
 
   // 개발자 모드: 걸음 수 추가
@@ -189,18 +205,18 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       _steps += 100;
 
-      // 5000보 달성 시 보상 + 햄스터 회복
-      if (_steps >= _targetSteps && _lastRewardDateKey != todayKey) {
+      // 5000보 달성 시 보상 + 햄스터 한 단계 회복
+      if (_steps >= _targetSteps && _last5kRewardDate != todayKey) {
         userProvider.earnSeeds(50);
-        userProvider.achieveDailyGoal(); // fatLevel 리셋 → 햄스터 회복
-        _hamsterState = HamsterState.normal;
-        _lastRewardDateKey = todayKey;
+        userProvider.achieveDailyGoal(); // 🎯 fatLevel 한 단계 감소
+        _hamsterState = HamsterState.values[userProvider.fatLevel]; // 🎯 현재 fatLevel로 설정
+        _last5kRewardDate = todayKey;
       }
 
       // 10000보 달성 시 추가 50 도토리 보상 (총 100개)
-      if (_steps >= 10000 && _lastRewardDateKey != '${todayKey}_10k') {
+      if (_steps >= 10000 && _last10kRewardDate != todayKey) {
         userProvider.earnSeeds(50);
-        _lastRewardDateKey = '${todayKey}_10k';
+        _last10kRewardDate = todayKey;
       }
     });
 
@@ -223,6 +239,7 @@ class _MainScreenState extends State<MainScreen> {
       onAddSteps: _addSteps, // 개발자 모드: 걸음 수 추가
       onMakeFat: _makeFat, // 개발자 모드: 살찌게
       onMakeSlim: _makeSlim, // 개발자 모드: 날씬하게
+      onKillHamster: _killHamster, // 개발자 모드: 햄스터 죽이기
     );
   }
 }

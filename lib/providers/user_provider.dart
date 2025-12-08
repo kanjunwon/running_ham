@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // 날짜 포맷팅
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +10,9 @@ class UserProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String? _uid; // 사용자 고유 ID
+
+  // 🎯 DB 저장 최적화용 타이머 (디바운싱)
+  Timer? _saveDebounceTimer;
 
   // 내 정보
   int _seedCount = 0; // 도토리
@@ -106,7 +110,7 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  // Firestore에 데이터 저장
+  // Firestore에 데이터 저장 (즉시 저장)
   Future<void> _saveDataToFirestore() async {
     if (_uid == null) return;
 
@@ -129,6 +133,23 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  // 🎯 디바운싱된 저장 (걸음 수 업데이트용 - 10초 후 저장)
+  void _debouncedSave() {
+    _saveDebounceTimer?.cancel(); // 기존 타이머 취소
+    _saveDebounceTimer = Timer(const Duration(seconds: 10), () {
+      _saveDataToFirestore();
+    });
+  }
+
+  // 🎯 타이머 정리 (앱 종료 시 호출)
+  @override
+  void dispose() {
+    _saveDebounceTimer?.cancel();
+    // 마지막 데이터 저장
+    _saveDataToFirestore();
+    super.dispose();
+  }
+
   // 데이터 가져오기
   int get seedCount => _seedCount;
   int get todaySteps => _todaySteps;
@@ -149,12 +170,15 @@ class UserProvider extends ChangeNotifier {
     return _exemptionDate == today;
   }
 
-  // 어제 걸음 수 체크해서 햄스터 상태 업데이트
+  // 어제 걸음 수 체크해서 햄스터 상태 업데이트 + 출석 일수 증가
   void _checkYesterdaySteps() {
     final today = DateFormat('yyyyMMdd').format(DateTime.now());
 
     // 오늘 이미 체크했으면 스킵
     if (_lastCheckedDate == today) return;
+
+    // 🎯 출석 일수 증가 (새로운 날이 시작되면 +1)
+    _attendanceDays++;
 
     // 어제 날짜 계산
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
@@ -193,10 +217,10 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  // 오늘 5000보 달성 시 호출 → fatLevel 리셋
+  // 오늘 5000보 달성 시 호출 → fatLevel 한 단계 감소
   void achieveDailyGoal() {
     if (_fatLevel > 0) {
-      _fatLevel = 0;
+      _fatLevel--; // 🎯 한 단계만 감소 (fat2 → fat1 → normal)
       _updateHamsterStateFromFatLevel();
       notifyListeners();
       _saveDataToFirestore();
@@ -211,12 +235,14 @@ class UserProvider extends ChangeNotifier {
     _saveDataToFirestore();
   }
 
-  // 개발자 모드: 햄스터 날씬하게 (fatLevel 리셋)
+  // 개발자 모드: 햄스터 날씬하게 (fatLevel 한 단계 감소)
   void devMakeSlim() {
-    _fatLevel = 0;
-    _updateHamsterStateFromFatLevel();
-    notifyListeners();
-    _saveDataToFirestore();
+    if (_fatLevel > 0) {
+      _fatLevel--; // 🎯 한 단계만 감소 (fat2 → fat1 → normal)
+      _updateHamsterStateFromFatLevel();
+      notifyListeners();
+      _saveDataToFirestore();
+    }
   }
 
   // 데이터 초기화 (죽음)
@@ -267,10 +293,16 @@ class UserProvider extends ChangeNotifier {
   Future<void> completeTutorial() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isFirstTime', false);
+
+    // 🎯 첫 출석 일수 설정 (1일차 시작)
+    _attendanceDays = 1;
+    _lastCheckedDate = DateFormat('yyyyMMdd').format(DateTime.now());
+
+    notifyListeners();
     await _saveDataToFirestore(); // Firebase 저장
   }
 
-  // 걸음 수 업데이트
+  // 걸음 수 업데이트 (🎯 디바운싱 적용 - 10초 후 저장)
   void updateSteps(int steps) {
     _todaySteps = steps;
 
@@ -279,7 +311,7 @@ class UserProvider extends ChangeNotifier {
     _stepHistory[todayKey] = steps;
 
     notifyListeners(); // 화면 갱신 알림
-    _saveDataToFirestore(); // Firebase 저장
+    _debouncedSave(); // 🎯 디바운싱된 저장 (매번 저장 X, 10초 후 저장)
   }
 
   // 아이템 구매

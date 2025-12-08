@@ -19,6 +19,7 @@ class MainScreenUI extends StatelessWidget {
   final VoidCallback? onAddSteps; // 개발자 모드: 걸음 수 추가
   final VoidCallback? onMakeFat; // 개발자 모드: 살찌게
   final VoidCallback? onMakeSlim; // 개발자 모드: 날씬하게
+  final VoidCallback? onKillHamster; // 개발자 모드: 햄스터 죽이기
 
   const MainScreenUI({
     super.key,
@@ -32,6 +33,7 @@ class MainScreenUI extends StatelessWidget {
     this.onAddSteps, // 개발자 모드 걸음 수 추가
     this.onMakeFat, // 개발자 모드 살찌게
     this.onMakeSlim, // 개발자 모드 날씬하게
+    this.onKillHamster, // 개발자 모드 햄스터 죽이기
   });
 
   @override
@@ -236,20 +238,10 @@ class MainScreenUI extends StatelessWidget {
                           vertical: s(4),
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFD700).withOpacity(0.9),
+                          color: const Color(0xFF990E0E).withOpacity(0.9),
                           borderRadius: BorderRadius.circular(s(8)),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              'assets/images/main_images/money_main_back.png',
-                              width: s(14),
-                              height: s(14),
-                            ),
-                            SizedBox(width: s(2)),
-                          ],
-                        ),
+                        child: Text('🌰', style: TextStyle(fontSize: s(12))),
                       ),
                     ),
                     SizedBox(width: s(6)),
@@ -262,20 +254,10 @@ class MainScreenUI extends StatelessWidget {
                           vertical: s(4),
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE76F6F).withOpacity(0.9),
+                          color: const Color(0xFFD82020).withOpacity(0.9),
                           borderRadius: BorderRadius.circular(s(8)),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.directions_walk,
-                              size: s(14),
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: s(2)),
-                          ],
-                        ),
+                        child: Text('👟', style: TextStyle(fontSize: s(12))),
                       ),
                     ),
                     SizedBox(width: s(6)),
@@ -288,7 +270,7 @@ class MainScreenUI extends StatelessWidget {
                           vertical: s(4),
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFF9800).withOpacity(0.9),
+                          color: const Color(0xFFE45151).withOpacity(0.9),
                           borderRadius: BorderRadius.circular(s(8)),
                         ),
                         child: Text('🐷', style: TextStyle(fontSize: s(12))),
@@ -304,10 +286,26 @@ class MainScreenUI extends StatelessWidget {
                           vertical: s(4),
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4CAF50).withOpacity(0.9),
+                          color: const Color(0xFFFD8F8F).withOpacity(0.9),
                           borderRadius: BorderRadius.circular(s(8)),
                         ),
                         child: Text('🏃', style: TextStyle(fontSize: s(12))),
+                      ),
+                    ),
+                    SizedBox(width: s(6)),
+                    // 햄스터 죽이기 버튼
+                    GestureDetector(
+                      onTap: onKillHamster,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: s(8),
+                          vertical: s(4),
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFC0C0).withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(s(8)),
+                        ),
+                        child: Text('💀', style: TextStyle(fontSize: s(12))),
                       ),
                     ),
                   ],
@@ -318,7 +316,7 @@ class MainScreenUI extends StatelessWidget {
           // 상단 도토리 표시
           Positioned(
             right: s(20),
-            top: 0,
+            top: 15,
             child: SafeArea(
               child: Row(
                 children: [
