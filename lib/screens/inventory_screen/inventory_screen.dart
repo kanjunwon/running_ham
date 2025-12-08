@@ -116,6 +116,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
       'image': '',
       'preview': 'assets/images/inventory_images/1day_inventory_preview.png',
       'category': 'consumable',
+      'description':
+          '챗바퀴 타기(1일)을 사용하면, 1일 동안 운동 면제가 적용되어, 5000보를 채우지 않아도 햄스터가 살찌지 않습니다.',
     },
     {
       'id': 'color_change',
@@ -124,6 +126,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       'preview':
           'assets/images/inventory_images/color_change_inventory_preview.png',
       'category': 'consumable',
+      'description': '파랑, 분홍, 검정, 기본의 색 중 랜덤한 색으로 햄스터의 색이 변경됩니다.',
     },
     {
       'id': 'nickname_change',
@@ -132,6 +135,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       'preview':
           'assets/images/inventory_images/nickname_change_inventory_preview.png',
       'category': 'consumable',
+      'description': '햄스터의 이름을 다시 지어줄 수 있습니다. 단, 6글자가 넘어가는 이름은 지을 수 없습니다.',
     },
   ];
 
@@ -139,36 +143,197 @@ class _InventoryScreenState extends State<InventoryScreen> {
   void _equipItem(Map<String, dynamic> item) {
     final provider = context.read<UserProvider>(); // Provider 가져오기
 
-    // 소모품 사용 로직
+    // 소모품 사용 로직 - 먼저 설명 다이얼로그 표시
     if (item['category'] == 'consumable') {
-      // 닉네임 변경권
-      if (item['id'] == 'nickname_change') {
-        _showNicknameDialog(provider, item['id']);
-        return;
-      }
-
-      // 염색권
-      if (item['id'] == 'color_change') {
-        _showDyeDialog(provider, item['id']);
-        return;
-      }
-
-      // 챗바퀴 1일권
-      if (item['id'] == '1day') {
-        provider.useExemptionTicket();
-        provider.consumeItem(item['id']); // 사용 시 소모
-
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('오늘 하루 운동 면제')));
-        return;
-      }
-
+      _showConsumableDialog(item);
       return;
     }
 
     // 치장 아이템 장착
     provider.equipItem(item['category'], item['image']);
+  }
+
+  // 소모 아이템 설명 다이얼로그
+  void _showConsumableDialog(Map<String, dynamic> item) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 상단 콘텐츠 (이미지 + 텍스트)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 아이템 이미지
+                    SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: Image.asset(item['preview'], fit: BoxFit.contain),
+                    ),
+                    const SizedBox(width: 16),
+                    // 텍스트 영역
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 아이템 이름
+                          Text(
+                            item['name'],
+                            style: const TextStyle(
+                              color: Color(0xFF4D3817),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Pretendard',
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          // 아이템 설명
+                          Text(
+                            item['description'] ?? '',
+                            style: const TextStyle(
+                              color: Color(0xFF4D3817),
+                              fontSize: 14,
+                              fontFamily: 'Pretendard',
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                // 하단 버튼들
+                Row(
+                  children: [
+                    // 닫기 버튼
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFB5B5),
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              '닫기',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Pretendard',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // 사용하기 버튼
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                          _useConsumableItem(item);
+                        },
+                        child: Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE57373),
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              '사용하기',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Pretendard',
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // 소모 아이템 실제 사용 로직
+  void _useConsumableItem(Map<String, dynamic> item) {
+    final provider = context.read<UserProvider>();
+
+    // 닉네임 변경권
+    if (item['id'] == 'nickname_change') {
+      _showNicknameDialog(provider, item['id']);
+      return;
+    }
+
+    // 염색권 - 바로 염색 실행
+    if (item['id'] == 'color_change') {
+      // 가능한 색상 리스트 (현재 색상 제외)
+      final allColors = ['default', 'black', 'pink', 'sky'];
+      final currentColor = provider.hamsterColor;
+      final availableColors = allColors
+          .where((c) => c != currentColor)
+          .toList();
+
+      // 랜덤 색상 선택
+      final random = Random();
+      final newColor = availableColors[random.nextInt(availableColors.length)];
+
+      provider.changeHamsterColor(newColor);
+      provider.consumeItem(item['id']); // 사용 시 소모
+
+      // 색상 이름 한글로 변환
+      String colorName;
+      switch (newColor) {
+        case 'black':
+          colorName = '검정';
+          break;
+        case 'pink':
+          colorName = '핑크';
+          break;
+        case 'sky':
+          colorName = '하늘';
+          break;
+        default:
+          colorName = '원래';
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('$colorName색으로 염색되었습니다!')));
+      return;
+    }
+
+    // 챗바퀴 1일권
+    if (item['id'] == '1day') {
+      provider.useExemptionTicket();
+      provider.consumeItem(item['id']); // 사용 시 소모
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('오늘 하루 운동 면제')));
+      return;
+    }
   }
 
   // 닉네임 변경 팝업
@@ -206,61 +371,6 @@ class _InventoryScreenState extends State<InventoryScreen> {
               }
             },
             child: const Text("변경"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 염색 팝업 (랜덤 색상 적용)
-  void _showDyeDialog(UserProvider provider, String itemId) {
-    // 가능한 색상 리스트 (현재 색상 제외)
-    final allColors = ['default', 'black', 'pink', 'sky'];
-    final currentColor = provider.hamsterColor;
-    final availableColors = allColors.where((c) => c != currentColor).toList();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("햄스터 염색"),
-        content: const Text("랜덤으로 색상이 변경됩니다!\n사용하시겠습니까?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("취소"),
-          ),
-          TextButton(
-            onPressed: () {
-              // 랜덤 색상 선택 (현재 색상 제외)
-              final random = Random();
-              final newColor =
-                  availableColors[random.nextInt(availableColors.length)];
-
-              provider.changeHamsterColor(newColor);
-              provider.consumeItem(itemId); // 사용 시 소모
-              Navigator.pop(context);
-
-              // 색상 이름 한글로 변환
-              String colorName;
-              switch (newColor) {
-                case 'black':
-                  colorName = '검정';
-                  break;
-                case 'pink':
-                  colorName = '핑크';
-                  break;
-                case 'sky':
-                  colorName = '하늘';
-                  break;
-                default:
-                  colorName = '원래';
-              }
-
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text('$colorName색으로 염색되었습니다!')));
-            },
-            child: const Text("염색하기"),
           ),
         ],
       ),

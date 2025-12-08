@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:running_ham/providers/user_provider.dart';
 import 'package:running_ham/screens/main_screen/main_screen.dart';
 import 'package:running_ham/screens/tutorial_screen/tutorial_screen.dart';
 import 'package:running_ham/screens/tutorial_screen/death_screen.dart';
@@ -49,7 +51,10 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkUserStatus() async {
-    // 로고 보여주기 위해 2초 정도 딜레이
+    // Firebase 익명 로그인 + 데이터 불러오기
+    await context.read<UserProvider>().initializeUser();
+
+    // 로고 보여주기 위해 1초 정도 딜레이
     await Future.delayed(const Duration(seconds: 1));
 
     if (!mounted) return;

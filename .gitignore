@@ -48,3 +48,23 @@ app.*.map.json
 google-services.json
 android/app/google-services.json
 **/google-services.json
+ios/Runner/GoogleService-Info.plist
+lib/firebase_options.dart
+
+# Build outputs (APK, AAB, IPA)
+*.apk
+*.aab
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Generated files
+*.g.dart
+*.freezed.dart
+
+# Local configuration
+*.env
+.env.*
+
+# IDE specific
+.cursor/

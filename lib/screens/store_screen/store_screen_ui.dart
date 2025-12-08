@@ -7,6 +7,7 @@ class StoreScreenUI extends StatelessWidget {
   final List<String> myInventory;
   final List<Map<String, dynamic>> storeItems;
   final Function(String, String, int) onBuyItem; // 구매 함수 전달받음
+  final Function(Map<String, dynamic>) onConsumableItemTap; // 소모 아이템 클릭 시
 
   const StoreScreenUI({
     super.key,
@@ -14,6 +15,7 @@ class StoreScreenUI extends StatelessWidget {
     required this.myInventory,
     required this.storeItems,
     required this.onBuyItem,
+    required this.onConsumableItemTap,
   });
 
   @override
@@ -135,6 +137,7 @@ class StoreScreenUI extends StatelessWidget {
           itemBuilder: (context, index) {
             final item = items[index];
             final isOwned = myInventory.contains(item['id']);
+            final isConsumable = item['category'] == 'consumable';
 
             // 부품 호출
             return StoreItemCard(
@@ -144,6 +147,9 @@ class StoreScreenUI extends StatelessWidget {
               isOwned: isOwned,
               onTap: isOwned
                   ? null
+                  : isConsumable
+                  ? () =>
+                        onConsumableItemTap(item) // 소모 아이템이면 다이얼로그
                   : () => onBuyItem(item['id'], item['name'], item['price']),
             );
           },

@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // 날짜 포맷팅
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserProvider extends ChangeNotifier {
+  // Firebase 인스턴스
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  String? _uid; // 사용자 고유 ID
+
   // 내 정보
-  int _seedCount = 300000; // 도토리 (테스트용 300000개)
+  int _seedCount = 0; // 도토리
   int _todaySteps = 0; // 오늘 걸음 수
   int _attendanceDays = 0; // 출석 일수
 
@@ -13,7 +20,7 @@ class UserProvider extends ChangeNotifier {
       "assets/images/main_images/ham_1.png"; // 햄스터 본체 (기본 이미지)
 
   // 현재 햄스터 상태 (메인 페이지에서 업데이트)
-  String _currentHamsterState = 'fat2'; // 'normal', 'fat1', 'fat2'
+  String _currentHamsterState = 'normal'; // 'normal', 'fat1', 'fat2'
 
   // 현재 햄스터 색상 (염색권 사용 시 변경)
   String _hamsterColor = 'default'; // 'default', 'black', 'pink', 'sky'
@@ -21,10 +28,10 @@ class UserProvider extends ChangeNotifier {
   String _exemptionDate = ""; // 운동 면제권 날짜 (yyyyMMdd)
 
   // 기록페이지 걸음 수
-  final Map<String, int> _stepHistory = {};
+  Map<String, int> _stepHistory = {};
 
   // 아이템 정보
-  final List<String> _myInventory = []; // 내가 가진 아이템 ID 리스트
+  List<String> _myInventory = []; // 내가 가진 아이템 ID 리스트
 
   // 현재 장착 중인 아이템
   Map<String, String> _equippedItems = {
@@ -34,6 +41,81 @@ class UserProvider extends ChangeNotifier {
     'glass': '', // 선글라스
     'hair': '', // 머리핀
   };
+
+  // ========== Firebase 연동 함수 ==========
+
+  // 익명 로그인 + 데이터 불러오기
+  Future<void> initializeUser() async {
+    try {
+      // 익명 로그인 (이미 로그인되어 있으면 기존 계정 사용)
+      if (_auth.currentUser == null) {
+        await _auth.signInAnonymously();
+      }
+      _uid = _auth.currentUser?.uid;
+
+      if (_uid != null) {
+        // Firestore에서 데이터 불러오기
+        await _loadDataFromFirestore();
+      }
+    } catch (e) {
+      debugPrint('Firebase 초기화 오류: $e');
+    }
+  }
+
+  // Firestore에서 데이터 불러오기
+  Future<void> _loadDataFromFirestore() async {
+    if (_uid == null) return;
+
+    try {
+      final doc = await _firestore.collection('users').doc(_uid).get();
+
+      if (doc.exists) {
+        final data = doc.data()!;
+        _seedCount = data['seedCount'] ?? 0;
+        _nickname = data['nickname'] ?? '';
+        _attendanceDays = data['attendanceDays'] ?? 0;
+        _hamsterColor = data['hamsterColor'] ?? 'default';
+        _exemptionDate = data['exemptionDate'] ?? '';
+        _myInventory = List<String>.from(data['myInventory'] ?? []);
+        _equippedItems = Map<String, String>.from(
+          data['equippedItems'] ??
+              {
+                'bowl': 'assets/images/main_images/food_normal_back.png',
+                'water': 'assets/images/main_images/water_normal_back.png',
+                'wheel': 'assets/images/main_images/chat_normal_back.png',
+                'glass': '',
+                'hair': '',
+              },
+        );
+        _stepHistory = Map<String, int>.from(data['stepHistory'] ?? {});
+
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('데이터 불러오기 오류: $e');
+    }
+  }
+
+  // Firestore에 데이터 저장
+  Future<void> _saveDataToFirestore() async {
+    if (_uid == null) return;
+
+    try {
+      await _firestore.collection('users').doc(_uid).set({
+        'seedCount': _seedCount,
+        'nickname': _nickname,
+        'attendanceDays': _attendanceDays,
+        'hamsterColor': _hamsterColor,
+        'exemptionDate': _exemptionDate,
+        'myInventory': _myInventory,
+        'equippedItems': _equippedItems,
+        'stepHistory': _stepHistory,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('데이터 저장 오류: $e');
+    }
+  }
 
   // 데이터 가져오기
   int get seedCount => _seedCount;
@@ -59,6 +141,7 @@ class UserProvider extends ChangeNotifier {
     _seedCount = 0; // 돈 초기화
     _todaySteps = 0;
     _attendanceDays = 1;
+    _hamsterColor = 'default'; // 색상 초기화
 
     // 인벤토리 비우기
     _myInventory.clear();
@@ -76,19 +159,21 @@ class UserProvider extends ChangeNotifier {
     _hamsterImage = "assets/images/main_images/ham_1.png";
 
     notifyListeners(); // 화면 갱신
+    await _saveDataToFirestore(); // Firebase 저장
   }
 
   // 닉네임 설정
   void setNickname(String newName) {
     _nickname = newName;
     notifyListeners();
+    _saveDataToFirestore(); // Firebase 저장
   }
 
   // 튜토리얼 완료 처리
   Future<void> completeTutorial() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isFirstTime', false);
-    // 필요하면 여기서 추가 로직 수행
+    await _saveDataToFirestore(); // Firebase 저장
   }
 
   // 걸음 수 업데이트
@@ -100,6 +185,7 @@ class UserProvider extends ChangeNotifier {
     _stepHistory[todayKey] = steps;
 
     notifyListeners(); // 화면 갱신 알림
+    _saveDataToFirestore(); // Firebase 저장
   }
 
   // 아이템 구매
@@ -110,6 +196,7 @@ class UserProvider extends ChangeNotifier {
     _seedCount -= price; // 돈 깎기
     _myInventory.add(itemId); // 가방에 넣기
     notifyListeners();
+    _saveDataToFirestore(); // Firebase 저장
     return true; // 구매 성공
   }
 
@@ -125,6 +212,7 @@ class UserProvider extends ChangeNotifier {
       _equippedItems[category] = imagePath;
     }
     notifyListeners(); // 화면 갱신 알림
+    _saveDataToFirestore(); // Firebase 저장
   }
 
   // 소모품 사용 (염색, 닉네임 변경 등)
@@ -135,29 +223,32 @@ class UserProvider extends ChangeNotifier {
     } else if (itemId == 'ticket_rename') {
       _nickname = value; // value에 새 이름 들어옴
     }
-    // 소모품이니까 인벤토리에서 삭제하는 로직도 필요하면 추가
     notifyListeners();
+    _saveDataToFirestore(); // Firebase 저장
   }
 
   // 도토리 획득
   void earnSeeds(int amount) {
     _seedCount += amount;
     notifyListeners();
+    _saveDataToFirestore(); // Firebase 저장
   }
 
   // 닉네임 변경
   void changeNickname(String newName) {
     _nickname = newName;
     notifyListeners();
+    _saveDataToFirestore(); // Firebase 저장
   }
 
   // 햄스터 스킨 변경
   void changeHamsterSkin(String newImagePath) {
     _hamsterImage = newImagePath;
     notifyListeners();
+    _saveDataToFirestore(); // Firebase 저장
   }
 
-  // 햄스터 상태 업데이트 (메인 페이지에서 호출)
+  // 햄스터 상태 업데이트 (메인 페이지에서 호출) - 이건 저장 안함 (매번 계산됨)
   void updateHamsterState(String state) {
     _currentHamsterState = state;
     notifyListeners();
@@ -167,17 +258,20 @@ class UserProvider extends ChangeNotifier {
   void changeHamsterColor(String color) {
     _hamsterColor = color;
     notifyListeners();
+    _saveDataToFirestore(); // Firebase 저장
   }
 
   // 운동 면제권 사용
   void useExemptionTicket() {
     _exemptionDate = DateFormat('yyyyMMdd').format(DateTime.now());
     notifyListeners();
+    _saveDataToFirestore(); // Firebase 저장
   }
 
   // 아이템 소모 (사용 시 인벤토리에서 삭제)
   void consumeItem(String itemId) {
     _myInventory.remove(itemId); // 인벤토리에서 삭제 → 상점에서 다시 구매 가능
     notifyListeners();
+    _saveDataToFirestore(); // Firebase 저장
   }
 }

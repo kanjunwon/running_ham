@@ -209,60 +209,32 @@ class MainScreenUI extends StatelessWidget {
             ),
           ),
 
-          // 상단 버튼 바 (설정, 도토리, 알람)
+          // 상단 도토리 표시
           Positioned(
-            left: 0,
-            right: 0,
+            right: s(20),
             top: 0,
             child: SafeArea(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: s(15.0)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.settings_outlined,
-                        color: Colors.grey.shade700,
-                        size: s(24),
-                      ),
-                      onPressed: () {},
-                    ),
-                    Row(
-                      children: [
-                        // 도토리 아이콘
-                        Image.asset(
-                          'assets/images/main_images/money_main_back.png',
-                          width: s(20),
-                          height: s(20),
-                        ),
+              child: Row(
+                children: [
+                  // 도토리 아이콘
+                  Image.asset(
+                    'assets/images/main_images/money_main_back.png',
+                    width: s(20),
+                    height: s(20),
+                  ),
 
-                        // 도토리 개수 텍스트
-                        SizedBox(width: s(4)),
-                        Text(
-                          '$seedCount',
-                          style: TextStyle(
-                            color: Colors.brown.shade700,
-                            fontSize: s(15),
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Pretendard',
-                          ),
-                        ),
-
-                        // 알람 아이콘
-                        SizedBox(width: s(8)),
-                        IconButton(
-                          icon: Icon(
-                            Icons.notifications_outlined,
-                            color: Colors.grey.shade700,
-                            size: s(24),
-                          ),
-                          onPressed: () {},
-                        ),
-                      ],
+                  // 도토리 개수 텍스트
+                  SizedBox(width: s(4)),
+                  Text(
+                    '$seedCount',
+                    style: TextStyle(
+                      color: Colors.brown.shade700,
+                      fontSize: s(15),
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Pretendard',
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

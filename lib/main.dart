@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // Provider 패키지
 import 'package:running_ham/providers/user_provider.dart'; // UserProvider import
-import 'package:running_ham/screens/main_screen/main_screen.dart'; // 메인화면 import
+// 메인화면 import
 import 'package:running_ham/screens/splash_screen/splash_screen.dart';
-import 'package:firebase_core/firebase_core.dart'; // Firebase
-import 'firebase_options.dart'; // Firebase 설정 파일
+// Firebase
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Firebase 없이 실행 중
-  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Firebase 초기화
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(
     MultiProvider(
