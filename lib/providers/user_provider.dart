@@ -60,18 +60,35 @@ class UserProvider extends ChangeNotifier {
   // 익명 로그인 + 데이터 불러오기
   Future<void> initializeUser() async {
     try {
+      debugPrint('[Firebase] 초기화 시작...');
+
       // 익명 로그인 (이미 로그인되어 있으면 기존 계정 사용)
       if (_auth.currentUser == null) {
-        await _auth.signInAnonymously();
+        debugPrint('[Firebase] 익명 로그인 시도...');
+        try {
+          await _auth.signInAnonymously();
+          debugPrint('[Firebase] 익명 로그인 성공!');
+        } catch (e, stackTrace) {
+          debugPrint('[Firebase] 익명 로그인 실패: $e');
+          debugPrint('[Firebase] 스택 트레이스: $stackTrace');
+          rethrow;
+        }
+      } else {
+        debugPrint('[Firebase] 이미 로그인된 사용자 존재');
       }
+
       _uid = _auth.currentUser?.uid;
+      debugPrint('[Firebase] UID: $_uid');
 
       if (_uid != null) {
         // Firestore에서 데이터 불러오기
         await _loadDataFromFirestore();
+      } else {
+        debugPrint('[Firebase] UID가 null! 로그인 실패');
       }
-    } catch (e) {
-      debugPrint('Firebase 초기화 오류: $e');
+    } catch (e, stackTrace) {
+      debugPrint('[Firebase] 초기화 오류: $e');
+      debugPrint('[Firebase] 스택 트레이스: $stackTrace');
     }
   }
 
@@ -79,10 +96,13 @@ class UserProvider extends ChangeNotifier {
   Future<void> _loadDataFromFirestore() async {
     if (_uid == null) return;
 
+    debugPrint('[Firebase] 데이터 불러오기 시도...');
+
     try {
       final doc = await _firestore.collection('users').doc(_uid).get();
 
       if (doc.exists) {
+        debugPrint('[Firebase] 문서 존재! 데이터 불러오는 중...');
         final data = doc.data()!;
         _seedCount = data['seedCount'] ?? 0;
         _nickname = data['nickname'] ?? '';
@@ -107,19 +127,55 @@ class UserProvider extends ChangeNotifier {
         );
         _stepHistory = Map<String, int>.from(data['stepHistory'] ?? {});
 
+        // 오늘 걸음수 복원 (stepHistory에서 오늘 날짜의 걸음수 가져오기)
+        final today = DateFormat('yyyyMMdd').format(DateTime.now());
+        _todaySteps = _stepHistory[today] ?? 0;
+        debugPrint('[Firebase] 오늘 걸음수 복원: $_todaySteps');
+
         // 어제 걸음 수 체크해서 햄스터 상태 업데이트
         _checkYesterdaySteps();
 
+        debugPrint(
+          '[Firebase] 불러오기 완료! 닉네임: $_nickname, 도토리: $_seedCount, 걸음수: $_todaySteps',
+        );
         notifyListeners();
+      } else {
+        debugPrint('[Firebase] 문서 없음 - 새 사용자');
       }
-    } catch (e) {
-      debugPrint('데이터 불러오기 오류: $e');
+    } catch (e, stackTrace) {
+      debugPrint('[Firebase] 불러오기 오류: $e');
+      debugPrint('[Firebase] 스택 트레이스: $stackTrace');
     }
   }
 
   // Firestore에 데이터 저장 (즉시 저장)
   Future<void> _saveDataToFirestore() async {
-    if (_uid == null) return;
+    // UID가 없으면 초기화 시도
+    if (_uid == null) {
+      debugPrint('[Firebase] UID가 null! 초기화 시도...');
+      try {
+        if (_auth.currentUser == null) {
+          debugPrint('[Firebase] 익명 로그인 재시도...');
+          await _auth.signInAnonymously();
+          debugPrint('[Firebase] 익명 로그인 재시도 성공');
+        }
+        _uid = _auth.currentUser?.uid;
+        debugPrint('[Firebase] 초기화 후 UID: $_uid');
+      } catch (e, stackTrace) {
+        debugPrint('[Firebase] 초기화 실패: $e');
+        debugPrint('[Firebase] 스택 트레이스: $stackTrace');
+        return;
+      }
+    }
+
+    if (_uid == null) {
+      debugPrint('[Firebase] 저장 실패 - UID가 여전히 null!');
+      return;
+    }
+
+    debugPrint(
+      '[Firebase] 저장 시도... UID: $_uid, 닉네임: $_nickname, 도토리: $_seedCount',
+    );
 
     try {
       await _firestore.collection('users').doc(_uid).set({
@@ -138,8 +194,10 @@ class UserProvider extends ChangeNotifier {
         'stepHistory': _stepHistory,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
-    } catch (e) {
-      debugPrint('데이터 저장 오류: $e');
+      debugPrint('[Firebase] 저장 성공! UID: $_uid');
+    } catch (e, stackTrace) {
+      debugPrint('[Firebase] 저장 오류: $e');
+      debugPrint('[Firebase] 스택 트레이스: $stackTrace');
     }
   }
 
@@ -198,8 +256,16 @@ class UserProvider extends ChangeNotifier {
     }
 
     // 오늘 걸음수 = 현재 센서값 - 기준점
-    final todaySteps = sensorSteps - _baseSteps;
-    return todaySteps < 0 ? 0 : todaySteps; // 음수 방지
+    final calculatedSteps = sensorSteps - _baseSteps;
+    final todaySteps = calculatedSteps < 0 ? 0 : calculatedSteps; // 음수 방지
+
+    // _stepHistory에 오늘 데이터가 있고, 그것이 계산된 값보다 크면 그것을 사용
+    final savedTodaySteps = _stepHistory[today] ?? 0;
+    if (savedTodaySteps > todaySteps) {
+      return savedTodaySteps;
+    }
+
+    return todaySteps;
   }
 
   // 어제 걸음 수 체크해서 햄스터 상태 업데이트 + 출석 일수 증가
@@ -232,6 +298,9 @@ class UserProvider extends ChangeNotifier {
 
     // 햄스터 상태 업데이트
     _updateHamsterStateFromFatLevel();
+
+    // 출석 일수, fatLevel, lastCheckedDate 변경사항 저장
+    _saveDataToFirestore();
   }
 
   // fatLevel에 따라 햄스터 상태 설정

@@ -29,6 +29,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   final int _targetSteps = 5000; // 목표 걸음 수
   String _last5kRewardDate = ''; // 5000보 보상 받은 날짜
   String _last10kRewardDate = ''; // 10000보 보상 받은 날짜
+  bool _isFirstSensorEvent = true; // 첫 센서 이벤트인지 확인
 
   // 터치 변수
   int _touchCount = 0; // 햄스터 터치 카운트 (상호작용)
@@ -40,11 +41,14 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this); // 앱 생명주기 옵저버 등록
 
-    // Provider에서 초기 햄스터 상태 읽어오기 (fatLevel 기반)
+    // Provider에서 초기 햄스터 상태 및 걸음수 읽어오기
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final fatLevel = context.read<UserProvider>().fatLevel;
+      final userProvider = context.read<UserProvider>();
+      final fatLevel = userProvider.fatLevel;
+      final todaySteps = userProvider.todaySteps; // 저장된 오늘 걸음수 복원
       setState(() {
         _hamsterState = HamsterState.values[fatLevel];
+        _steps = todaySteps; // 걸음수 복원
       });
     });
 
@@ -148,7 +152,19 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
         setState(() {
           // 오늘 걸음수 계산 (센서값 - 자정 기준점)
-          _steps = userProvider.getTodaySteps(event.steps);
+          final calculatedSteps = userProvider.getTodaySteps(event.steps);
+
+          // 첫 센서 이벤트인 경우: 복원된 걸음수와 계산된 걸음수 중 더 큰 값 사용
+          // (복원된 걸음수가 0보다 크면 그것을 우선 사용)
+          if (_isFirstSensorEvent) {
+            final restoredSteps = userProvider.todaySteps;
+            _steps = restoredSteps > calculatedSteps
+                ? restoredSteps
+                : calculatedSteps;
+            _isFirstSensorEvent = false;
+          } else {
+            _steps = calculatedSteps;
+          }
 
           // 햄스터 상태는 fatLevel에서 가져옴 (연속 미달 일수 기반)
           _hamsterState = HamsterState.values[userProvider.fatLevel];
